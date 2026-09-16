@@ -59,8 +59,14 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-dvh bg-canvas selection:bg-brand/20 overflow-x-hidden">
-      {/* Premium ambient glow background */}
-      <div className="absolute inset-0 -z-10 h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(47,107,255,0.15),rgba(255,255,255,0))]"></div>
+      {/* Premium ambient background */}
+      <div className="absolute inset-0 -z-10 h-[110vh] w-full overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center bg-no-repeat opacity-60"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(47,107,255,0.15),rgba(255,255,255,0))] mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-b from-canvas/10 via-canvas/60 to-canvas" />
+      </div>
       
       {/* Header */}
       <header className="mx-auto flex max-w-content items-center justify-between px-6 py-6 md:px-8">
