@@ -16,7 +16,7 @@ export function CivoraLogo({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <img
-        src="/logo.jpg"
+        src="/logo.png"
         alt="Civora"
         width={size}
         height={size}
