@@ -1,0 +1,243 @@
+// Reference relational schema for Civora.
+//
+// The demo runtime persists to a JSON file store (src/lib/db/store.ts) shaped
+// exactly like this model, so the app runs with zero infrastructure. To move
+// to PostgreSQL: `npm i prisma @prisma/client`, run `prisma migrate dev`, and
+// swap the read/write helpers in store.ts for Prisma queries — domain logic,
+// API routes and UI stay unchanged.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PrivacyMode {
+  anonymous
+  confidential
+  identified
+}
+
+enum VerificationState {
+  unverified
+  partially_verified
+  documented
+  conflicting
+  resolved
+}
+
+enum ResponseState {
+  not_assigned
+  received
+  acknowledged
+  in_progress
+  action_recorded
+  closed
+}
+
+enum CaseCategory {
+  safety
+  community
+  service
+  infrastructure
+  dispute
+  other
+}
+
+enum CasePriority {
+  standard
+  elevated
+  urgent
+}
+
+enum EvidenceKind {
+  photo
+  video
+  document
+  report
+  official
+  note
+}
+
+enum EvidenceSourceType {
+  primary
+  corroborating
+  official
+  citizen
+}
+
+enum EventType {
+  REPORT_SUBMITTED
+  EVIDENCE_ADDED
+  CORROBORATION_RECEIVED
+  VERIFICATION_UPDATED
+  CASE_ASSIGNED
+  CASE_ACKNOWLEDGED
+  RESPONSE_IN_PROGRESS
+  INFO_REQUESTED
+  PUBLIC_UPDATE_ADDED
+  ACTION_RECORDED
+  UPDATE_REQUESTED
+  CASE_CLOSED
+}
+
+enum Visibility {
+  public
+  restricted
+}
+
+enum Role {
+  citizen
+  responder
+  admin
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  role      Role     @default(citizen)
+  orgId     String?
+  org       Organization? @relation(fields: [orgId], references: [id])
+  reports   Report[]
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  contactEmail String?
+  createdAt   DateTime @default(now())
+  users       User[]
+  cases       Case[]
+}
+
+model Case {
+  id                String      @id @default(cuid()) // internal id — never exposed
+  publicCaseId      String      @unique // e.g. "CS-1042" — the only id shown anywhere
+  title             String
+  description       String
+  category          CaseCategory
+  locationGeneral   String?
+  lat               Float?
+  lng               Float?
+  incidentAt        DateTime
+  privacyMode       PrivacyMode
+  verification      VerificationState @default(unverified)
+  response          ResponseState     @default(received)
+  priority          CasePriority      @default(standard)
+  assignedOrgId     String?
+  assignedOrg       Organization? @relation(fields: [assignedOrgId], references: [id])
+  nextUpdateAt      DateTime?
+  awaitingReporter  Boolean       @default(false)
+  disputePathway    Boolean       @default(false)
+  publicVisible     Boolean       @default(true)
+  known             String[] // "what we know" bullet list
+  uncertain         String[] // "what remains uncertain" bullet list
+  trackingTokenHash String? // SHA-256 of the reporter's tracking token
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  resolvedAt        DateTime?
+
+  reports  Report[]
+  evidence CaseEvidence[]
+  events   CaseEvent[]
+  updates  CaseUpdate[]
+  notes    InternalNote[]
+  assignments CaseAssignment[]
+}
+
+model Report {
+  id          String     @id @default(cuid())
+  caseId      String
+  case        Case       @relation(fields: [caseId], references: [id])
+  reporterId  String? // null for anonymous
+  reporter    User?      @relation(fields: [reporterId], references: [id])
+  role        String // "initial" | "corroborating"
+  privacyMode PrivacyMode
+  reporterContact String? // PRIVATE reporter data — responder views only
+  areaNote    String?
+  receivedAt  DateTime   @default(now())
+  @@index([caseId])
+}
+
+model Evidence {
+  id            String            @id @default(cuid())
+  kind          EvidenceKind
+  title         String
+  sourceType    EvidenceSourceType
+  submittedByLabel String // privacy-aware label, never raw identity
+  excerpt       String?
+  relationship  String // relationship to the claim
+  fileName      String?
+  mimeType      String?
+  sizeBytes     Int?
+  checksum      String? // SHA-256 of content
+  storageKey    String? // object-storage key (S3/MinIO/local in demo)
+  sourceRef     String? // citation for official/primary sources
+  publicVisible Boolean           @default(true)
+  submittedAt   DateTime          @default(now())
+
+  cases CaseEvidence[]
+}
+
+model CaseEvidence {
+  caseId     String
+  case       Case    @relation(fields: [caseId], references: [id])
+  evidenceId String
+  evidence   Evidence @relation(fields: [evidenceId], references: [id])
+  addedAt    DateTime @default(now())
+  @@id([caseId, evidenceId])
+}
+
+model CaseEvent {
+  id         String     @id @default(cuid())
+  caseId     String
+  case       Case       @relation(fields: [caseId], references: [id])
+  type       EventType
+  actor      String
+  visibility Visibility @default(public)
+  title      String
+  detail     String?
+  at         DateTime   @default(now())
+  @@index([caseId, at])
+}
+
+model CaseUpdate {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  authorLabel String
+  body        String
+  at          DateTime @default(now())
+  @@index([caseId, at])
+}
+
+model InternalNote {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  authorLabel String
+  body        String
+  at          DateTime @default(now())
+}
+
+model CaseAssignment {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+  assignedBy String
+  assignedAt DateTime @default(now())
+  active     Boolean  @default(true)
+}
+
+model PublicCaseView {
+  id        String   @id @default(cuid())
+  caseId    String
+  viewedAt  DateTime @default(now())
+  @@index([caseId])
+}

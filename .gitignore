@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+data/civora-db.json
+data/uploads
+.env*.local
+*.tsbuildinfo
+.DS_Store

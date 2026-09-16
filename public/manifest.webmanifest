@@ -1,0 +1,17 @@
+{
+  "name": "Civora",
+  "short_name": "Civora",
+  "description": "Report safely. Verify carefully. Respond together.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#F4F4F1",
+  "theme_color": "#F4F4F1",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

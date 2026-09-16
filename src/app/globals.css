@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(47, 107, 255, 0.18);
+  }
+
+  /* Visible, consistent keyboard focus everywhere */
+  :focus-visible {
+    outline: 2px solid #2f6bff;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Calm, restrained motion — disabled for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  dialog::backdrop {
+    background: rgba(17, 17, 17, 0.42);
+    backdrop-filter: blur(3px);
+  }
+
+  dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: 100vw;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-surface shadow-card;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+
+  .meta-label {
+    @apply text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-soft;
+  }
+
+  .field {
+    @apply w-full rounded-field border border-line bg-surface px-4 py-3 text-[15px] text-ink placeholder:text-ink-soft/70 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15;
+  }
+
+  .press {
+    @apply transition-all duration-150 active:scale-[0.985];
+  }
+
+  /* bottom sheet on mobile, centered dialog on desktop */
+  .modal-card {
+    @apply w-full max-w-xl rounded-t-container bg-surface p-6 shadow-raise md:rounded-container;
+  }
+
+  .timeline-rail {
+    @apply absolute left-[15px] top-8 bottom-0 w-px bg-line;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
