@@ -8,7 +8,7 @@ import { buildSeed } from "./seed-data";
 // model in prisma/schema.prisma. Swap `readDb`/`writeDb` for Prisma queries to
 // move to PostgreSQL without touching domain code or UI.
 
-const ROOT = process.cwd();
+const ROOT = process.env.VERCEL ? "/tmp" : process.cwd();
 const DATA_DIR = process.env.DATA_DIR || "data";
 const DB_PATH = path.join(ROOT, DATA_DIR, "civora-db.json");
 const UPLOAD_DIR = path.join(ROOT, DATA_DIR, "uploads");
