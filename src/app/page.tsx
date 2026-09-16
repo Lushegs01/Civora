@@ -62,7 +62,8 @@ export default function LandingPage() {
       {/* Premium ambient background */}
       <div className="absolute inset-0 -z-10 h-[110vh] w-full overflow-hidden">
         <div 
-          className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center bg-no-repeat opacity-60"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+          style={{ backgroundImage: "url('/hero-bg.jpg')" }}
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(47,107,255,0.15),rgba(255,255,255,0))] mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-b from-canvas/10 via-canvas/60 to-canvas" />
