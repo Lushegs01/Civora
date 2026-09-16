@@ -274,7 +274,7 @@ export default function LandingPage() {
       <footer className="border-t border-line/10 bg-ink">
         <div className="mx-auto flex max-w-content flex-col gap-6 px-4 py-12 text-[15px] text-white/50 md:flex-row md:items-center md:justify-between md:px-8">
           <div className="flex items-center gap-3 text-white">
-            <CivoraLogo size={28} />
+            <CivoraLogo size={28} dark={true} />
           </div>
           <p>Report safely. Verify carefully. Respond together.</p>
           <div className="flex gap-6">

@@ -37,17 +37,7 @@ export function MobileBottomNav() {
               reportActive ? "bg-brand-deep" : "bg-ink"
             )}
           >
-            <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
-              <rect width="32" height="32" rx="9" fill="transparent" />
-              <path
-                d="M22.5 9.5a9 9 0 1 0 0 13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <circle cx="23.5" cy="16" r="3" fill="currentColor" className="text-brand-soft" />
-            </svg>
+            <CivoraLogo size={22} withWordmark={false} dark={true} />
             <span className="mt-0.5 text-[10px] font-semibold">Report</span>
           </Link>
         </div>
