@@ -28,6 +28,7 @@ export function CivoraLogo({
           width: size,
           height: size,
           objectFit: "cover",
+          transform: "scale(1.5)",
           filter: dark ? "invert(1) contrast(1.2)" : undefined
         }}
       />
