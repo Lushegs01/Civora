@@ -23,58 +23,31 @@ const TRUST = [
     icon: "eye-off",
     title: "Private by default",
     body: "Report anonymously or confidentially. Reporter identity is never public.",
+    className: "md:col-span-2 md:row-span-2",
     diagram: (
-      <svg viewBox="0 0 120 56" className="h-14 w-full" aria-hidden="true">
-        <rect x="8" y="12" width="60" height="32" rx="10" className="fill-muted" />
-        <circle cx="24" cy="28" r="7" className="fill-surface stroke-ink-soft" strokeWidth="1.6" />
-        <path d="M38 22h22M38 34h16" className="stroke-ink-soft" strokeWidth="2" strokeLinecap="round" />
-        <rect x="78" y="18" width="34" height="20" rx="8" className="fill-surface stroke-line" />
-        <path d="M85 28h4M93 28h12" className="stroke-ink-soft" strokeWidth="2" strokeLinecap="round" />
-        <text x="95" y="15" className="fill-ink-soft" fontSize="7">hidden</text>
-      </svg>
+      <div className="absolute -right-4 -top-4 opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-100 bg-brand/20 h-40 w-40 rounded-full" />
     )
   },
   {
     icon: "link",
     title: "Evidence-linked",
     body: "Every claim stays connected to its source, with checksums recorded.",
-    diagram: (
-      <svg viewBox="0 0 120 56" className="h-14 w-full" aria-hidden="true">
-        <circle cx="20" cy="28" r="8" className="fill-brand-soft stroke-brand" strokeWidth="1.6" />
-        <circle cx="60" cy="28" r="8" className="fill-surface stroke-line" strokeWidth="1.6" />
-        <circle cx="100" cy="28" r="8" className="fill-surface stroke-line" strokeWidth="1.6" />
-        <path d="M28 28h24M68 28h24" className="stroke-ink-soft" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" />
-        <path d="M17 28h6M57 28h6M97 28h6" className="stroke-ink-soft" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    )
+    className: "md:col-span-1 md:row-span-1",
+    diagram: null
   },
   {
     icon: "history",
     title: "Transparent status",
-    body: "Reported ≠ verified ≠ responded. Each state stays distinct, in public.",
-    diagram: (
-      <svg viewBox="0 0 120 56" className="h-14 w-full" aria-hidden="true">
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i}>
-            <circle cx={22 + i * 26} cy="28" r={i === 0 ? 8 : 6.5} className={i === 0 ? "fill-ink" : i === 3 ? "fill-surface stroke-line" : "fill-brand-soft stroke-brand"} />
-            {i < 3 && <path d={`M${30 + i * 26} 28h${10}`} className="stroke-ink-soft" strokeWidth="2" strokeLinecap="round" />}
-          </g>
-        ))}
-      </svg>
-    )
+    body: "Reported ≠ verified ≠ responded. Distinct states.",
+    className: "md:col-span-1 md:row-span-1",
+    diagram: null
   },
   {
     icon: "arrow-right",
     title: "Action-oriented",
     body: "Every case ends with a concrete next step — never a dead end.",
-    diagram: (
-      <svg viewBox="0 0 120 56" className="h-14 w-full" aria-hidden="true">
-        <rect x="10" y="18" width="52" height="20" rx="10" className="fill-surface stroke-line" />
-        <path d="M20 28h30" className="stroke-ink-soft" strokeWidth="2" strokeLinecap="round" />
-        <rect x="70" y="18" width="40" height="20" rx="10" className="fill-brand-soft stroke-brand" />
-        <path d="M80 28h18m-5-4 5 4-5 4" className="stroke-brand-deep" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      </svg>
-    )
+    className: "md:col-span-2 md:row-span-1",
+    diagram: null
   }
 ];
 
@@ -85,228 +58,229 @@ export default function LandingPage() {
   const row = demo ? publicCaseRow(db, demo) : null;
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh bg-canvas selection:bg-brand/20 overflow-x-hidden">
+      {/* Premium ambient glow background */}
+      <div className="absolute inset-0 -z-10 h-screen w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(47,107,255,0.15),rgba(255,255,255,0))]"></div>
+      
       {/* Header */}
-      <header className="mx-auto flex max-w-content items-center justify-between px-4 py-5 md:px-8">
+      <header className="mx-auto flex max-w-content items-center justify-between px-6 py-6 md:px-8">
         <CivoraLogo size={34} />
-        <div className="flex items-center gap-2">
-          <Button href="/responder" variant="ghost" size="sm" className="hidden sm:inline-flex">
+        <div className="flex items-center gap-3">
+          <Button href="/responder" variant="ghost" size="sm" className="hidden sm:inline-flex text-[14px]">
             Responder demo
           </Button>
-          <Button href="/home" size="sm">
+          <Button href="/home" size="sm" className="rounded-full shadow-lg shadow-brand/20 transition-transform hover:scale-105">
             Open the app
           </Button>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-content px-4 pb-14 pt-8 md:px-8 md:pb-20 md:pt-16">
-        <div className="grid items-center gap-10 md:grid-cols-2">
-          <div>
-            <span className="chip bg-brand-soft text-brand-deep">
-              <Icon name="shield-check" className="h-3.5 w-3.5" />
-              Civic incident platform
+      {/* Hero Section */}
+      <section className="relative mx-auto flex max-w-content flex-col items-center justify-center px-4 pt-20 pb-16 md:pt-32 md:pb-24 text-center">
+        <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/50 px-4 py-1.5 text-sm font-medium text-ink-soft backdrop-blur-md shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand"></span>
             </span>
-            <h1 className="text-balance mt-4 text-[34px] font-bold leading-[1.12] tracking-[-0.02em] text-ink md:text-[44px]">
-              Report safely.
-              <br />
-              Verify carefully.
-              <br />
-              Respond together.
-            </h1>
-            <p className="mt-5 max-w-md text-[15.5px] leading-relaxed text-ink-soft md:text-base">
-              Civora connects civic reports, evidence, response, and accountability in one traceable
-              workflow — so communities know what's happening, what's verified, and what happens next.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button href="/report" size="lg" icon="plus">
-                Report an issue
-              </Button>
-              <Button href="/community" size="lg" variant="secondary">
-                Explore cases
-              </Button>
-            </div>
-            <p className="mt-6 text-[13px] leading-relaxed text-ink-soft">
-              Know what's happening. Know what's verified. Know what happens next.
-            </p>
-          </div>
-
-          {/* Case example — the product in one card */}
-          {demo && demoView && row && (
-            <div className="md:pl-6">
-              <p className="meta-label mb-3">A Civora case</p>
-              <Link href="/community/CS-1042" className="press card block px-6 py-6 hover:shadow-raise">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[13px] font-semibold text-ink">CS-1042</span>
-                  <span className="chip bg-danger-soft text-danger">
-                    <Icon name="shield-alert" className="h-3 w-3" /> Safety
-                  </span>
-                </div>
-                <h2 className="mt-2.5 text-xl font-semibold leading-snug tracking-[-0.01em] text-ink">
-                  {demo.title}
-                </h2>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <VerificationBadge state={demo.verification} />
-                  <ResponseBadge state={demo.response} />
-                </div>
-                <div className="mt-5 space-y-2.5 border-t border-line pt-4">
-                  {demoView.case.known.slice(0, 2).map((k, i) => (
-                    <p key={i} className="flex gap-2 text-[13px] leading-relaxed text-ink-soft">
-                      <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />
-                      {k}
-                    </p>
-                  ))}
-                  <p className="flex gap-2 text-[13px] leading-relaxed text-ink-soft">
-                    <Icon name="triangle-alert" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
-                    {demoView.case.uncertain[0]}
-                  </p>
-                </div>
-                <p className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-deep">
-                  See what happens next <Icon name="arrow-right" className="h-3.5 w-3.5" />
-                </p>
-              </Link>
-              <p className="mt-2.5 px-1 text-xs text-ink-soft">
-                Fictional demo case for evaluation.
-              </p>
-            </div>
-          )}
+            <span className="ml-2">Civic incident platform</span>
+          </span>
         </div>
-      </section>
-
-      {/* The problem */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-content px-4 py-14 md:px-8 md:py-20">
-          <div className="grid gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">
-                Civic information is fragmented
-              </h2>
-              <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
-                People report problems through word-of-mouth, chats and phone calls. The result:
-                duplicated reports, unverified claims, unclear responsibility — and rumours moving
-                faster than facts.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                "Duplicate or conflicting reports",
-                "Unsafe reporting channels",
-                "Unclear responsibility",
-                "No visibility into response",
-                "Rumours replacing verified updates",
-                "People not knowing what's next"
-              ].map((p) => (
-                <p key={p} className="flex items-start gap-2.5 rounded-2xl bg-muted px-4 py-3.5 text-[13.5px] font-medium text-ink">
-                  <Icon name="circle-alert" className="mt-0.5 h-4 w-4 shrink-0 text-ink-soft" />
-                  {p}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="mx-auto max-w-content px-4 py-14 md:px-8 md:py-20">
-        <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">
-          One traceable lifecycle
-        </h2>
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink-soft">
-          Every case moves through the same loop. Reported never collapses into verified; verified
-          never collapses into resolved.
+        
+        <h1 className="text-balance mt-8 max-w-4xl text-5xl font-extrabold tracking-tighter text-ink md:text-7xl lg:text-[80px] leading-[1.05] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
+          Report safely.<br />
+          <span className="bg-gradient-to-r from-brand via-info to-brand bg-clip-text text-transparent">Verify carefully.</span><br />
+          Respond together.
+        </h1>
+        
+        <p className="mt-8 max-w-2xl text-[17px] leading-relaxed text-ink-soft md:text-xl animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 fill-mode-both text-balance">
+          Civora connects civic reports, evidence, response, and accountability in one traceable
+          workflow — so communities know what's happening and what happens next.
         </p>
-        <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {LOOP.map((s, i) => (
-            <li key={s.label} className="card px-5 py-4">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink font-mono text-[11px] font-semibold text-white">
-                  {i + 1}
-                </span>
-                <h3 className="text-[15px] font-semibold text-ink">{s.label}</h3>
-              </div>
-              <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">{s.detail}</p>
-            </li>
-          ))}
-        </ol>
+        
+        <div className="mt-10 flex flex-wrap justify-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-500 fill-mode-both">
+          <Button href="/report" size="lg" icon="plus" className="rounded-full px-8 shadow-xl shadow-brand/20 transition-all hover:scale-105 hover:shadow-brand/30">
+            Report an issue
+          </Button>
+          <Button href="/community" size="lg" variant="secondary" className="rounded-full px-8 bg-surface/80 backdrop-blur transition-all hover:bg-surface">
+            Explore cases
+          </Button>
+        </div>
       </section>
 
-      {/* Trust by design */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-content px-4 py-14 md:px-8 md:py-20">
-          <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">
-            Trust by design
-          </h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {TRUST.map((t) => (
-              <div key={t.title} className="card px-5 py-5">
+      {/* Floating Case Example Component */}
+      {demo && demoView && row && (
+        <section className="mx-auto max-w-3xl px-4 pb-20 md:pb-32 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700 fill-mode-both">
+          <div className="relative group">
+            <div className="absolute -inset-1 rounded-[32px] bg-gradient-to-b from-brand/20 to-transparent opacity-50 blur-lg transition duration-500 group-hover:opacity-75"></div>
+            <Link href="/community/CS-1042" className="relative block rounded-[28px] border border-line/80 bg-surface/80 p-8 backdrop-blur-xl shadow-2xl transition-transform duration-500 hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-sm font-semibold tracking-wide text-ink/70">CS-1042</span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-danger/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-danger">
+                  <Icon name="shield-alert" className="h-3.5 w-3.5" /> Safety
+                </span>
+              </div>
+              <h2 className="mt-4 text-2xl font-bold leading-tight tracking-tight text-ink md:text-3xl">
+                {demo.title}
+              </h2>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <VerificationBadge state={demo.verification} className="bg-surface border border-line shadow-sm" />
+                <ResponseBadge state={demo.response} className="bg-surface border border-line shadow-sm" />
+              </div>
+              <div className="mt-8 space-y-4 border-t border-line/60 pt-6">
+                {demoView.case.known.slice(0, 2).map((k, i) => (
+                  <p key={i} className="flex items-start gap-3 text-[15px] leading-relaxed text-ink-soft">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
+                      <Icon name="check" className="h-3 w-3" />
+                    </span>
+                    {k}
+                  </p>
+                ))}
+                <p className="flex items-start gap-3 text-[15px] leading-relaxed text-ink-soft">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning/15 text-warning">
+                    <Icon name="triangle-alert" className="h-3 w-3" />
+                  </span>
+                  {demoView.case.uncertain[0]}
+                </p>
+              </div>
+              <div className="mt-8 flex items-center justify-between border-t border-line/60 pt-6">
+                <p className="text-sm text-ink-soft">Fictional demo case for evaluation.</p>
+                <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand transition-colors group-hover:text-brand-deep">
+                  See full details <Icon name="arrow-right" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </p>
+              </div>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Bento Grid: Trust by Design */}
+      <section className="bg-surface py-24 md:py-32">
+        <div className="mx-auto max-w-content px-4 md:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="text-4xl font-bold tracking-tight text-ink md:text-5xl">
+              Trust by design
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-[17px] text-ink-soft">
+              Civic information is often fragmented and unverified. Civora was built from the ground up to protect privacy, establish ground truth, and demand accountability.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:grid-rows-2">
+            {TRUST.map((t, i) => (
+              <div key={t.title} className={`group relative overflow-hidden rounded-[32px] border border-line bg-canvas/40 p-8 transition-colors hover:bg-muted/50 ${t.className}`}>
                 {t.diagram}
-                <div className="mt-3 flex items-center gap-2">
-                  <Icon name={t.icon} className="h-4 w-4 text-brand-deep" />
-                  <h3 className="text-[15px] font-semibold text-ink">{t.title}</h3>
+                <div className="relative z-10 flex h-full flex-col">
+                  <div className="mb-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-surface shadow-sm border border-line/50">
+                    <Icon name={t.icon} className="h-6 w-6 text-brand" />
+                  </div>
+                  <div className="mt-12">
+                    <h3 className="text-xl font-bold text-ink">{t.title}</h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-ink-soft max-w-[280px]">{t.body}</p>
+                  </div>
                 </div>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">{t.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* The Lifecycle Loop */}
+      <section className="mx-auto max-w-content px-4 py-24 md:px-8 md:py-32">
+        <div className="mb-16 flex flex-col items-center text-center">
+          <h2 className="text-4xl font-bold tracking-tight text-ink md:text-5xl">
+            One traceable lifecycle
+          </h2>
+          <p className="mt-4 max-w-2xl text-[17px] text-ink-soft">
+            Every case moves through the same transparent loop. Reported never collapses into verified; verified never collapses into resolved.
+          </p>
+        </div>
+        
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {LOOP.slice(0, 4).map((s, i) => (
+            <div key={s.label} className="group relative rounded-3xl border border-line bg-surface p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 font-mono text-sm font-bold text-brand">
+                0{i + 1}
+              </div>
+              <h3 className="text-lg font-bold text-ink">{s.label}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">{s.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-3">
+          {LOOP.slice(4).map((s, i) => (
+            <div key={s.label} className="group relative rounded-3xl border border-line bg-surface p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 font-mono text-sm font-bold text-brand">
+                0{i + 5}
+              </div>
+              <h3 className="text-lg font-bold text-ink">{s.label}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">{s.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Built for real conditions + CTA */}
-      <section className="mx-auto max-w-content px-4 py-14 md:px-8 md:py-20">
-        <div className="card overflow-hidden">
-          <div className="grid md:grid-cols-2">
-            <div className="px-6 py-8 md:px-8 md:py-10">
-              <h2 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
+      <section className="bg-ink text-white">
+        <div className="mx-auto max-w-content px-4 py-24 md:px-8 md:py-32">
+          <div className="grid gap-16 md:grid-cols-2 md:items-center">
+            <div>
+              <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
                 Built for real conditions
               </h2>
-              <ul className="mt-5 space-y-3.5">
+              <ul className="mt-10 space-y-8">
                 {[
                   ["cloud-off", "Works offline", "Drafts are stored on the device and submitted automatically when connection returns."],
                   ["upload", "Low-bandwidth friendly", "Text and status first; photos are compressed before upload."],
-                  ["eye-off", "Privacy controls", "Anonymous, confidential or identified — chosen per report."],
                   ["users", "Neutral by design", "Civora organizes evidence and response. It doesn't judge people."]
                 ].map(([icon, title, body]) => (
-                  <li key={title as string} className="flex gap-3">
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-deep">
-                      <Icon name={icon as string} className="h-4 w-4" />
+                  <li key={title as string} className="flex gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white">
+                      <Icon name={icon as string} className="h-6 w-6" />
                     </span>
                     <div>
-                      <h3 className="text-[14.5px] font-semibold text-ink">{title}</h3>
-                      <p className="mt-0.5 text-[13px] leading-relaxed text-ink-soft">{body}</p>
+                      <h3 className="text-xl font-bold">{title}</h3>
+                      <p className="mt-2 text-[15px] leading-relaxed text-white/70">{body}</p>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="border-t border-line bg-muted/60 px-6 py-8 md:border-l md:border-t-0 md:px-8 md:py-10">
-              <h3 className="text-[17px] font-semibold text-ink">Try the demo</h3>
-              <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-                Three roles, one product. All data is fictional.
+            
+            <div className="rounded-[32px] border border-white/10 bg-white/5 p-8 backdrop-blur-xl md:p-12">
+              <h3 className="text-3xl font-bold">Try the demo</h3>
+              <p className="mt-4 text-[16px] leading-relaxed text-white/70">
+                Experience the platform from three perspectives. All data is entirely fictional.
               </p>
-              <div className="mt-5 space-y-2.5">
-                <Button href="/home" className="w-full" iconRight="arrow-right">
-                  Explore as a citizen
-                </Button>
-                <Button href="/responder" variant="secondary" className="w-full" iconRight="arrow-right">
-                  Open the responder workspace
-                </Button>
-                <Button href="/community" variant="secondary" className="w-full" iconRight="arrow-right">
-                  Browse public cases
-                </Button>
+              <div className="mt-10 flex flex-col gap-4">
+                <Link href="/home" className="group flex items-center justify-between rounded-2xl bg-white px-6 py-5 text-ink transition-transform hover:scale-[1.02]">
+                  <span className="font-bold">Explore as a citizen</span>
+                  <Icon name="arrow-right" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link href="/responder" className="group flex items-center justify-between rounded-2xl border border-white/20 bg-transparent px-6 py-5 transition-colors hover:bg-white/10">
+                  <span className="font-bold">Open responder workspace</span>
+                  <Icon name="arrow-right" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link href="/community" className="group flex items-center justify-between rounded-2xl border border-white/20 bg-transparent px-6 py-5 transition-colors hover:bg-white/10">
+                  <span className="font-bold">Browse public cases</span>
+                  <Icon name="arrow-right" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-content flex-col gap-3 px-4 py-8 text-[13px] text-ink-soft md:flex-row md:items-center md:justify-between md:px-8">
-          <CivoraLogo size={26} />
+      <footer className="border-t border-line/10 bg-ink">
+        <div className="mx-auto flex max-w-content flex-col gap-6 px-4 py-12 text-[15px] text-white/50 md:flex-row md:items-center md:justify-between md:px-8">
+          <div className="flex items-center gap-3 text-white">
+            <CivoraLogo size={28} />
+          </div>
           <p>Report safely. Verify carefully. Respond together.</p>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-ink">Privacy</Link>
-            <Link href="/resources" className="hover:text-ink">Get help</Link>
-            <Link href="/more" className="hover:text-ink">About this demo</Link>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="transition-colors hover:text-white">Privacy</Link>
+            <Link href="/resources" className="transition-colors hover:text-white">Get help</Link>
+            <Link href="/more" className="transition-colors hover:text-white">About this demo</Link>
           </div>
         </div>
       </footer>
