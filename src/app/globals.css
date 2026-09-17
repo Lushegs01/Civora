@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -27,7 +27,7 @@
     border-radius: 6px;
   }
 
-  /* Calm, restrained motion — disabled for users who prefer reduced motion */
+  /* Calm, restrained motion â€” disabled for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -63,49 +63,49 @@
 }
 
 @layer components {
-  /* Core card — restrained depth, clean edge */
+  /* Core card â€” restrained depth, clean edge */
   .card {
     @apply rounded-card border border-line bg-surface;
     box-shadow: 0 1px 3px rgba(17, 17, 17, 0.04), 0 6px 20px -10px rgba(17, 17, 17, 0.10);
   }
 
-  /* Status chip — compact, readable */
+  /* Status chip â€” compact, readable */
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[12px] font-medium leading-tight;
     letter-spacing: 0.008em;
   }
 
-  /* Structural label — quiet authority */
+  /* Structural label â€” quiet authority */
   .meta-label {
     @apply text-[10.5px] font-semibold uppercase tracking-[0.10em];
     color: rgba(111, 111, 107, 0.75);
   }
 
-  /* Form field — tactile, clearly interactive */
+  /* Form field â€” tactile, clearly interactive */
   .field {
     @apply w-full rounded-field border border-line bg-surface px-4 py-3 text-[15px] text-ink
            placeholder:text-ink-soft/50 transition-colors duration-150
-           focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/10;
+           focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/10;
   }
 
-  /* Press — crisp physical feedback */
+  /* Press â€” crisp physical feedback */
   .press {
     @apply transition-all duration-100 active:scale-[0.982] active:opacity-90;
   }
 
-  /* Modal card — bottom sheet on mobile, centered dialog on desktop */
+  /* Modal card â€” bottom sheet on mobile, centered dialog on desktop */
   .modal-card {
     @apply w-full max-w-xl max-h-[90dvh] overflow-y-auto rounded-t-container bg-surface p-6 md:rounded-container;
     box-shadow: 0 8px 40px -8px rgba(17,17,17,0.24), 0 2px 6px rgba(17,17,17,0.06);
   }
 
-  /* Timeline rail — gradient fade towards the bottom */
+  /* Timeline rail â€” gradient fade towards the bottom */
   .timeline-rail {
     @apply absolute left-[15px] top-10 bottom-0 w-px;
     background: linear-gradient(to bottom, rgba(17,17,17,0.14) 0%, rgba(17,17,17,0.04) 80%, transparent 100%);
   }
 
-  /* Scroll-hide — for horizontal strips */
+  /* Scroll-hide â€” for horizontal strips */
   .scroll-hide {
     scrollbar-width: none;
     -ms-overflow-style: none;

@@ -84,7 +84,7 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
           <EmptyState
             icon="search"
             title="No cases match"
-            description={
+            body={
               query
                 ? `Nothing matches "${query}". Try a case ID like CS-1042, or clear the filters.`
                 : "No public cases in this filter yet."
@@ -97,3 +97,4 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
     </div>
   );
 }
+

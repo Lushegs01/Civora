@@ -5,15 +5,14 @@ import { Button } from "@/components/ui/Button";
 interface EmptyStateProps {
   icon: string;
   title: string;
-  description: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
+  body: string;
+  actionLabel?: string;
+  actionHref?: string;
+  actionOnClick?: () => void;
   className?: string;
 }
 
-export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({ icon, title, body, actionLabel, actionHref, actionOnClick, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
@@ -25,11 +24,11 @@ export function EmptyState({ icon, title, description, action, className }: Empt
         <Icon name={icon} className="h-6 w-6" />
       </div>
       <h3 className="mt-4 text-[16px] font-semibold tracking-[-0.01em] text-ink">{title}</h3>
-      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{description}</p>
-      {action && (
+      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{body}</p>
+      {actionLabel && (actionHref || actionOnClick) && (
         <div className="mt-6">
-          <Button variant="secondary" onClick={action.onClick}>
-            {action.label}
+          <Button variant="secondary" href={actionHref} onClick={actionOnClick}>
+            {actionLabel}
           </Button>
         </div>
       )}
@@ -39,12 +38,12 @@ export function EmptyState({ icon, title, description, action, className }: Empt
 
 export function ErrorState({
   title = "Something went wrong",
-  description = "We had trouble loading this data. Please try again.",
+  body = "We had trouble loading this data. Please try again.",
   onRetry,
   className
 }: {
   title?: string;
-  description?: string;
+  body?: string;
   onRetry?: () => void;
   className?: string;
 }) {
@@ -59,7 +58,7 @@ export function ErrorState({
         <Icon name="triangle-alert" className="h-6 w-6" />
       </div>
       <h3 className="mt-4 text-[16px] font-semibold tracking-[-0.01em] text-ink">{title}</h3>
-      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{description}</p>
+      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{body}</p>
       {onRetry && (
         <div className="mt-6">
           <Button variant="secondary" onClick={onRetry}>
