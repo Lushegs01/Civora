@@ -6,14 +6,30 @@ import { ServiceWorkerRegister } from "@/components/system/ServiceWorkerRegister
 import { OutboxSync } from "@/components/system/OutboxSync";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
     default: "Civora — Report safely. Verify carefully. Respond together.",
     template: "%s · Civora"
   },
   description:
-    "Civora is a trusted civic incident platform: report community problems safely, preserve evidence, coordinate response, and transparently track what happens next.",
+    "Civora connects civic reports, evidence, response, and accountability in one traceable workflow.",
   manifest: "/manifest.webmanifest",
   applicationName: "Civora",
+  openGraph: {
+    title: "Civora — Report safely. Verify carefully. Respond together.",
+    description:
+      "Civora connects civic reports, evidence, response, and accountability in one traceable workflow.",
+    siteName: "Civora",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Civora"
+      }
+    ]
+  },
   robots: { index: false } // demo build — keep out of search indexes
 };
 

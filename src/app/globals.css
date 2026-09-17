@@ -87,4 +87,58 @@
   .text-balance {
     text-wrap: balance;
   }
+  .landing-subtle-grid {
+    background-image:
+      linear-gradient(rgba(17, 17, 17, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 17, 17, 0.055) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(to bottom, black, transparent 72%);
+  }
+  .landing-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .landing-delay-1 {
+    animation-delay: 140ms;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .landing-reveal {
+      animation: landing-fade-up 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    .landing-drift {
+      animation: landing-drift 8s ease-in-out infinite alternate;
+    }
+    .landing-drift:nth-child(2) {
+      animation-delay: -1.8s;
+    }
+    .landing-drift:nth-child(3) {
+      animation-delay: -3.2s;
+    }
+    .landing-drift:nth-child(4) {
+      animation-delay: -4.4s;
+    }
+  }
+
+  @keyframes landing-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes landing-drift {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 -7px;
+    }
+  }
 }
