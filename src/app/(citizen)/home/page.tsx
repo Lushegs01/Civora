@@ -5,7 +5,6 @@ import { TopBar } from "@/components/shell/TopBar";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { YourCases } from "@/components/home/YourCases";
-import { CheckCase } from "@/components/home/CheckCase";
 
 export const dynamic = "force-dynamic";
 
@@ -46,22 +45,34 @@ export default function HomePage() {
 
       <main className="mx-auto max-w-content px-4 md:px-8">
         {/* Hero */}
-        <section className="pb-10 pt-8 md:pb-14 md:pt-12">
-          <h1 className="text-balance text-[28px] font-bold leading-[1.12] tracking-[-0.03em] text-ink md:text-[34px]">
-            Know what's happening.
-            <br />
-            Know what's verified.
-            <br />
-            Know what happens next.
+        <section className="relative flex flex-col items-center text-center pb-14 pt-10 md:pb-20 md:pt-16">
+          {/* Subtle radial glow background behind hero */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[100px]" aria-hidden="true" />
+          
+          <div className="mb-6 flex items-center justify-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-[11px] font-medium text-ink-soft shadow-sm backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+              Civic incident platform
+            </div>
+          </div>
+
+          <h1 className="text-balance text-[40px] font-extrabold leading-[1.05] tracking-[-0.04em] text-ink md:text-[56px] lg:text-[64px]">
+            Report safely.<br />
+            <span className="text-brand">Verify carefully.</span><br />
+            Respond together.
           </h1>
-          <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-soft">
-            Report civic issues safely, follow the evidence, and track what happens next.
+          
+          <p className="mx-auto mt-6 max-w-[600px] text-[15px] leading-relaxed text-ink-soft md:text-[17px]">
+            Civora connects civic reports, evidence, response, and accountability in one traceable workflow — so communities know what's happening and what happens next.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Button href="/report" size="lg" icon="plus">
+          
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Button href="/report" size="lg" className="rounded-full px-7 shadow-lg shadow-brand/10" icon="plus">
               Report an issue
             </Button>
-            <CheckCase />
+            <Button href="/community" size="lg" variant="secondary" className="rounded-full bg-surface/80 px-7 shadow-sm backdrop-blur">
+              Explore cases
+            </Button>
           </div>
         </section>
 
