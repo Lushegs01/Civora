@@ -348,7 +348,7 @@ export function ReportWizard() {
       </main>
 
       {/* sticky action bar */}
-      <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 backdrop-blur md:static md:border-0 md:bg-transparent md:backdrop-blur-none">
+      <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas/95 backdrop-blur shadow-nav md:static md:border-0 md:bg-transparent md:backdrop-blur-none md:shadow-none">
         <div className="mx-auto max-w-content px-4 py-3.5 md:px-0 md:pb-10">
           {stepError && (
             <p role="alert" className="mb-2.5 text-[13px] font-medium text-danger">

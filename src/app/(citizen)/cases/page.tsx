@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { CaseCardRow } from "@/components/case/CaseCard";
 import { CaseCard } from "@/components/case/CaseCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { TopBar } from "@/components/shell/TopBar";
 import { getTokens } from "@/lib/offline/db";
 
 export default function MyCasesPage() {
@@ -37,7 +38,9 @@ export default function MyCasesPage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-content px-4 pb-16 pt-6 md:px-8 md:pt-10">
+    <>
+      <TopBar />
+      <main className="mx-auto max-w-content px-4 pb-16 pt-5 md:px-8 md:pt-10">
       <h1 className="text-[26px] font-bold tracking-[-0.02em] text-ink md:text-[30px]">My cases</h1>
       <p className="mt-2 max-w-lg text-[14.5px] leading-relaxed text-ink-soft">
         Cases submitted or tracked on this device. Tracking is device-local — nothing here is public.
@@ -70,5 +73,6 @@ export default function MyCasesPage() {
         )}
       </div>
     </main>
+    </>
   );
 }

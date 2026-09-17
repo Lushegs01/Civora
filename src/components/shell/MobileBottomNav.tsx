@@ -14,7 +14,10 @@ const ITEMS = [
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const reportActive = pathname.startsWith("/report");
+
+  // Hide the global bottom navigation bar on /report so the wizard's
+  // dedicated sticky action bar ("Continue", "Back", "Submit") is clearly visible.
+  if (pathname.startsWith("/report")) return null;
 
   return (
     <nav
@@ -31,11 +34,7 @@ export function MobileBottomNav() {
           <Link
             href="/report"
             aria-label="Report an issue"
-            aria-current={reportActive ? "page" : undefined}
-            className={cn(
-              "press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full text-white shadow-raise",
-              reportActive ? "bg-brand-deep" : "bg-ink"
-            )}
+            className="press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-ink text-white shadow-raise"
           >
             <CivoraLogo size={22} withWordmark={false} dark={true} />
             <span className="mt-0.5 text-[10px] font-semibold">Report</span>

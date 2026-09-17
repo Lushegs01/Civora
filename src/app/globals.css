@@ -76,7 +76,7 @@
 
   /* bottom sheet on mobile, centered dialog on desktop */
   .modal-card {
-    @apply w-full max-w-xl rounded-t-container bg-surface p-6 shadow-raise md:rounded-container;
+    @apply w-full max-w-xl max-h-[88dvh] overflow-y-auto rounded-t-container bg-surface p-6 shadow-raise md:rounded-container;
   }
 
   .timeline-rail {
