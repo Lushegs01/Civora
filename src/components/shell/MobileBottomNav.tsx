@@ -24,13 +24,13 @@ export function MobileBottomNav() {
       aria-label="Primary"
       className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur md:hidden"
     >
-      <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2 pb-1.5 pt-1.5">
+      <div className="grid w-full grid-cols-5 items-end px-1 pb-1.5 pt-1.5">
         {ITEMS.slice(0, 2).map((item) => (
           <NavItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
         ))}
 
         {/* Report — visually prominent, centred, still calm */}
-        <div className="relative flex justify-center">
+        <div className="relative flex w-full justify-center">
           <Link
             href="/report"
             aria-label="Report an issue"
@@ -61,8 +61,8 @@ function NavItem({
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "press flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium",
-        active ? "text-ink" : "text-ink-soft"
+        "press flex w-full min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium",
+        active ? "text-ink font-semibold" : "text-ink-soft"
       )}
     >
       <NavGlyph name={item.icon} active={active} />
