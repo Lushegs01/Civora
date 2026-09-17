@@ -67,13 +67,13 @@ export function Button({
   if (href && !disabled) {
     if (external) {
       return (
-        <a href={href} className={classes} target="_blank" rel="noopener noreferrer" {...aria}>
+        <a href={href} className={classes} target="_blank" rel="noopener noreferrer" onClick={onClick} {...aria}>
           {inner}
         </a>
       );
     }
     return (
-      <Link href={href} className={classes} {...aria}>
+      <Link href={href} className={classes} onClick={onClick} {...aria}>
         {inner}
       </Link>
     );

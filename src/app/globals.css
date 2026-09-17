@@ -47,6 +47,10 @@
     background: transparent;
     max-width: 100vw;
   }
+
+  dialog:not([open]) {
+    display: none !important;
+  }
 }
 
 @layer components {
