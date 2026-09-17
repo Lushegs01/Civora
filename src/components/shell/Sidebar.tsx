@@ -1,4 +1,7 @@
+﻿"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CivoraLogo } from "@/components/CivoraLogo";
 import { cn } from "@/lib/utils";
 import { DemoTag } from "@/components/shell/DemoTag";
@@ -17,6 +20,7 @@ const SECONDARY = [
 ] as const;
 
 export function Sidebar({ className }: { className?: string }) {
+  const pathname = usePathname();
   return (
     <aside
       className={cn(
@@ -24,13 +28,13 @@ export function Sidebar({ className }: { className?: string }) {
         className
       )}
     >
-      <Link href="/home" aria-label="Civora home" className="mb-8 px-2">
+      <Link href="/home" aria-label="Civora home" className="mb-7 px-2">
         <CivoraLogo size={34} />
       </Link>
 
       <nav aria-label="Primary" className="flex flex-col gap-1">
         {NAV.map((item) => (
-          <SideLink key={item.href} href={item.href} icon={item.icon}>
+          <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
             {item.label}
           </SideLink>
         ))}
@@ -40,7 +44,7 @@ export function Sidebar({ className }: { className?: string }) {
 
       <nav aria-label="Secondary" className="flex flex-col gap-1">
         {SECONDARY.map((item) => (
-          <SideLink key={item.href} href={item.href} icon={item.icon}>
+          <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
             {item.label}
           </SideLink>
         ))}
@@ -50,7 +54,7 @@ export function Sidebar({ className }: { className?: string }) {
         <DemoTag />
         <Link
           href="/responder"
-          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink-soft hover:bg-muted hover:text-ink"
+          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink-soft hover:bg-muted hover:text-ink transition-colors"
         >
           <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand-soft text-brand-deep">
             <svg width="11" height="11" viewBox="0 0 32 32" aria-hidden="true">
@@ -64,22 +68,25 @@ export function Sidebar({ className }: { className?: string }) {
   );
 }
 
-function SideLink({ href, icon, children }: { href: string; icon: string; children: React.ReactNode }) {
+function SideLink({ href, icon, active, children }: { href: string; icon: string; active?: boolean; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className="press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium text-ink-soft hover:bg-muted hover:text-ink"
+      className={cn(
+        "press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium transition-colors",
+        active ? "bg-muted text-ink font-semibold" : "text-ink-soft hover:bg-muted/50 hover:text-ink"
+      )}
     >
-      <NavGlyph name={icon} />
+      <NavGlyph name={icon} active={active} />
       {children}
     </Link>
   );
 }
 
-function NavGlyph({ name }: { name: string }) {
-  const common = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+function NavGlyph({ name, active }: { name: string; active?: boolean }) {
+  const common = { fill: "none", stroke: "currentColor", strokeWidth: active ? 2.3 : 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="text-ink-soft">
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className={active ? "text-ink" : "text-ink-soft"}>
       {name === "house" && <path d="M4 11.5 12 4l8 7.5V20h-5.5v-5h-5v5H4z" {...common} />}
       {name === "plus" && <path d="M12 5v14M5 12h14" {...common} />}
       {name === "folder" && <path d="M4 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} />}

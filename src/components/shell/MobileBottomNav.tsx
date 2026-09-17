@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ export function MobileBottomNav() {
             className="press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-ink text-white shadow-raise"
           >
             <CivoraLogo size={22} withWordmark={false} dark={true} />
-            <span className="mt-0.5 text-[10px] font-semibold">Report</span>
+            <span className="mt-0.5 text-[10px] font-bold tracking-[0.02em] uppercase">Report</span>
           </Link>
         </div>
 
@@ -61,12 +61,13 @@ function NavItem({
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "press flex w-full min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium",
-        active ? "text-ink font-semibold" : "text-ink-soft"
+        "press relative flex w-full min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl py-1 text-[11px] transition-colors",
+        active ? "text-ink font-semibold" : "text-ink-soft hover:text-ink/80"
       )}
     >
       <NavGlyph name={item.icon} active={active} />
-      {item.label}
+      <span>{item.label}</span>
+      {active && <span className="absolute bottom-0 h-1 w-1 rounded-full bg-ink" />}
     </Link>
   );
 }
@@ -76,7 +77,7 @@ function NavGlyph({ name, active }: { name: string; active: boolean }) {
   const stroke = active ? 2.4 : 2;
   const common = { fill: "none", stroke: "currentColor", strokeWidth: stroke, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return (
-    <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true" className="mb-0.5">
       {name === "house" && <path d="M4 11.5 12 4l8 7.5V20h-5.5v-5h-5v5H4z" {...common} />}
       {name === "folder" && <path d="M4 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} />}
       {name === "users" && (

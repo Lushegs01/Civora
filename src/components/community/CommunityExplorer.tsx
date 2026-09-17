@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import type { CaseCardRow } from "@/components/case/CaseCard";
@@ -60,7 +60,7 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
         </label>
       </div>
 
-      <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Filter cases">
+      <div className="mt-4 flex gap-1.5 overflow-x-auto scroll-hide pb-1" role="tablist" aria-label="Filter cases">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -68,10 +68,10 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
             aria-selected={filter === f.key}
             onClick={() => setFilter(f.key)}
             className={cn(
-              "press min-h-10 shrink-0 rounded-full border px-4 text-[13.5px] font-medium",
+              "press min-h-10 shrink-0 rounded-full border px-4 text-[13.5px] font-medium transition-colors",
               filter === f.key
                 ? "border-ink bg-ink text-white"
-                : "border-line bg-surface text-ink-soft hover:text-ink"
+                : "border-line bg-surface text-ink-soft hover:border-ink-soft/40 hover:text-ink"
             )}
           >
             {f.label}
@@ -79,12 +79,12 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
         ))}
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 space-y-2.5">
         {filtered.length === 0 ? (
           <EmptyState
             icon="search"
             title="No cases match"
-            body={
+            description={
               query
                 ? `Nothing matches "${query}". Try a case ID like CS-1042, or clear the filters.`
                 : "No public cases in this filter yet."

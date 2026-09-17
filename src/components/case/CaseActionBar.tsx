@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -87,7 +87,7 @@ export function CaseActionBar({
   return (
     <section aria-label="Actions" className="card px-5 py-5">
       <h2 className="meta-label mb-4">What you can do next</h2>
-      <div className="flex flex-wrap gap-2.5">
+      <div className="flex flex-wrap gap-2">
         {isReporter && !closed && (
           <Button icon="paperclip" onClick={() => setShowAddEvidence(true)}>
             Add evidence
@@ -122,7 +122,7 @@ export function CaseActionBar({
       </div>
 
       {message && (
-        <p role="status" className="mt-3.5 rounded-xl bg-muted px-3.5 py-2.5 text-[13px] text-ink">
+        <p role="status" className="mt-4 rounded-2xl border border-line/60 bg-canvas px-4 py-3 text-[13px] leading-relaxed text-ink">
           {message}
         </p>
       )}
@@ -193,11 +193,11 @@ function AddEvidenceDialog({
 
   return (
     <Modal open={open} onClose={onClose} title="Add evidence">
-      <p className="mb-4 text-sm leading-relaxed text-ink-soft">
+      <p className="mb-4 text-[13.5px] leading-relaxed text-ink-soft">
         Anything you add becomes part of case {caseId}'s evidence chain, with its source and checksum
         recorded.
       </p>
-      <div className="space-y-3.5">
+      <div className="space-y-4">
         <div>
           <label htmlFor="evidence-note" className="meta-label mb-1.5 block">
             Short note
@@ -239,7 +239,7 @@ function AddEvidenceDialog({
             Cancel
           </Button>
           <Button onClick={submit} disabled={busy}>
-            {busy ? "Adding…" : "Add to case"}
+            {busy ? "Adding..." : "Add to case"}
           </Button>
         </div>
       </div>

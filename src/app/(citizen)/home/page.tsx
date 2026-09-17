@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { readDb } from "@/lib/db/store";
 import { isResolved } from "@/lib/types";
 import { TopBar } from "@/components/shell/TopBar";
@@ -37,7 +37,7 @@ export default function HomePage() {
           <Link
             href="/more"
             aria-label="Settings and more"
-            className="press flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink-soft hover:text-ink"
+            className="press flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink-soft hover:bg-canvas hover:text-ink transition-colors"
           >
             <Icon name="settings" className="h-5 w-5" />
           </Link>
@@ -46,8 +46,8 @@ export default function HomePage() {
 
       <main className="mx-auto max-w-content px-4 md:px-8">
         {/* Hero */}
-        <section className="pb-8 pt-6 md:pb-12 md:pt-10">
-          <h1 className="text-balance text-[27px] font-bold leading-[1.15] tracking-[-0.02em] text-ink md:text-[32px]">
+        <section className="pb-10 pt-8 md:pb-14 md:pt-12">
+          <h1 className="text-balance text-[28px] font-bold leading-[1.12] tracking-[-0.03em] text-ink md:text-[34px]">
             Know what's happening.
             <br />
             Know what's verified.
@@ -57,7 +57,7 @@ export default function HomePage() {
           <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-soft">
             Report civic issues safely, follow the evidence, and track what happens next.
           </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <Button href="/report" size="lg" icon="plus">
               Report an issue
             </Button>
@@ -66,12 +66,12 @@ export default function HomePage() {
         </section>
 
         {/* Your cases */}
-        <section aria-labelledby="your-cases-heading" className="pb-8">
-          <div className="mb-3.5 flex items-baseline justify-between">
-            <h2 id="your-cases-heading" className="text-[18px] font-semibold tracking-[-0.01em] text-ink">
+        <section aria-labelledby="your-cases-heading" className="pb-10">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 id="your-cases-heading" className="text-[17px] font-semibold tracking-[-0.01em] text-ink">
               Your cases
             </h2>
-            <Link href="/cases" className="text-[13px] font-medium text-brand-deep hover:underline">
+            <Link href="/cases" className="text-[13px] font-medium text-ink-soft hover:text-ink transition-colors">
               View all
             </Link>
           </div>
@@ -79,52 +79,51 @@ export default function HomePage() {
         </section>
 
         {/* Community snapshot */}
-        <section aria-labelledby="snapshot-heading" className="pb-8">
-          <h2 id="snapshot-heading" className="mb-3.5 text-[18px] font-semibold tracking-[-0.01em] text-ink">
-            Community snapshot
-          </h2>
+        <section aria-labelledby="snapshot-heading" className="pb-10">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 id="snapshot-heading" className="text-[17px] font-semibold tracking-[-0.01em] text-ink">
+              Community snapshot
+            </h2>
+            <Link href="/community" className="text-[13px] font-medium text-ink-soft hover:text-ink transition-colors">
+              Browse cases
+            </Link>
+          </div>
           <div className="card grid grid-cols-3 divide-x divide-line">
             {snapshot.map((s) => (
               <div key={s.label} className="px-4 py-5 text-center sm:px-6 sm:text-left">
-                <span className={`mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full sm:mx-0 ${s.tone}`}>
+                <span className={`mx-auto mb-3 flex h-9 w-9 items-center justify-center rounded-full sm:mx-0 ${s.tone}`}>
                   <Icon name={s.icon} className="h-4 w-4" />
                 </span>
-                <p className="text-[22px] font-bold leading-none tracking-[-0.02em] text-ink">{s.value}</p>
-                <p className="mt-1.5 text-[11.5px] font-medium leading-tight text-ink-soft">{s.label}</p>
+                <p className="text-[24px] font-bold leading-none tracking-[-0.02em] text-ink">{s.value}</p>
+                <p className="mt-1.5 text-[12px] font-medium leading-tight text-ink-soft">{s.label}</p>
               </div>
             ))}
           </div>
-          <p className="mt-2 px-1 text-xs text-ink-soft">
-            Snapshot of the fictional demo dataset.{" "}
-            <Link href="/community" className="font-medium text-brand-deep hover:underline">
-              Browse community cases
-            </Link>
-          </p>
         </section>
 
         {/* How Civora works */}
         <section aria-labelledby="how-heading" className="pb-10">
-          <h2 id="how-heading" className="mb-3.5 text-[18px] font-semibold tracking-[-0.01em] text-ink">
+          <h2 id="how-heading" className="mb-4 text-[17px] font-semibold tracking-[-0.01em] text-ink">
             How Civora works
           </h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {HOW.map((h, i) => (
-              <div key={h.label} className="card px-4 py-4">
+              <div key={h.label} className="card px-5 py-5 transition-colors hover:border-ink-soft/40">
                 <div className="flex items-center justify-between">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-ink">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-muted text-ink">
                     <Icon name={h.icon} className="h-4 w-4" />
                   </span>
-                  <span className="font-mono text-[11px] font-semibold text-ink-soft/70">
+                  <span className="font-mono text-[11px] font-semibold text-ink-soft/50">
                     0{i + 1}
                   </span>
                 </div>
-                <h3 className="mt-3 text-[14.5px] font-semibold text-ink">{h.label}</h3>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft">{h.body}</p>
+                <h3 className="mt-4 text-[14.5px] font-semibold text-ink">{h.label}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">{h.body}</p>
               </div>
             ))}
           </div>
-          <p className="mt-5 max-w-xl text-[13.5px] leading-relaxed text-ink-soft">
-            Civora separates reports, evidence, verification, and response so you can see what is
+          <p className="mt-5 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
+            Civora separates reports, evidence, verification, and response so you can clearly see what is
             known and what is still uncertain.
           </p>
         </section>

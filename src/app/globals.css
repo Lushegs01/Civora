@@ -6,15 +6,18 @@
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
   body {
     @apply bg-canvas font-sans text-ink antialiased;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background: rgba(47, 107, 255, 0.18);
+    background: rgba(47, 107, 255, 0.15);
   }
 
   /* Visible, consistent keyboard focus everywhere */
@@ -37,8 +40,9 @@
   }
 
   dialog::backdrop {
-    background: rgba(17, 17, 17, 0.42);
-    backdrop-filter: blur(3px);
+    background: rgba(17, 17, 17, 0.46);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   dialog {
@@ -51,36 +55,71 @@
   dialog:not([open]) {
     display: none !important;
   }
+
+  /* Balanced headings */
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
 }
 
 @layer components {
+  /* Core card — restrained depth, clean edge */
   .card {
-    @apply rounded-card border border-line bg-surface shadow-card;
+    @apply rounded-card border border-line bg-surface;
+    box-shadow: 0 1px 3px rgba(17, 17, 17, 0.04), 0 6px 20px -10px rgba(17, 17, 17, 0.10);
   }
 
+  /* Status chip — compact, readable */
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[12px] font-medium leading-tight;
+    letter-spacing: 0.008em;
   }
 
+  /* Structural label — quiet authority */
   .meta-label {
-    @apply text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-soft;
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.10em];
+    color: rgba(111, 111, 107, 0.75);
   }
 
+  /* Form field — tactile, clearly interactive */
   .field {
-    @apply w-full rounded-field border border-line bg-surface px-4 py-3 text-[15px] text-ink placeholder:text-ink-soft/70 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15;
+    @apply w-full rounded-field border border-line bg-surface px-4 py-3 text-[15px] text-ink
+           placeholder:text-ink-soft/50 transition-colors duration-150
+           focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/10;
   }
 
+  /* Press — crisp physical feedback */
   .press {
-    @apply transition-all duration-150 active:scale-[0.985];
+    @apply transition-all duration-100 active:scale-[0.982] active:opacity-90;
   }
 
-  /* bottom sheet on mobile, centered dialog on desktop */
+  /* Modal card — bottom sheet on mobile, centered dialog on desktop */
   .modal-card {
-    @apply w-full max-w-xl max-h-[88dvh] overflow-y-auto rounded-t-container bg-surface p-6 shadow-raise md:rounded-container;
+    @apply w-full max-w-xl max-h-[90dvh] overflow-y-auto rounded-t-container bg-surface p-6 md:rounded-container;
+    box-shadow: 0 8px 40px -8px rgba(17,17,17,0.24), 0 2px 6px rgba(17,17,17,0.06);
   }
 
+  /* Timeline rail — gradient fade towards the bottom */
   .timeline-rail {
-    @apply absolute left-[15px] top-8 bottom-0 w-px bg-line;
+    @apply absolute left-[15px] top-10 bottom-0 w-px;
+    background: linear-gradient(to bottom, rgba(17,17,17,0.14) 0%, rgba(17,17,17,0.04) 80%, transparent 100%);
+  }
+
+  /* Scroll-hide — for horizontal strips */
+  .scroll-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Loading shimmer skeleton */
+  .shimmer {
+    background: linear-gradient(90deg, #ededea 25%, #e4e4e0 50%, #ededea 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+    border-radius: 6px;
   }
 }
 
@@ -88,15 +127,21 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
   .text-balance {
     text-wrap: balance;
   }
+  .text-pretty {
+    text-wrap: pretty;
+  }
   .landing-subtle-grid {
     background-image:
-      linear-gradient(rgba(17, 17, 17, 0.055) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(17, 17, 17, 0.055) 1px, transparent 1px);
-    background-size: 56px 56px;
-    mask-image: linear-gradient(to bottom, black, transparent 72%);
+      linear-gradient(rgba(17, 17, 17, 0.048) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 17, 17, 0.048) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: linear-gradient(to bottom, black, transparent 74%);
   }
   .landing-reveal {
     opacity: 1;
@@ -108,28 +153,28 @@
 
   @media (prefers-reduced-motion: no-preference) {
     .landing-reveal {
-      animation: landing-fade-up 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation: landing-fade-up 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(16px);
     }
     .landing-drift {
-      animation: landing-drift 8s ease-in-out infinite alternate;
+      animation: landing-drift 9s ease-in-out infinite alternate;
     }
     .landing-drift:nth-child(2) {
-      animation-delay: -1.8s;
+      animation-delay: -2s;
     }
     .landing-drift:nth-child(3) {
-      animation-delay: -3.2s;
+      animation-delay: -3.5s;
     }
     .landing-drift:nth-child(4) {
-      animation-delay: -4.4s;
+      animation-delay: -4.8s;
     }
   }
 
   @keyframes landing-fade-up {
     from {
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(16px);
     }
     to {
       opacity: 1;
@@ -142,7 +187,12 @@
       translate: 0 0;
     }
     to {
-      translate: 0 -7px;
+      translate: 0 -8px;
     }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 }

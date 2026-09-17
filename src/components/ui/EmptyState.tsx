@@ -1,71 +1,69 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
+﻿import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/Button";
 
-export function EmptyState({
-  icon = "folder",
-  title,
-  body,
-  actionLabel,
-  actionHref,
-  secondaryLabel,
-  secondaryHref,
-  className
-}: {
-  icon?: string;
+interface EmptyStateProps {
+  icon: string;
   title: string;
-  body: string;
-  actionLabel?: string;
-  actionHref?: string;
-  secondaryLabel?: string;
-  secondaryHref?: string;
+  description: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
   className?: string;
-}) {
+}
+
+export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div className={cn("card flex flex-col items-center px-6 py-12 text-center", className)}>
-      <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-ink-soft">
-        <Icon name={icon} className="h-5 w-5" />
-      </span>
-      <h3 className="text-[17px] font-semibold text-ink">{title}</h3>
-      <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-ink-soft">{body}</p>
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
-        {actionLabel && actionHref && (
-          <Button href={actionHref} icon="plus">
-            {actionLabel}
-          </Button>
-        )}
-        {secondaryLabel && secondaryHref && (
-          <Button href={secondaryHref} variant="secondary">
-            {secondaryLabel}
-          </Button>
-        )}
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-[24px] border border-line border-dashed bg-canvas px-8 py-14 text-center",
+        className
+      )}
+    >
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-ink-soft">
+        <Icon name={icon} className="h-6 w-6" />
       </div>
+      <h3 className="mt-4 text-[16px] font-semibold tracking-[-0.01em] text-ink">{title}</h3>
+      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{description}</p>
+      {action && (
+        <div className="mt-6">
+          <Button variant="secondary" onClick={action.onClick}>
+            {action.label}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
 
 export function ErrorState({
   title = "Something went wrong",
-  body,
+  description = "We had trouble loading this data. Please try again.",
   onRetry,
-  retryLabel = "Try again"
+  className
 }: {
   title?: string;
-  body: string;
+  description?: string;
   onRetry?: () => void;
-  retryLabel?: string;
+  className?: string;
 }) {
   return (
-    <div className="card flex flex-col items-center px-6 py-10 text-center">
-      <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-soft text-danger">
-        <Icon name="circle-alert" className="h-5 w-5" />
-      </span>
-      <h3 className="text-[17px] font-semibold text-ink">{title}</h3>
-      <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-ink-soft">{body}</p>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-[24px] border border-line bg-surface px-8 py-14 text-center",
+        className
+      )}
+    >
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-danger/10 text-danger">
+        <Icon name="triangle-alert" className="h-6 w-6" />
+      </div>
+      <h3 className="mt-4 text-[16px] font-semibold tracking-[-0.01em] text-ink">{title}</h3>
+      <p className="mt-2 max-w-sm text-[13.5px] leading-relaxed text-ink-soft">{description}</p>
       {onRetry && (
-        <div className="mt-5">
-          <Button variant="secondary" icon="refresh" onClick={onRetry}>
-            {retryLabel}
+        <div className="mt-6">
+          <Button variant="secondary" onClick={onRetry}>
+            Try again
           </Button>
         </div>
       )}
