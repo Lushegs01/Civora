@@ -48,7 +48,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"]
+        mono: ["var(--font-geist-mono)", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        display: ["var(--font-display)", "var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"]
       },
       maxWidth: {
         content: "72rem"

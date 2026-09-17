@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { readDb, findCase } from "@/lib/db/store";
 import { buildCaseView, publicCaseRow } from "@/lib/case-view";
 import { CivoraLogo } from "@/components/CivoraLogo";
-import { Button } from "@/components/ui/Button";
+import { HeroNav } from "@/components/landing/HeroNav";
+import { HeroDevice } from "@/components/landing/HeroDevice";
 import { VerificationBadge, ResponseBadge } from "@/components/ui/Badges";
 import { Icon } from "@/components/ui/Icon";
 
@@ -30,54 +30,137 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-dvh bg-canvas selection:bg-brand/20 overflow-x-hidden">
-      {/* Hero & Header Shared Atmosphere Container */}
-      <div className="relative isolate overflow-hidden">
-        {/* Header */}
-        <header className="mx-auto flex max-w-content items-center justify-between px-6 py-6 md:px-8">
-          <CivoraLogo size={34} />
-          <div className="flex items-center gap-3">
-            <Button href="/responder" variant="ghost" size="sm" className="hidden sm:inline-flex text-[14px]">
-              Responder demo
-            </Button>
-            <Button href="/home" size="sm" className="rounded-full shadow-lg shadow-brand/20 transition-transform hover:scale-105">
-              Open the app
-            </Button>
-          </div>
-        </header>
+      {/* ============ Hero — dark forest gradient with flowing waves ============ */}
+      <HeroNav />
+      <section className="relative isolate overflow-hidden bg-[#071710] text-white">
+        {/* Atmosphere: layered gradients + blurred wave shapes */}
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(90rem 44rem at 82% -12%, rgba(83,158,109,0.32), transparent 62%), radial-gradient(70rem 40rem at -18% 34%, rgba(35,94,60,0.48), transparent 64%), radial-gradient(64rem 44rem at 52% 118%, rgba(16,54,33,0.85), transparent 68%)"
+            }}
+          />
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 1440 900"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <defs>
+              <linearGradient id="heroWaveA" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#2E7D4F" />
+                <stop offset="100%" stopColor="#0C2E1D" />
+              </linearGradient>
+              <linearGradient id="heroWaveB" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#123B26" />
+                <stop offset="55%" stopColor="#1E5A36" />
+                <stop offset="100%" stopColor="#0A2416" />
+              </linearGradient>
+              <linearGradient id="heroWaveC" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#3E9B63" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#123B26" stopOpacity="0" />
+              </linearGradient>
+              <filter id="heroBlur" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="42" />
+              </filter>
+            </defs>
+            <g filter="url(#heroBlur)">
+              <g className="hero-wave-a">
+                <path
+                  d="M-180,640 C220,470 470,760 860,600 C1140,485 1330,540 1640,380 L1640,1080 L-180,1080 Z"
+                  fill="url(#heroWaveA)"
+                  opacity="0.75"
+                />
+              </g>
+              <g className="hero-wave-b">
+                <path
+                  d="M-180,780 C320,640 690,850 1080,690 C1310,595 1500,650 1640,540 L1640,1080 L-180,1080 Z"
+                  fill="url(#heroWaveB)"
+                  opacity="0.85"
+                />
+              </g>
+              <g className="hero-wave-a">
+                <path
+                  d="M420,-80 C620,140 980,60 1190,220 C1380,365 1580,290 1680,220 L1680,-260 L380,-260 Z"
+                  fill="url(#heroWaveC)"
+                  opacity="0.5"
+                />
+              </g>
+            </g>
+          </svg>
+          {/* Soft sheen */}
+          <div className="absolute inset-0 bg-[radial-gradient(46rem_24rem_at_24%_8%,rgba(255,255,255,0.07),transparent_65%)]" />
+        </div>
 
-        {/* Hero Section */}
-        <section className="relative mx-auto flex max-w-content flex-col items-center justify-center px-4 pt-16 pb-20 md:pt-28 md:pb-28 text-center">
-          <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line/80 bg-surface/85 px-4 py-1.5 text-sm font-medium text-ink-soft backdrop-blur-md shadow-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand"></span>
-              </span>
-              <span className="ml-2">Civic incident platform</span>
-            </span>
+        <div className="mx-auto flex min-h-svh w-full max-w-content flex-col justify-center px-6 pb-24 pt-32 sm:px-8 lg:pb-20 lg:pt-36">
+          <div className="grid w-full items-center gap-20 lg:grid-cols-[1.1fr_0.94fr] lg:gap-6">
+            {/* Copy */}
+            <div className="max-w-[620px]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-[#9CC5AA]">
+                Civic incident platform
+              </p>
+              <h1 className="mt-5 font-display text-[44px] font-light leading-[1.06] tracking-[-0.01em] text-white sm:text-[58px] lg:text-[62px]">
+                Report safely.
+                <br />
+                Verify carefully.
+                <br />
+                Respond together.
+              </h1>
+              <p className="mt-6 max-w-md text-[16px] leading-relaxed text-white/65 md:text-[17px]">
+                Civora connects reports, evidence, response, and accountability in one traceable
+                workflow — so communities know what&rsquo;s happening, and what happens next.
+              </p>
+
+              <div className="mt-9 flex flex-wrap items-center gap-3.5">
+                <Link
+                  href="/report"
+                  className="press group inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-white py-2 pl-7 pr-2 text-[15px] font-semibold text-[#0B1F14] shadow-[0_18px_40px_-16px_rgba(255,255,255,0.45)] transition-colors hover:bg-[#EFF5F0]"
+                >
+                  Report an issue
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B1F14] text-white transition-transform duration-200 group-hover:rotate-45">
+                    <Icon name="arrow-up-right" className="h-4 w-4" />
+                  </span>
+                </Link>
+                <Link
+                  href="/community"
+                  className="press inline-flex min-h-[52px] items-center rounded-full border border-white/25 px-7 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/10"
+                >
+                  Explore cases
+                </Link>
+              </div>
+
+              {/* Social proof */}
+              <div className="mt-12 flex items-center gap-4">
+                <div className="flex -space-x-2.5">
+                  {[
+                    ["AK", "from-[#5FA97C] to-[#2E7D4F]"],
+                    ["JM", "from-[#7FB7A4] to-[#3E7D63]"],
+                    ["RS", "from-[#4E8FBF] to-[#2C5E85]"],
+                    ["LT", "from-[#C9A96A] to-[#8F7440]"],
+                    ["NW", "from-[#9C8FC4] to-[#5E548E]"]
+                  ].map(([initials, gradient]) => (
+                    <span
+                      key={initials}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white ring-2 ring-[#0A241A] ${gradient}`}
+                    >
+                      {initials}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[15px] text-white/70">
+                  <span className="font-bold text-white">10,000+</span> neighbors are reporting
+                </p>
+              </div>
+            </div>
+
+            {/* Device mockup */}
+            <div className="relative lg:pl-6">
+              <HeroDevice />
+            </div>
           </div>
-          
-          <h1 className="text-balance mt-8 max-w-4xl text-5xl font-extrabold tracking-tighter text-ink md:text-7xl lg:text-[80px] leading-[1.05] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both drop-shadow-sm">
-            Report safely.<br />
-            <span className="bg-gradient-to-r from-brand via-info to-brand bg-clip-text text-transparent">Verify carefully.</span><br />
-            Respond together.
-          </h1>
-          
-          <p className="mt-8 max-w-2xl text-[17px] leading-relaxed text-ink-soft md:text-xl animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 fill-mode-both text-balance">
-            Civora connects civic reports, evidence, response, and accountability in one traceable
-            workflow — so communities know what's happening and what happens next.
-          </p>
-          
-          <div className="mt-10 flex flex-wrap justify-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-500 fill-mode-both">
-            <Button href="/report" size="lg" icon="plus" className="rounded-full px-8 shadow-xl shadow-brand/20 transition-all hover:scale-105 hover:shadow-brand/30">
-              Report an issue
-            </Button>
-            <Button href="/community" size="lg" variant="secondary" className="rounded-full px-8 bg-surface/90 backdrop-blur transition-all hover:bg-surface">
-              Explore cases
-            </Button>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* Floating Case Example Component */}
       {demo && demoView && row && (
@@ -126,7 +209,7 @@ export default function LandingPage() {
       )}
 
       {/* Bento Grid: Trust by Design */}
-      <section className="border-y border-line/60 bg-muted/30 py-20 md:py-28">
+      <section id="trust" className="scroll-mt-28 border-y border-line/60 bg-muted/30 py-20 md:py-28">
         <div className="mx-auto max-w-content px-4 md:px-8">
           {/* Section Header */}
           <div className="mb-14 text-center">

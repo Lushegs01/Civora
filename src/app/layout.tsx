@@ -1,9 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/system/ServiceWorkerRegister";
 import { OutboxSync } from "@/components/system/OutboxSync";
+
+// Light geometric display face for landing headlines
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-display",
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
@@ -51,7 +60,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${poppins.variable}`}>
       <body className="min-h-dvh bg-canvas text-ink">
         {children}
         <ServiceWorkerRegister />

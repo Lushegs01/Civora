@@ -195,4 +195,37 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+
+  /* ===== Landing hero ===== */
+  .hero-wave-a {
+    animation: hero-wave-a 22s ease-in-out infinite alternate;
+  }
+  .hero-wave-b {
+    animation: hero-wave-b 26s ease-in-out infinite alternate;
+  }
+  @keyframes hero-wave-a {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-42px, -26px, 0); }
+  }
+  @keyframes hero-wave-b {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(32px, 20px, 0); }
+  }
+  .hero-device {
+    animation: hero-device 7s ease-in-out infinite alternate;
+  }
+  @keyframes hero-device {
+    from { transform: rotate(-1.1deg) translateY(0); }
+    to { transform: rotate(0.9deg) translateY(-10px); }
+  }
+  .hero-float {
+    animation: hero-float 6s ease-in-out infinite alternate;
+  }
+  .hero-float-delay {
+    animation-delay: -3s;
+  }
+  @keyframes hero-float {
+    from { transform: translateY(0); }
+    to { transform: translateY(-12px); }
+  }
 }
