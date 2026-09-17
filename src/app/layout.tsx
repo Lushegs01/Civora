@@ -15,6 +15,16 @@ export const metadata: Metadata = {
     "Civora connects civic reports, evidence, response, and accountability in one traceable workflow.",
   manifest: "/manifest.webmanifest",
   applicationName: "Civora",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico", sizes: "any" }
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" }
+    ]
+  },
   openGraph: {
     title: "Civora — Report safely. Verify carefully. Respond together.",
     description:

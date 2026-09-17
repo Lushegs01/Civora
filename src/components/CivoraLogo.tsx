@@ -16,20 +16,14 @@ export function CivoraLogo({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <img
-        src="/logo.png"
+        src={dark ? "/logo-white.png" : "/logo.png"}
         alt="Civora"
         width={size}
         height={size}
-        className={cn(
-          "shrink-0 rounded-md",
-          dark ? "mix-blend-screen" : "mix-blend-multiply"
-        )}
+        className={cn("shrink-0 object-contain")}
         style={{
           width: size,
-          height: size,
-          objectFit: "cover",
-          transform: "scale(1.5)",
-          filter: dark ? "invert(1) contrast(1.2)" : undefined
+          height: size
         }}
       />
       {withWordmark && (
