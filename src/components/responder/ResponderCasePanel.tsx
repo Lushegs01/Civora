@@ -234,7 +234,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
       {/* Header */}
       <header className="mt-2">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-ink px-3 py-1 font-mono text-[12.5px] font-semibold text-white">
+          <span className="rounded-full bg-brand-soft px-3 py-1 font-mono text-[12.5px] font-semibold text-brand-deep">
             CASE #{c.id}
           </span>
           <span className="chip bg-muted text-ink-soft">
@@ -349,7 +349,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                     a.disabled
                       ? "cursor-not-allowed text-ink-soft/50"
                       : a.primary
-                        ? "bg-ink text-white hover:bg-black"
+                        ? "bg-brand text-white hover:bg-brand-deep"
                         : "bg-surface text-ink ring-1 ring-line hover:bg-muted"
                   }`}
                 >
@@ -493,7 +493,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
               <button
                 onClick={confirm}
                 disabled={busy}
-                className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-btn bg-ink px-5 text-[15px] font-medium text-white hover:bg-black disabled:opacity-60"
+                className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[15px] font-medium text-white hover:bg-brand-deep disabled:opacity-60"
               >
                 {busy && <Icon name="loader-circle" className="h-4 w-4 animate-spin" />}
                 {dialog.confirmLabel}

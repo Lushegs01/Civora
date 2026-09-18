@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -59,7 +59,7 @@ export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; ba
 
       <header className="mt-4 md:mt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-ink px-3 py-1 font-mono text-[11.5px] font-bold tracking-tight text-white">
+          <span className="rounded-full bg-brand-soft px-3 py-1 font-mono text-[11.5px] font-bold tracking-tight text-brand-deep">
             {c.id}
           </span>
           <span className="chip bg-muted text-ink-soft">

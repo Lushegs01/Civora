@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { readDb } from "@/lib/db/store";
 import { isResolved } from "@/lib/types";
 import { TopBar } from "@/components/shell/TopBar";
@@ -47,7 +47,7 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative flex flex-col items-center text-center pb-14 pt-10 md:pb-20 md:pt-16">
           {/* Subtle radial glow background behind hero */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[100px]" aria-hidden="true" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/8 blur-[100px]" aria-hidden="true" />
           
           <div className="mb-6 flex items-center justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-[11px] font-medium text-ink-soft shadow-sm backdrop-blur">

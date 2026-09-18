@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 import type { CaseCardRow } from "@/components/case/CaseCard";
@@ -70,7 +70,7 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
             className={cn(
               "press min-h-10 shrink-0 rounded-full border px-4 text-[13.5px] font-medium transition-colors",
               filter === f.key
-                ? "border-ink bg-ink text-white"
+                ? "border-brand bg-brand text-white"
                 : "border-line bg-surface text-ink-soft hover:border-ink-soft/40 hover:text-ink"
             )}
           >

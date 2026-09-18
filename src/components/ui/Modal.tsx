@@ -165,7 +165,7 @@ export function ConfirmDialog({
           onClick={onConfirm}
           disabled={busy}
           className={cn(
-            "press inline-flex min-h-11 items-center justify-center gap-2 rounded-btn bg-ink px-5 text-[15px] font-medium text-white hover:bg-black disabled:opacity-60"
+            "press inline-flex min-h-11 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[15px] font-medium text-white hover:bg-brand-deep disabled:opacity-60"
           )}
         >
           {busy && <Icon name="loader-circle" className="h-4 w-4 animate-spin" />}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,7 +34,7 @@ export function MobileBottomNav() {
           <Link
             href="/report"
             aria-label="Report an issue"
-            className="press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-ink text-white shadow-raise"
+            className="press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand text-white shadow-raise"
           >
             <CivoraLogo size={22} withWordmark={false} dark={true} />
             <span className="mt-0.5 text-[10px] font-bold tracking-[0.02em] uppercase">Report</span>
@@ -67,7 +67,7 @@ function NavItem({
     >
       <NavGlyph name={item.icon} active={active} />
       <span>{item.label}</span>
-      {active && <span className="absolute bottom-0 h-1 w-1 rounded-full bg-ink" />}
+      {active && <span className="absolute bottom-0 h-1 w-1 rounded-full bg-brand" />}
     </Link>
   );
 }

@@ -53,7 +53,7 @@ export function CheckCase({ variant = "secondary" }: { variant?: "secondary" | "
         />
         <button
           type="submit"
-          className="press inline-flex min-h-[48px] items-center gap-2 rounded-btn bg-ink px-4 text-[14px] font-medium text-white hover:bg-black"
+          className="press inline-flex min-h-[48px] items-center gap-2 rounded-btn bg-brand px-4 text-[14px] font-medium text-white hover:bg-brand-deep"
         >
           <Icon name="search" className="h-4 w-4" />
           <span className="hidden sm:inline">Check</span>

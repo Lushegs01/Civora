@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -17,12 +17,12 @@
   }
 
   ::selection {
-    background: rgba(47, 107, 255, 0.15);
+    background: rgba(46, 125, 79, 0.18);
   }
 
   /* Visible, consistent keyboard focus everywhere */
   :focus-visible {
-    outline: 2px solid #2f6bff;
+    outline: 2px solid #2e7d4f;
     outline-offset: 2px;
     border-radius: 6px;
   }

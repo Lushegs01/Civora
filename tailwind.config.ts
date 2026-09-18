@@ -14,9 +14,9 @@ const config: Config = {
         line: "#E4E4DF",
         muted: "#EEEEEA",
         brand: {
-          DEFAULT: "#2F6BFF",
-          soft: "#EAF0FF",
-          deep: "#1F4FD6"
+          DEFAULT: "#2E7D4F",
+          soft: "#E6F4EC",
+          deep: "#1B5E38"
         },
         success: {
           DEFAULT: "#2E8B57",

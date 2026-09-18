@@ -60,7 +60,7 @@ export function YourCases() {
         </div>
         <Link
           href="/report"
-          className="press inline-flex min-h-11 shrink-0 items-center gap-2 rounded-btn bg-ink px-4 text-[13.5px] font-medium text-white hover:bg-black"
+          className="press inline-flex min-h-11 shrink-0 items-center gap-2 rounded-btn bg-brand px-4 text-[13.5px] font-medium text-white hover:bg-brand-deep"
         >
           <Icon name="plus" className="h-4 w-4" />
           Report

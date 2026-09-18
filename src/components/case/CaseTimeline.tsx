@@ -4,12 +4,12 @@ import { formatDateTime } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 
 const EVENT_STYLE: Record<string, { icon: string; tone: string }> = {
-  REPORT_SUBMITTED: { icon: "file-text", tone: "bg-ink text-white" },
-  EVIDENCE_ADDED: { icon: "paperclip", tone: "bg-ink text-white" },
+  REPORT_SUBMITTED: { icon: "file-text", tone: "bg-brand-soft text-brand-deep" },
+  EVIDENCE_ADDED: { icon: "paperclip", tone: "bg-brand-soft text-brand-deep" },
   CORROBORATION_RECEIVED: { icon: "users", tone: "bg-info-soft text-info" },
   VERIFICATION_UPDATED: { icon: "badge-check", tone: "bg-info-soft text-info" },
-  CASE_ASSIGNED: { icon: "building", tone: "bg-ink text-white" },
-  CASE_ACKNOWLEDGED: { icon: "mail-check", tone: "bg-ink text-white" },
+  CASE_ASSIGNED: { icon: "building", tone: "bg-brand text-white" },
+  CASE_ACKNOWLEDGED: { icon: "mail-check", tone: "bg-brand text-white" },
   RESPONSE_IN_PROGRESS: { icon: "loader-circle", tone: "bg-info-soft text-info" },
   INFO_REQUESTED: { icon: "message", tone: "bg-warning-soft text-warning" },
   PUBLIC_UPDATE_ADDED: { icon: "scroll-text", tone: "bg-brand-soft text-brand-deep" },
@@ -78,7 +78,7 @@ export function CaseTimeline({
                   {(isFirst || e.visibility === "restricted") && (
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {isFirst && (
-                        <span className="inline-flex items-center rounded-full bg-ink px-2 py-0.5 text-[10px] font-bold tracking-widest text-white uppercase">
+                        <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-widest text-brand-deep uppercase">
                           Latest
                         </span>
                       )}

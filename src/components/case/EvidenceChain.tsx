@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 import { cn, formatDateTime } from "@/lib/utils";
@@ -113,7 +113,7 @@ export function EvidenceChain({
                   </span>
                 )}
                 {isLast && (
-                  <span className="hidden shrink-0 items-center gap-1 rounded-lg bg-ink px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white sm:flex">
+                  <span className="hidden shrink-0 items-center gap-1 rounded-lg bg-brand-soft px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-deep sm:flex">
                     Latest
                   </span>
                 )}
@@ -177,7 +177,7 @@ function EvidenceDetail({ e }: { e: EvidenceRecord }) {
             href={`/api/evidence-file/${e.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="press inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-ink px-5 text-[14px] font-medium text-white hover:bg-black"
+            className="press inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[14px] font-medium text-white hover:bg-brand-deep"
           >
             <Icon name="arrow-up-right" className="h-4 w-4" />
             View original file
