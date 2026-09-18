@@ -11,6 +11,7 @@ import {
 import { reportSubmissionSchema } from "@/lib/validation/schemas";
 import { fail, clientIp, extFor, kindFor, ok } from "@/lib/api-helpers";
 import { hashToken, newTrackingToken } from "@/lib/auth/session";
+import { put } from "@vercel/blob";
 import { similarity, tokenOverlap } from "@/lib/utils";
 import type { CaseEvent, CaseRecord, EvidenceRecord, ReportEntry } from "@/lib/types";
 import fs from "fs";
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
   const p = parsed.data;
   const now = new Date().toISOString();
 
-  const db = readDb();
+  const db = await readDb();
 
   // ---- duplicate / corroboration matching (Rule: humans & rules confirm links)
   // Deterministic demo rule: same category + strong overlap in area or text.
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
         sizeBytes: buf.length,
         checksum: sha256(buf),
         storageKey,
-        publicVisible: true
+        publicVisible: false
       }
     });
   }
@@ -116,12 +117,12 @@ export async function POST(req: NextRequest) {
       at: now,
       role: "corroborating",
       privacyMode: p.privacyMode,
-      areaNote: p.locationGeneral ? undefined : p.locationGeneral
+      trackingTokenHash: hashToken(token),
+      areaNote: p.locationGeneral || undefined
     };
     linked.reports.push(entry);
     if (p.locationGeneral && !linked.locationGeneral) linked.locationGeneral = p.locationGeneral;
-    const assignedToken = linked.trackingTokenHash ? null : token;
-    if (!linked.trackingTokenHash) linked.trackingTokenHash = hashToken(token);
+    const assignedToken = token;
     const previousVerification = linked.verification;
     if (previousVerification === "unverified") {
       linked.verification = "partially_verified";
@@ -150,7 +151,11 @@ export async function POST(req: NextRequest) {
 
     for (const f of files) {
       const storageKey = f.rec.storageKey!;
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await put(`uploads/${storageKey}`, f.data, { access: 'public', addRandomSuffix: false });
+    } else {
       fs.writeFileSync(path.join(dir, storageKey), f.data);
+    }
       db.evidence.push({ ...f.rec, caseId: linked.id, submittedAt: now });
       db.events.push({
         id: `evt-${crypto.randomBytes(6).toString("hex")}`,
@@ -163,7 +168,7 @@ export async function POST(req: NextRequest) {
         detail: f.rec.title
       });
     }
-    writeDb(db);
+    await writeDb(db);
     return ok({
       linkedTo: linked.id,
       caseId: linked.id,
@@ -191,7 +196,6 @@ export async function POST(req: NextRequest) {
     priority,
     createdAt: now,
     updatedAt: now,
-    trackingTokenHash: hashToken(token),
     reporterContact: p.privacyMode === "identified" && p.contactName ? p.contactName : undefined,
     publicVisible: true,
     known: ["A single initial report has been received."],
@@ -205,6 +209,7 @@ export async function POST(req: NextRequest) {
         at: now,
         role: "initial",
         privacyMode: p.privacyMode,
+        trackingTokenHash: hashToken(token),
         areaNote: p.locationGeneral
       }
     ]
@@ -224,7 +229,11 @@ export async function POST(req: NextRequest) {
 
   for (const f of files) {
     const storageKey = f.rec.storageKey!;
-    fs.writeFileSync(path.join(dir, storageKey), f.data);
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await put(`uploads/${storageKey}`, f.data, { access: 'public', addRandomSuffix: false });
+    } else {
+      fs.writeFileSync(path.join(dir, storageKey), f.data);
+    }
     db.evidence.push({ ...f.rec, caseId, submittedAt: now });
     db.events.push({
       id: `evt-${crypto.randomBytes(6).toString("hex")}`,
@@ -238,7 +247,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  writeDb(db);
+  await writeDb(db);
   return ok({ caseId, token, linkedTo: null });
 }
 

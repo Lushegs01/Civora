@@ -4,7 +4,7 @@ import path from "path";
 import { cookies } from "next/headers";
 import { readDb, uploadDir } from "@/lib/db/store";
 import { fail } from "@/lib/api-helpers";
-import { isResponder, tokenMatches } from "@/lib/auth/session";
+import { isResponder, isAuthorizedReporter } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +12,14 @@ export const dynamic = "force-dynamic";
 // restricted evidence requires a responder session or a valid tracking token.
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const db = readDb();
+  const db = await readDb();
   const e = db.evidence.find((x) => x.id === params.id);
   if (!e || !e.storageKey) return fail("Evidence file not found.", 404);
 
   if (!e.publicVisible) {
     const c = db.cases.find((x) => x.id === e.caseId);
     const token = req.nextUrl.searchParams.get("token") || "";
-    const allowed = isResponder(cookies()) || (c ? tokenMatches(c.trackingTokenHash, token) : false);
+    const allowed = isResponder(cookies()) || (c ? isAuthorizedReporter(c, token) : false);
     if (!allowed) return fail("This evidence is restricted to authorized viewers.", 403);
   }
 

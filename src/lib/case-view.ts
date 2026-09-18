@@ -28,7 +28,14 @@ export interface ProgressStep {
 export function buildCaseView(db: CivoraDB, c: CaseRecord, role: ViewerRole): CaseView {
   // PRIVATE reporter data is stripped for everyone except responders (Rule 3).
   const safeCase: CaseRecord =
-    role === "responder" ? c : { ...c, reporterContact: undefined, trackingTokenHash: undefined };
+    role === "responder"
+      ? c
+      : { 
+          ...c, 
+          reporterContact: undefined, 
+          coordinates: undefined,
+          reports: c.reports.map(r => ({ ...r, trackingTokenHash: undefined }))
+        };
   c = safeCase;
   const allEvidence = db.evidence.filter((e) => e.caseId === c.id);
   const evidence =

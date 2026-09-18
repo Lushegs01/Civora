@@ -905,8 +905,8 @@ function ReviewStep({ data, onEdit }: { data: WizardData; onEdit: (step: number)
       <div className="mt-4 rounded-card bg-muted px-4 py-3.5 text-[12.5px] leading-relaxed text-ink-soft">
         <p className="flex gap-2">
           <Icon name="lock" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
-          Submitted over an encrypted connection. Your identity is handled according to the privacy
-          choice above.
+          Your identity is handled according to the privacy
+          mode you select.
         </p>
         <p className="mt-2 flex gap-2">
           <Icon name="info" className="mt-0.5 h-3.5 w-3.5 shrink-0" />

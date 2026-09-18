@@ -81,8 +81,7 @@ export default function PrivacyPage() {
         </section>
 
         <p className="mt-8 rounded-card bg-muted px-5 py-4 text-[13px] leading-relaxed text-ink-soft">
-          This is a demonstration build containing only fictional data. In a production deployment,
-          Civora would publish a full data-retention policy and independent security review.
+          This is a demonstration build running on Vercel. While it is designed to show how a privacy-preserving civic platform could work, any data you submit is for demonstration purposes and does not yet have enterprise-grade security guarantees.
         </p>
       </main>
     </>

@@ -15,8 +15,8 @@ const HOW = [
   { icon: "eye", label: "Track", body: "Anyone can follow status and outcome." }
 ];
 
-export default function HomePage() {
-  const db = readDb();
+export default async function HomePage() {
+  const db = await readDb();
   const openCases = db.cases.filter((c) => !isResolved(c));
   const awaitingResponse = db.cases.filter((c) =>
     ["not_assigned", "received"].includes(c.response)

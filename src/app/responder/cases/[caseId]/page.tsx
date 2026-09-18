@@ -16,7 +16,7 @@ export default async function ResponderCasePage({
   params: { caseId: string };
 }) {
   if (!isResponder(cookies())) redirect("/responder/access");
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   if (!c) notFound();
   const view = buildCaseView(db, c, "responder");

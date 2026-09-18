@@ -11,15 +11,15 @@ export async function generateMetadata({
 }: {
   params: { caseId: string };
 }): Promise<Metadata> {
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   return { title: c ? `Case ${c.id} — public view` : "Case not found" };
 }
 
 // Public case page: what is known, what remains uncertain, what has happened,
 // and what happens next — with reporter identity never exposed.
-export default function PublicCasePage({ params }: { params: { caseId: string } }) {
-  const db = readDb();
+export default async function PublicCasePage({ params }: { params: { caseId: string } }) {
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   if (!c || !c.publicVisible) notFound();
   const view = buildCaseView(db, c, "public");

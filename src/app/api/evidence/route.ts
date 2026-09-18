@@ -11,7 +11,8 @@ import {
 } from "@/lib/db/store";
 import { addEvidenceSchema } from "@/lib/validation/schemas";
 import { fail, extFor, kindFor, ok } from "@/lib/api-helpers";
-import { tokenMatches } from "@/lib/auth/session";
+import { isAuthorizedReporter } from "@/lib/auth/session";
+import { put } from "@vercel/blob";
 
 export const dynamic = "force-dynamic";
 
@@ -28,9 +29,9 @@ export async function POST(req: NextRequest) {
   }
   const { caseId, token, note, file } = parsed.data;
 
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, caseId);
-  if (!c || !tokenMatches(c.trackingTokenHash, token)) {
+  if (!c || !isAuthorizedReporter(c, token)) {
     return fail("This case couldn't be verified for your device. Please check the case ID and tracking link.", 403);
   }
 
@@ -54,7 +55,11 @@ export async function POST(req: NextRequest) {
     }
     const id = `ev-${crypto.randomBytes(6).toString("hex")}`;
     const storageKey = `${id}${extFor(file.mimeType, file.fileName)}`;
-    fs.writeFileSync(path.join(uploadDir(), storageKey), buf);
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await put(`uploads/${storageKey}`, buf, { access: 'public', addRandomSuffix: false });
+    } else {
+      fs.writeFileSync(path.join(uploadDir(), storageKey), buf);
+    }
     db.evidence.push({
       id,
       caseId: c.id,
@@ -68,7 +73,7 @@ export async function POST(req: NextRequest) {
       sizeBytes: buf.length,
       checksum: sha256(buf),
       storageKey,
-      publicVisible: true,
+      publicVisible: false,
       submittedAt: now
     });
     db.events.push({
@@ -93,7 +98,7 @@ export async function POST(req: NextRequest) {
       submittedByLabel,
       relationship: "Clarifying information added by the reporter.",
       excerpt: note,
-      publicVisible: true,
+      publicVisible: false,
       submittedAt: now
     });
     db.events.push({
@@ -109,6 +114,6 @@ export async function POST(req: NextRequest) {
   }
 
   c.updatedAt = now;
-  writeDb(db);
+  await writeDb(db);
   return ok({ ok: true });
 }

@@ -29,9 +29,14 @@ export function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-export function tokenMatches(storedHash: string | undefined, token: string): boolean {
+export function tokenMatches(storedHash: string | undefined | null, token: string): boolean {
   if (!storedHash) return false;
   const a = Buffer.from(hashToken(token));
   const b = Buffer.from(storedHash);
   return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+export function isAuthorizedReporter(c: any, token: string | null | undefined): boolean {
+  if (!token) return false;
+  return c.reports.some((r: any) => tokenMatches(r.trackingTokenHash, token));
 }

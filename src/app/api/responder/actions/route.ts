@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const ACTOR = "Response desk";
 
-function evt(dbEvents: ReturnType<typeof readDb>["events"], caseId: string, e: Omit<import("@/lib/types").CaseEvent, "id" | "caseId" | "at">) {
+function evt(dbEvents: Awaited<ReturnType<typeof readDb>>["events"], caseId: string, e: Omit<import("@/lib/types").CaseEvent, "id" | "caseId" | "at">) {
   dbEvents.push({
     id: `evt-${crypto.randomBytes(6).toString("hex")}`,
     at: new Date().toISOString(),
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
   const { caseId, action, note, publicUpdate, orgId, verification } = parsed.data;
 
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, caseId);
   if (!c) return fail("That case could not be found.", 404);
 
@@ -191,6 +191,6 @@ export async function POST(req: NextRequest) {
   }
 
   c.updatedAt = now;
-  writeDb(db);
+  await writeDb(db);
   return ok({ ok: true, caseId: c.id });
 }

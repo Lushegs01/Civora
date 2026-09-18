@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
 
 // Public transparency surface. Only public-safe fields are exposed here —
 // never reporter identity, never sensitive personal data.
-export default function CommunityPage() {
-  const db = readDb();
+export default async function CommunityPage() {
+  const db = await readDb();
   const rows = db.cases
     .filter((c) => c.publicVisible)
     .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))

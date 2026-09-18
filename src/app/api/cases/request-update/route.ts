@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { findCase, readDb, writeDb } from "@/lib/db/store";
 import { requestUpdateSchema } from "@/lib/validation/schemas";
 import { fail, ok } from "@/lib/api-helpers";
-import { tokenMatches } from "@/lib/auth/session";
+import { isAuthorizedReporter } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +18,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return fail("The request details need attention. Please try again.");
 
   const { caseId, token } = parsed.data;
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, caseId);
-  if (!c || !tokenMatches(c.trackingTokenHash, token)) {
-    return fail("This case couldn't be verified for your device.", 403);
+  if (!c || !isAuthorizedReporter(c, token)) {
+    return fail("Not authorized to request updates for this case.", 403);
   }
   if (c.response === "closed") {
     return fail("This case is closed, so an update can no longer be requested.");
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       title: "Update requested by the reporter",
       detail: "The reporter asked for a status update through their secure tracking link."
     });
-    writeDb(db);
+    await writeDb(db);
   }
   return ok({ ok: true });
 }

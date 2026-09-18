@@ -29,7 +29,24 @@ export function sha256(input: string | Buffer): string {
   return crypto.createHash("sha256").update(input).digest("hex");
 }
 
-export function readDb(): CivoraDB {
+import { put, head } from "@vercel/blob";
+
+export async function readDb(): Promise<CivoraDB> {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const { url } = await head("civora-db.json");
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        return (await res.json()) as CivoraDB;
+      }
+    } catch (e) {
+      // If not found, fall back to seeding it below
+    }
+    const seeded = buildSeed();
+    await put("civora-db.json", JSON.stringify(seeded, null, 2), { access: "public", addRandomSuffix: false });
+    return seeded;
+  }
+
   ensureDirs();
   if (!fs.existsSync(DB_PATH)) {
     const seeded = buildSeed();
@@ -43,7 +60,11 @@ export function readDb(): CivoraDB {
   return db;
 }
 
-export function writeDb(db: CivoraDB): void {
+export async function writeDb(db: CivoraDB): Promise<void> {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    await put("civora-db.json", JSON.stringify(db, null, 2), { access: "public", addRandomSuffix: false });
+    return;
+  }
   ensureDirs();
   fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
   cached = null;
@@ -55,9 +76,13 @@ export function nextCaseId(db: CivoraDB): string {
   return `CS-${n}`;
 }
 
-export function resetDb(): CivoraDB {
-  ensureDirs();
+export async function resetDb(): Promise<CivoraDB> {
   const seeded = buildSeed();
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    await put("civora-db.json", JSON.stringify(seeded, null, 2), { access: "public", addRandomSuffix: false });
+    return seeded;
+  }
+  ensureDirs();
   fs.writeFileSync(DB_PATH, JSON.stringify(seeded, null, 2), "utf-8");
   cached = null;
   return seeded;

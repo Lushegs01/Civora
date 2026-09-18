@@ -132,6 +132,7 @@ const REGISTRY: Record<string, LucideIcon> = {
   trash: Trash2,
   upload: Upload,
   user: UserRound,
+  "user-round": UserRound,
   users: Users,
   video: Video,
   "wifi-off": WifiOff,

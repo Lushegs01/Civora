@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { readDb, findCase } from "@/lib/db/store";
 import { publicCaseRow } from "@/lib/case-view";
-import { tokenMatches } from "@/lib/auth/session";
+import { isAuthorizedReporter } from "@/lib/auth/session";
 import { fail, ok } from "@/lib/api-helpers";
 import { z } from "zod";
 
@@ -31,12 +31,12 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return fail("Couldn't read your tracked cases. Please refresh.");
 
-  const db = readDb();
+  const db = await readDb();
   const rows = [];
   for (const p of parsed.data.pairs) {
     const c = findCase(db, p.caseId);
     if (!c || !c.publicVisible) continue;
-    const reporter = p.token ? tokenMatches(c.trackingTokenHash, p.token) : false;
+    const reporter = p.token ? isAuthorizedReporter(c, p.token) : false;
     rows.push({ ...publicCaseRow(db, c), href: reporter ? `/cases/${c.id}` : `/community/${c.id}`, reporter });
   }
   return ok({ rows });

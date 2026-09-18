@@ -13,10 +13,10 @@ import { relativeTime } from "@/lib/utils";
 export const metadata: Metadata = { title: "Responder workspace" };
 export const dynamic = "force-dynamic";
 
-export default function ResponderDashboard() {
+export default async function ResponderDashboard() {
   if (!isResponder(cookies())) redirect("/responder/access");
 
-  const db = readDb();
+  const db = await readDb();
   const open = db.cases.filter((c) => !isResolved(c));
   const metrics = [
     { label: "New", value: db.cases.filter((c) => ["received", "not_assigned"].includes(c.response)).length, tone: "bg-brand-soft text-brand-deep", icon: "inbox" },

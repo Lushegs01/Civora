@@ -136,7 +136,6 @@ model Case {
   publicVisible     Boolean       @default(true)
   known             String[] // "what we know" bullet list
   uncertain         String[] // "what remains uncertain" bullet list
-  trackingTokenHash String? // SHA-256 of the reporter's tracking token
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   resolvedAt        DateTime?
@@ -157,6 +156,7 @@ model Report {
   reporter    User?      @relation(fields: [reporterId], references: [id])
   role        String // "initial" | "corroborating"
   privacyMode PrivacyMode
+  trackingTokenHash String? // SHA-256 of the reporter's tracking token
   reporterContact String? // PRIVATE reporter data — responder views only
   areaNote    String?
   receivedAt  DateTime   @default(now())

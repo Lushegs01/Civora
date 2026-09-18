@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 // official finding. Subordinate to the underlying evidence (Product Rule 2).
 
 export async function GET(req: NextRequest, { params }: { params: { caseId: string } }) {
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   if (!c) return fail("Case not found.", 404);
 

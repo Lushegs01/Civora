@@ -218,7 +218,6 @@ export function buildSeed(): CivoraDB {
       updatedAt: iso(-3 * HOUR),
       incidentAt: iso(-2 * DAY - 8 * HOUR),
       nextUpdateAt: iso(2 * HOUR),
-      trackingTokenHash: demoTokenHash("CS-1040"),
       known: [
         "The utility published a maintenance notice covering this zone.",
         "Two independent reports match the notice's timeframe and area.",
@@ -229,7 +228,7 @@ export function buildSeed(): CivoraDB {
         "Some streets in the zone have partial supply while others have none."
       ],
       reports: [
-        { id: "r-1", at: t0, role: "initial", privacyMode: "confidential" },
+        { id: "r-1", at: t0, role: "initial", privacyMode: "confidential", trackingTokenHash: demoTokenHash("CS-1040") },
         { id: "r-2", at: iso(-2 * DAY - 4 * HOUR), role: "corroborating", privacyMode: "anonymous", areaNote: "Adjacent street, same morning" }
       ]
     });
@@ -264,7 +263,6 @@ export function buildSeed(): CivoraDB {
       updatedAt: ackAt,
       incidentAt: iso(-2 * DAY - 2 * HOUR),
       nextUpdateAt: iso(2 * HOUR),
-      trackingTokenHash: demoTokenHash("CS-1042"),
       known: [
         "Three reports within 36 hours refer to the same walkway panel.",
         "A supporting photo was submitted with a recorded checksum.",
@@ -276,7 +274,7 @@ export function buildSeed(): CivoraDB {
         "Resolution has not yet been confirmed."
       ],
       reports: [
-        { id: "r-1", at: t0, role: "initial", privacyMode: "anonymous", areaNote: "North walkway, beside Halls B entrance" },
+        { id: "r-1", at: t0, role: "initial", privacyMode: "anonymous", areaNote: "North walkway, beside Halls B entrance", trackingTokenHash: demoTokenHash("CS-1042") },
         { id: "r-2", at: iso(-1 * DAY - 20 * HOUR), role: "corroborating", privacyMode: "anonymous", areaNote: "Same panel, evening" },
         { id: "r-3", at: iso(-1 * DAY - 4 * HOUR), role: "corroborating", privacyMode: "identified", areaNote: "Resident, Halls B" }
       ]

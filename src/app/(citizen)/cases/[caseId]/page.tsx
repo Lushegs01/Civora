@@ -11,15 +11,15 @@ export async function generateMetadata({
 }: {
   params: { caseId: string };
 }): Promise<Metadata> {
-  const db = readDb();
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   return { title: c ? `Case ${c.id}` : "Case not found" };
 }
 
 // Reporter/tracking view of a case. The server renders the public-safe view;
 // reporter affordances unlock only after token verification on the client.
-export default function TrackedCasePage({ params }: { params: { caseId: string } }) {
-  const db = readDb();
+export default async function TrackedCasePage({ params }: { params: { caseId: string } }) {
+  const db = await readDb();
   const c = findCase(db, params.caseId);
   if (!c) notFound();
   const view = buildCaseView(db, c, "public");

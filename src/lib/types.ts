@@ -59,6 +59,7 @@ export interface ReportEntry {
   at: string;
   role: "initial" | "corroborating";
   privacyMode: PrivacyMode;
+  trackingTokenHash?: string;
   areaNote?: string;
 }
 
@@ -80,7 +81,7 @@ export interface CaseRecord {
   createdAt: string;
   updatedAt: string;
   resolvedAt?: string;
-  trackingTokenHash?: string;
+
   reporterContact?: string; // PRIVATE reporter data — responder views only, never public
   publicVisible: boolean;
   known: string[];

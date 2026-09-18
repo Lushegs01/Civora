@@ -22,8 +22,8 @@ const LOOP = [
 
 
 
-export default function LandingPage() {
-  const db = readDb();
+export default async function LandingPage() {
+  const db = await readDb();
   const demo = findCase(db, "CS-1042");
   const demoView = demo ? buildCaseView(db, demo, "public") : null;
   const row = demo ? publicCaseRow(db, demo) : null;
@@ -130,28 +130,6 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              {/* Social proof */}
-              <div className="mt-12 flex items-center gap-4">
-                <div className="flex -space-x-2.5">
-                  {[
-                    ["AK", "from-[#5FA97C] to-[#2E7D4F]"],
-                    ["JM", "from-[#7FB7A4] to-[#3E7D63]"],
-                    ["RS", "from-[#4E8FBF] to-[#2C5E85]"],
-                    ["LT", "from-[#C9A96A] to-[#8F7440]"],
-                    ["NW", "from-[#9C8FC4] to-[#5E548E]"]
-                  ].map(([initials, gradient]) => (
-                    <span
-                      key={initials}
-                      className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-[12px] font-bold text-white ring-2 ring-[#0A241A] ${gradient}`}
-                    >
-                      {initials}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[15px] text-white/70">
-                  <span className="font-bold text-white">10,000+</span> neighbors are reporting
-                </p>
-              </div>
             </div>
 
             {/* Device mockup */}
@@ -224,7 +202,7 @@ export default function LandingPage() {
               Trust by design
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft md:text-[18px]">
-              Civic information is often fragmented and unverified. Civora was built from the ground up to protect privacy, establish ground truth, and demand accountability.
+              Civic information is often fragmented and unverified. Civora was built to demonstrate how platforms can protect reporter privacy, establish ground truth, and demand accountability.
             </p>
           </div>
           
@@ -252,52 +230,20 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* Mini-UI: Anonymity & Sanitation Simulation */}
+              {/* Feature highlight: Anonymity */}
               <div className="mt-8 rounded-2xl border border-[#E3EAE2] bg-[#F5F8F4]/80 p-4 shadow-xs sm:p-5">
-                <div className="flex items-center justify-between border-b border-[#E3EAE2] pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
+                  <div className="flex items-center gap-2 rounded-xl border border-[#E3EAE2] bg-white px-3 py-2.5">
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Icon name="check" className="h-2.5 w-2.5" />
                     </span>
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0B1F14]">
-                      Sanitized Ingestion Tunnel
-                    </span>
+                    <span className="font-medium text-ink-soft text-[12px]">Location is optional</span>
                   </div>
-                  <span className="rounded-md border border-[#DCE5DC] bg-white px-2 py-0.5 font-mono text-[11px] text-ink-soft">
-                    TLS 1.3 · E2E
-                  </span>
-                </div>
-
-                <div className="mt-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between rounded-xl border border-[#E3EAE2] bg-white p-3 shadow-xs">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E7F3EC] text-[#2E7D4F]">
-                        <Icon name="user" className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-[#0B1F14]">Reporter Identity Masked</div>
-                        <div className="font-mono text-[11px] text-ink-soft">ID: anon_8b4e9f · Stripped at boundary</div>
-                      </div>
-                    </div>
-                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
-                      Protected
+                  <div className="flex items-center gap-2 rounded-xl border border-[#E3EAE2] bg-white px-3 py-2.5">
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Icon name="check" className="h-2.5 w-2.5" />
                     </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
-                    <div className="flex items-center gap-2 rounded-xl border border-[#E3EAE2] bg-white px-3 py-2.5">
-                      <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                        <Icon name="check" className="h-2.5 w-2.5" />
-                      </span>
-                      <span className="font-medium text-ink-soft text-[12px]">EXIF & GPS metadata stripped</span>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-xl border border-[#E3EAE2] bg-white px-3 py-2.5">
-                      <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                        <Icon name="check" className="h-2.5 w-2.5" />
-                      </span>
-                      <span className="font-medium text-ink-soft text-[12px]">No IP addresses or cookies stored</span>
-                    </div>
+                    <span className="font-medium text-ink-soft text-[12px]">No account required</span>
                   </div>
                 </div>
               </div>
