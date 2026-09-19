@@ -176,10 +176,22 @@ const fr: Record<keyof typeof en, string> = {
   "simple.description": "Texte plus grand, mise en page plus simple, plus facile à lire",
 
   // Landing
-  "landing.headline": "Une information en laquelle vous pouvez avoir confiance",
+  "landing.headline": "Des informations auxquelles vous pouvez faire confiance",
   "landing.subheadline": "Sachez ce qui se passe. Sachez ce qui est vérifié. Sachez quoi faire ensuite.",
-  "landing.problem": "L'accès aux droits et services dépend de la recherche d'informations fiables. Pour de nombreuses communautés, les informations essentielles sont fragmentées ou obsolètes.",
-  "landing.solution": "Civora rend l'information civique visible, vérifiable et exploitable.",
+  "landing.problem": "L'accès aux droits et aux services dépend souvent de la recherche d'informations que vous comprenez et auxquelles vous pouvez faire confiance. Pour de nombreuses communautés, les informations essentielles sont fragmentées, obsolètes ou difficiles à vérifier.",
+  "landing.solution": "Civora rend les informations civiques transparentes, vérifiables et exploitables.",
+  "landing.hero.super": "L'information fiable",
+  "landing.hero.title1": "Connaissez vos droits.",
+  "landing.hero.title2": "Signalez en sécurité.",
+  "landing.hero.title3": "Vérifiez ensemble.",
+  "landing.hero.desc": "Civora vous aide à trouver des informations vérifiées sur les services et les opportunités, et connecte les signalements, les preuves et les réponses dans un flux de travail transparent.",
+  "landing.hero.btn1": "Trouver des informations fiables",
+  "landing.hero.btn2": "Signaler un problème",
+  "landing.try.title": "Essayez la démo",
+  "landing.try.desc": "Découvrez la plateforme sous trois perspectives. Toutes les données sont entièrement fictives.",
+  "landing.try.btn1": "Explorer en tant que citoyen",
+  "landing.try.btn2": "Ouvrir l'espace intervenant",
+  "landing.try.btn3": "Parcourir les cas publics",
 
   // Language
   "lang.en": "Anglais",

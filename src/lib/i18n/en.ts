@@ -178,9 +178,21 @@ const en: Record<string, string> = {
 
   // ── Landing ─────────────────────────────────────────────────────────────────
   "landing.headline": "Information you can trust",
-  "landing.subheadline": "Know what is happening. Know what is verified. Know what to do next.",
-  "landing.problem": "Access to rights, services, and opportunities depends on finding information you understand and trust. For many communities, essential information is fragmented, outdated, or hidden.",
-  "landing.solution": "Civora makes civic information visible, verifiable, and actionable.",
+  "landing.subheadline": "Know what's happening. Know what's verified. Know what's next.",
+  "landing.problem": "Access to rights and services often depends on finding information you can understand and trust. For many communities, essential information is fragmented, outdated, or hard to verify.",
+  "landing.solution": "Civora makes civic information transparent, verifiable, and actionable.",
+  "landing.hero.super": "Information you can trust",
+  "landing.hero.title1": "Know your rights.",
+  "landing.hero.title2": "Report safely.",
+  "landing.hero.title3": "Verify together.",
+  "landing.hero.desc": "Civora helps you find verified information about services and opportunities, and connects reports, evidence, and response in one transparent workflow.",
+  "landing.hero.btn1": "Find trusted information",
+  "landing.hero.btn2": "Report an issue",
+  "landing.try.title": "Try the demo",
+  "landing.try.desc": "Experience the platform from three perspectives. All data is entirely fictional.",
+  "landing.try.btn1": "Explore as a citizen",
+  "landing.try.btn2": "Open responder workspace",
+  "landing.try.btn3": "Browse public cases",
 
   // ── Language ────────────────────────────────────────────────────────────────
   "lang.en": "English",

@@ -175,6 +175,18 @@ const sw: Record<keyof typeof en, string> = {
   "landing.subheadline": "San abin da ke faruwa. San abin da aka tabbatar. San abin da za'a yi gaba.",
   "landing.problem": "Samun damar hakkoki da ayyuka ya danganta ga samun bayani wanda zaku iya ganewa kuma ku dogara dashi. Ga al'ummomi da yawa, bayani na yau da kullum yana da wahalar samu ko ya tsufa.",
   "landing.solution": "Civora yana sa bayanin al'umma ya kasance a bayyane, mai tabbatarwa, kuma mai amfani.",
+  "landing.hero.super": "Taarifa unayoweza kuiamini",
+  "landing.hero.title1": "Jua haki zako.",
+  "landing.hero.title2": "Ripoti kwa usalama.",
+  "landing.hero.title3": "Thibitisha pamoja.",
+  "landing.hero.desc": "Civora inakusaidia kupata taarifa zilizothibitishwa kuhusu huduma na fursa, na kuunganisha ripoti, ushahidi, na majibu katika mtiririko mmoja wazi.",
+  "landing.hero.btn1": "Tafuta taarifa za kuaminika",
+  "landing.hero.btn2": "Ripoti tatizo",
+  "landing.try.title": "Jaribu onyesho",
+  "landing.try.desc": "Pata uzoefu wa jukwaa kutoka kwa mitazamo mitatu. Data zote ni za kubuni tu.",
+  "landing.try.btn1": "Chunguza kama raia",
+  "landing.try.btn2": "Fungua nafasi ya mtoa majibu",
+  "landing.try.btn3": "Vinjari kesi za umma",
 
   // Language
   "lang.en": "English",
