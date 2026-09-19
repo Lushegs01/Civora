@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/home", label: "Home", icon: "house" },
   { href: "/cases", label: "My cases", icon: "folder" },
-  { href: "/community", label: "Community", icon: "users" },
+  { href: "/explore", label: "Explore", icon: "search" },
   { href: "/more", label: "More", icon: "settings" }
 ] as const;
 
@@ -79,13 +79,13 @@ function NavGlyph({ name, active }: { name: string; active: boolean }) {
   return (
     <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true" className="mb-0.5">
       {name === "house" && <path d="M4 11.5 12 4l8 7.5V20h-5.5v-5h-5v5H4z" {...common} />}
-      {name === "folder" && <path d="M4 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} />}
-      {name === "users" && (
+      {name === "search" && (
         <>
-          <circle cx="9" cy="9" r="3.2" {...common} />
-          <path d="M3.5 19.5c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15.5 6.4a3.2 3.2 0 0 1 0 5.2M17.5 15.2c1.6.7 2.7 2 3.2 4.3" {...common} />
+          <circle cx="11" cy="11" r="8" {...common} />
+          <path d="m21 21-4.3-4.3" {...common} />
         </>
       )}
+      {name === "folder" && <path d="M4 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} />}
       {name === "settings" && (
         <>
           <circle cx="12" cy="12" r="3" {...common} />

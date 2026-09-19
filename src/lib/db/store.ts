@@ -96,6 +96,18 @@ export function orgName(db: CivoraDB, orgId?: string): string | undefined {
   return db.orgs.find((o) => o.id === orgId)?.name;
 }
 
+export function findCivicInfo(db: CivoraDB, id: string) {
+  return db.civicInfo.find((c) => c.id === id.toUpperCase());
+}
+
+export function civicInfoByJurisdiction(db: CivoraDB, level: string, locality?: string) {
+  return db.civicInfo.filter((c) => {
+    if (c.jurisdiction.level !== level) return false;
+    if (locality && c.jurisdiction.locality !== locality) return false;
+    return true;
+  });
+}
+
 // ---- simple in-memory rate limiting (per IP, demo grade) -------------------
 const hits = new Map<string, number[]>();
 export function rateLimit(key: string, limit = 8, windowMs = 15 * 60_000): boolean {

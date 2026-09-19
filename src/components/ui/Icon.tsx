@@ -65,6 +65,13 @@ import {
   WifiOff,
   Wrench,
   X,
+  ChevronUp,
+  ChevronDown,
+  Cpu,
+  ExternalLink,
+  Globe,
+  Languages,
+  ListChecks,
   type LucideIcon
 } from "lucide-react";
 
@@ -137,7 +144,17 @@ const REGISTRY: Record<string, LucideIcon> = {
   video: Video,
   "wifi-off": WifiOff,
   wrench: Wrench,
-  x: X
+  x: X,
+  "chevron-up": ChevronUp,
+  "chevron-down": ChevronDown,
+  cpu: Cpu,
+  "external-link": ExternalLink,
+  globe: Globe,
+  languages: Languages,
+  "list-checks": ListChecks,
+  "check-circle": CircleCheck,
+  "help-circle": CircleHelp,
+  "loader-2": LoaderCircle
 };
 
 export function Icon({

@@ -33,6 +33,7 @@ interface DialogSpec {
   confirmLabel: string;
   requireNote: boolean;
   withPublicUpdate: boolean;
+  requirePublicUpdate?: boolean;
   withOrgSelect?: boolean;
   withVerificationSelect?: boolean;
   noteLabel: string;
@@ -67,8 +68,8 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
       setError("A short description is required — it becomes part of the case record.");
       return;
     }
-    if (dialog.kind === "add_update" && !publicUpdate.trim()) {
-      setError("Write the public update before posting it.");
+    if ((dialog.kind === "add_update" || dialog.requirePublicUpdate) && !publicUpdate.trim()) {
+      setError("A public update documenting the action/resolution is required.");
       return;
     }
     setBusy(true);
@@ -187,7 +188,8 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
       confirmLabel: "Close case",
       requireNote: true,
       withPublicUpdate: true,
-      noteLabel: "Resolution summary",
+      requirePublicUpdate: true,
+      noteLabel: "Internal Resolution summary",
       notePlaceholder: "e.g. Fault repaired and tested; walkway reopened"
     },
     add_note: {
@@ -458,6 +460,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
               <div className="mt-3.5">
                 <label htmlFor="action-public" className="meta-label mb-1.5 block">
                   Public update
+                  {(dialog.kind === "add_update" || dialog.requirePublicUpdate) && <span className="text-danger"> *</span>}
                 </label>
                 <textarea
                   id="action-public"
@@ -471,7 +474,9 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                 <p className="mt-1.5 text-xs text-ink-soft">
                   {publicUpdate.trim()
                     ? `Preview: “${publicUpdate.trim()}”`
-                    : "Optional for most actions — required when publishing an update."}
+                    : (dialog.kind === "add_update" || dialog.requirePublicUpdate) 
+                        ? "Required." 
+                        : "Optional for most actions — required when publishing an update."}
                 </p>
               </div>
             )}

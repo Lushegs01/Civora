@@ -156,6 +156,9 @@ export async function POST(req: NextRequest) {
       }
       case "close": {
         requireNote();
+        if (!publicUpdate) {
+          throw new Error("A public update documenting the resolution is required to close a case.");
+        }
         c.response = "closed";
         c.verification = "resolved";
         c.resolvedAt = now;
@@ -168,7 +171,7 @@ export async function POST(req: NextRequest) {
           title: "Case closed",
           detail: note
         });
-        if (publicUpdate) addPublicUpdate(publicUpdate);
+        addPublicUpdate(publicUpdate);
         break;
       }
       case "add_note": {

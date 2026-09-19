@@ -8,6 +8,7 @@ import { VerificationBadge, ResponseBadge, PriorityBadge } from "@/components/ui
 import { Icon } from "@/components/ui/Icon";
 import { CaseProgress } from "@/components/case/CaseProgress";
 import { TrustPanel } from "@/components/case/TrustPanel";
+import { TrustExplainer } from "@/components/case/TrustExplainer";
 import { EvidenceChain } from "@/components/case/EvidenceChain";
 import { CaseTimeline } from "@/components/case/CaseTimeline";
 import { ResponseSection, EvidenceSummaryRow } from "@/components/case/ResponseSection";
@@ -106,6 +107,7 @@ export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; ba
         <div className="space-y-5">
           <AiSummaryCard caseId={c.id} sourceTitles={sourceTitles} />
           <TrustPanel view={view} />
+          <TrustExplainer />
           <EvidenceChain evidence={view.evidence} canSeeRestricted={reporter} />
           <CaseTimeline view={view} />
         </div>

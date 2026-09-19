@@ -229,3 +229,26 @@
     to { transform: translateY(-12px); }
   }
 }
+
+/* Simple/Accessibility Mode overrides */
+:root[data-simple="true"] {
+  --tw-prose-body: 1.125rem;
+}
+:root[data-simple="true"] body {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  letter-spacing: 0.025em;
+}
+:root[data-simple="true"] button,
+:root[data-simple="true"] a,
+:root[data-simple="true"] input,
+:root[data-simple="true"] select {
+  min-height: 48px;
+  min-width: 48px;
+}
+:root[data-simple="true"] .text-slate-500 {
+  color: #334155; 
+}
+:root[data-simple="true"] .text-slate-400 {
+  color: #475569; 
+}

@@ -98,35 +98,34 @@ export default async function LandingPage() {
             {/* Copy */}
             <div className="max-w-[620px]">
               <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-[#9CC5AA]">
-                Civic incident platform
+                Information you can trust
               </p>
               <h1 className="mt-5 font-display text-[44px] font-light leading-[1.06] tracking-[-0.01em] text-white sm:text-[58px] lg:text-[62px]">
+                Know your rights.
+                <br />
                 Report safely.
                 <br />
-                Verify carefully.
-                <br />
-                Respond together.
+                Verify together.
               </h1>
               <p className="mt-6 max-w-md text-[16px] leading-relaxed text-white/65 md:text-[17px]">
-                Civora connects reports, evidence, response, and accountability in one traceable
-                workflow — so communities know what&rsquo;s happening, and what happens next.
+                Civora helps you find verified information about services and opportunities, and connects reports, evidence, and response in one transparent workflow.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3.5">
                 <Link
-                  href="/report"
+                  href="/explore"
                   className="press group inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-white py-2 pl-7 pr-2 text-[15px] font-semibold text-[#0B1F14] shadow-[0_18px_40px_-16px_rgba(255,255,255,0.45)] transition-colors hover:bg-[#EFF5F0]"
                 >
-                  Report an issue
+                  Find trusted information
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B1F14] text-white transition-transform duration-200 group-hover:rotate-45">
                     <Icon name="arrow-up-right" className="h-4 w-4" />
                   </span>
                 </Link>
                 <Link
-                  href="/community"
+                  href="/report"
                   className="press inline-flex min-h-[52px] items-center rounded-full border border-white/25 px-7 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/10"
                 >
-                  Explore cases
+                  Report an issue
                 </Link>
               </div>
 
@@ -518,7 +517,7 @@ export default async function LandingPage() {
           <div className="flex items-center gap-3 text-white">
             <CivoraLogo size={28} dark={true} />
           </div>
-          <p className="text-white/60">Report safely. Verify carefully. Respond together.</p>
+          <p className="text-white/60">Know your rights. Report safely. Verify together.</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="transition-colors hover:text-white">Privacy</Link>
             <Link href="/resources" className="transition-colors hover:text-white">Get help</Link>

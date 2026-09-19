@@ -15,13 +15,22 @@ interface SyncNotice {
 
 export function OutboxSync() {
   const [notice, setNotice] = useState<SyncNotice | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   const syncing = useRef(false);
 
   const flush = useCallback(async () => {
     if (syncing.current || !navigator.onLine) return;
-    syncing.current = true;
     try {
       const items = await listOutbox();
+      if (items.length === 0) return;
+      
+      syncing.current = true;
+      setIsSyncing(true);
+      
+      let successCount = 0;
+      let lastCaseId = undefined;
+      let linked = false;
+
       for (const item of items) {
         try {
           const res = await fetch("/api/reports", {
@@ -33,20 +42,27 @@ export function OutboxSync() {
           if (!res.ok) throw new Error(data?.error || "Submission failed");
           if (data.caseId && data.token) await saveToken(data.caseId, data.token);
           await removeFromOutbox(item.id);
-          setNotice({
-            kind: data.linkedTo ? "success" : "success",
-            caseId: data.linkedTo || data.caseId,
-            message: data.linkedTo
-              ? "Your saved report was submitted after reconnecting and linked to an existing case."
-              : "Your saved report was submitted automatically after reconnecting."
-          });
+          
+          successCount++;
+          lastCaseId = data.linkedTo || data.caseId;
+          if (data.linkedTo) linked = true;
         } catch (e) {
-          // keep in outbox for the next reconnect
           break;
         }
       }
+
+      if (successCount > 0) {
+        setNotice({
+          kind: "success",
+          caseId: successCount === 1 ? lastCaseId : undefined,
+          message: successCount === 1 
+            ? (linked ? "Your saved report was submitted after reconnecting and linked to an existing case." : "Your saved report was submitted automatically after reconnecting.")
+            : `${successCount} saved reports were submitted automatically.`
+        });
+      }
     } finally {
       syncing.current = false;
+      setIsSyncing(false);
     }
   }, []);
 
@@ -63,7 +79,7 @@ export function OutboxSync() {
     return () => clearTimeout(t);
   }, [notice]);
 
-  if (!notice) return null;
+  if (!notice && !isSyncing) return null;
 
   return (
     <div
@@ -74,18 +90,24 @@ export function OutboxSync() {
       <div className="card flex items-start gap-3 p-4 shadow-raise">
         <span
           className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-            notice.kind === "success" ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
+            isSyncing 
+              ? "bg-brand-soft text-brand-deep"
+              : notice?.kind === "success" ? "bg-success-soft text-success" : "bg-danger-soft text-danger"
           }`}
         >
-          <Icon name={notice.kind === "success" ? "check-circle-2" : "circle-alert"} className="h-4 w-4" />
+          {isSyncing ? (
+            <Icon name="loader-circle" className="h-4 w-4 animate-spin" />
+          ) : (
+            <Icon name={notice?.kind === "success" ? "check-circle-2" : "circle-alert"} className="h-4 w-4" />
+          )}
         </span>
         <div className="min-w-0 flex-1 text-sm">
           <p className="font-medium text-ink">
-            {notice.kind === "success" ? "Report submitted" : "Submission problem"}
+            {isSyncing ? "Syncing drafts..." : notice?.kind === "success" ? "Report submitted" : "Submission problem"}
           </p>
           <p className="mt-0.5 leading-relaxed text-ink-soft">
-            {notice.message}
-            {notice.caseId && (
+            {isSyncing ? "Please wait while your offline reports are submitted." : notice?.message}
+            {notice?.caseId && !isSyncing && (
               <>
                 {" "}
                 Case{" "}
@@ -97,13 +119,15 @@ export function OutboxSync() {
             )}
           </p>
         </div>
-        <button
-          onClick={() => setNotice(null)}
-          aria-label="Dismiss notification"
-          className="rounded-full p-1.5 text-ink-soft hover:bg-muted hover:text-ink"
-        >
-          <Icon name="x" className="h-4 w-4" />
-        </button>
+        {!isSyncing && (
+          <button
+            onClick={() => setNotice(null)}
+            aria-label="Dismiss notification"
+            className="rounded-full p-1.5 text-ink-soft hover:bg-muted hover:text-ink"
+          >
+            <Icon name="x" className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );

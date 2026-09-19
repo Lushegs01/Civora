@@ -8,6 +8,7 @@ import type {
   InternalNote,
   Organization
 } from "../types";
+import type { CivicInfoItem } from "../civic-types";
 
 // All demo content is fictional and written for evaluation purposes.
 // Timestamps are generated relative to first seed so the demo always feels live.
@@ -68,6 +69,7 @@ export function buildSeed(): CivoraDB {
   const events: CaseEvent[] = [];
   const updates: CaseUpdate[] = [];
   const notes: InternalNote[] = [];
+  const civicInfo: CivicInfoItem[] = [];
   let evSeq = 0;
   let evtSeq = 0;
 
@@ -362,6 +364,91 @@ export function buildSeed(): CivoraDB {
     addEvidence({ caseId: c.id, at: iso(-2 * DAY + 2 * HOUR), kind: "note", title: "Mediation pathway record", sourceType: "official", submittedByLabel: org("org-mediation").name, excerpt: "Case accepted on the mediation/referral pathway. A mediator will contact participants who opted in. Civora does not determine fault and does not label parties.", relationship: "Documents the chosen pathway for the case.", publicVisible: true, sourceRef: "Mediation intake record (fictional demo record)" });
   }
 
+  // --- CIVIC INFO DEMO DATA ---
+  civicInfo.push({
+    id: "CIV-ELEC-01",
+    title: "Electrical Safety Standards in Public Areas",
+    category: "safety",
+    jurisdiction: { country: "Nigeria", region: "Kano State", level: "state" },
+    explanation: "Public areas and walkways must have properly insulated electrical fittings. Any exposed wiring or scorched panels must be isolated within 24 hours of reporting.",
+    officialSource: "State Electricity Board",
+    sourceAuthority: "Regulatory Agency",
+    publishedAt: iso(-180 * DAY),
+    lastVerifiedAt: iso(-10 * DAY),
+    freshnessState: "current",
+    freshnessThresholdDays: 30,
+    verificationMethod: "Checked against published state regulations (2024 handbook)",
+    nextActions: [
+      { label: "Report a fault", type: "report" },
+      { label: "View full regulations", type: "link", href: "#" }
+    ],
+    fictional: true,
+    languageVersions: {}
+  });
+
+  civicInfo.push({
+    id: "CIV-WATER-01",
+    title: "Rights During Emergency Water Outages",
+    category: "right",
+    jurisdiction: { country: "Nigeria", level: "federal" },
+    explanation: "If a municipal water outage lasts longer than 48 hours, the utility is required to provide alternative water access points or tankers for affected communities.",
+    officialSource: "National Water Resources Commission",
+    sourceAuthority: "Federal Commission",
+    publishedAt: iso(-400 * DAY),
+    lastVerifiedAt: iso(-60 * DAY),
+    freshnessState: "review_needed",
+    freshnessThresholdDays: 30,
+    whatRemainsUncertain: ["The exact locations of emergency tankers are not always published in advance."],
+    nextActions: [
+      { label: "Contact Utility", type: "contact" }
+    ],
+    fictional: true,
+    languageVersions: {}
+  });
+
+  civicInfo.push({
+    id: "CIV-MED-01",
+    title: "Community Dispute Mediation Service",
+    category: "service",
+    jurisdiction: { country: "Nigeria", region: "Kano State", locality: "Kano Municipal", level: "local" },
+    explanation: "Free neutral mediation for disputes over shared community resources, land boundaries, and neighborhood noise. Process is confidential and voluntary.",
+    officialSource: "Municipal Mediation Center",
+    sourceAuthority: "Local Government",
+    publishedAt: iso(-120 * DAY),
+    lastVerifiedAt: iso(-5 * DAY),
+    freshnessState: "current",
+    freshnessThresholdDays: 90,
+    eligibility: "Residents of Kano Municipal",
+    requirements: ["Both parties must agree to mediate", "Valid ID"],
+    fees: "Free of charge",
+    nextActions: [
+      { label: "Apply for mediation", type: "apply" }
+    ],
+    fictional: true,
+    languageVersions: {}
+  });
+
+  civicInfo.push({
+    id: "CIV-POLICY-01",
+    title: "Market Pavilion Refurbishment Program",
+    category: "project",
+    jurisdiction: { country: "Nigeria", region: "Kano State", level: "state" },
+    explanation: "A state-funded project to refurbish 5 major market pavilions. Phase 1 covers structural repairs, Phase 2 covers internal fit-outs.",
+    officialSource: "State Ministry of Works",
+    sourceAuthority: "State Ministry",
+    publishedAt: iso(-200 * DAY),
+    lastVerifiedAt: iso(-2 * DAY),
+    freshnessState: "conflicting",
+    freshnessThresholdDays: 14,
+    verificationMethod: "Cross-referenced budget summaries and procurement records.",
+    whatRemainsUncertain: ["Whether Phase 1 is actually complete, as public notices and procurement records disagree."],
+    nextActions: [
+      { label: "Track related cases", type: "internal", href: "/cases" }
+    ],
+    fictional: true,
+    languageVersions: {}
+  });
+
   return {
     version: 1,
     orgs: ORGS,
@@ -370,6 +457,7 @@ export function buildSeed(): CivoraDB {
     events,
     updates,
     notes,
+    civicInfo,
     meta: { lastCaseNumber: 1045, seededAt: new Date().toISOString() }
   };
 }

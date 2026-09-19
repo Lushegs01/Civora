@@ -1,13 +1,17 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CivoraLogo } from "@/components/CivoraLogo";
 import { cn } from "@/lib/utils";
 import { DemoTag } from "@/components/shell/DemoTag";
+import { LanguageSwitcher } from "@/components/shell/LanguageSwitcher";
+import { useSimpleMode } from "@/components/system/SimpleMode";
+import { Icon } from "@/components/ui/Icon";
 
 const NAV = [
   { href: "/home", label: "Home", icon: "house" },
+  { href: "/explore", label: "Explore", icon: "search" },
   { href: "/report", label: "Report an issue", icon: "plus" },
   { href: "/cases", label: "My cases", icon: "folder" },
   { href: "/community", label: "Community", icon: "users" },
@@ -21,6 +25,8 @@ const SECONDARY = [
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { isSimpleMode, setSimpleMode } = useSimpleMode();
+  
   return (
     <aside
       className={cn(
@@ -48,6 +54,18 @@ export function Sidebar({ className }: { className?: string }) {
             {item.label}
           </SideLink>
         ))}
+        
+        <div className="pt-2">
+          <LanguageSwitcher />
+        </div>
+        
+        <button
+          onClick={() => setSimpleMode(!isSimpleMode)}
+          className="press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium text-ink-soft hover:bg-muted/50 hover:text-ink transition-colors w-full text-left"
+        >
+          <Icon name="eye" className="h-[18px] w-[18px] text-ink-soft" />
+          {isSimpleMode ? "Standard view" : "Simple view"}
+        </button>
       </nav>
 
       <div className="mt-auto space-y-3">
@@ -88,6 +106,12 @@ function NavGlyph({ name, active }: { name: string; active?: boolean }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className={active ? "text-ink" : "text-ink-soft"}>
       {name === "house" && <path d="M4 11.5 12 4l8 7.5V20h-5.5v-5h-5v5H4z" {...common} />}
+      {name === "search" && (
+        <>
+          <circle cx="11" cy="11" r="8" {...common} />
+          <path d="m21 21-4.3-4.3" {...common} />
+        </>
+      )}
       {name === "plus" && <path d="M12 5v14M5 12h14" {...common} />}
       {name === "folder" && <path d="M4 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" {...common} />}
       {name === "users" && (

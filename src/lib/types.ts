@@ -2,6 +2,8 @@
 // prisma/schema.prisma; the demo runtime persists them via the JSON store
 // (src/lib/db/store.ts) which can be swapped for Postgres without UI changes.
 
+import type { CivicInfoItem } from "./civic-types";
+
 export type PrivacyMode = "anonymous" | "confidential" | "identified";
 
 export type VerificationState =
@@ -144,6 +146,7 @@ export interface CivoraDB {
   events: CaseEvent[];
   updates: CaseUpdate[];
   notes: InternalNote[];
+  civicInfo: CivicInfoItem[];
   meta: { lastCaseNumber: number; seededAt: string };
 }
 

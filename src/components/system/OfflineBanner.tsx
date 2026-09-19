@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { listOutbox } from "@/lib/offline/db";
 
 export function OfflineBanner() {
   const [offline, setOffline] = useState<boolean | null>(null);
+  const [outboxCount, setOutboxCount] = useState(0);
 
   useEffect(() => {
     const update = () => setOffline(!navigator.onLine);
@@ -16,6 +18,12 @@ export function OfflineBanner() {
       window.removeEventListener("offline", update);
     };
   }, []);
+
+  useEffect(() => {
+    if (offline) {
+      listOutbox().then(items => setOutboxCount(items.length)).catch(() => {});
+    }
+  }, [offline]);
 
   if (offline !== true) return null;
 
@@ -32,8 +40,11 @@ export function OfflineBanner() {
         <div className="min-w-0 text-[13px] leading-snug">
           <p className="font-semibold text-ink">No connection</p>
           <p className="text-ink-soft">
-            You can keep working. Drafts are saved securely on this device and submitted when you're
-            back online.
+            You can keep working. {outboxCount > 0 ? (
+              <span className="font-medium text-warning-deep">{outboxCount} {outboxCount === 1 ? 'draft is' : 'drafts are'} waiting to sync.</span>
+            ) : (
+              "Drafts are saved securely on this device and submitted when you're back online."
+            )}
           </p>
         </div>
       </div>

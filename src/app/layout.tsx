@@ -58,13 +58,20 @@ export const viewport: Viewport = {
   themeColor: "#F4F4F1"
 };
 
+import { LocaleProvider } from "@/components/system/LocaleProvider";
+import { SimpleModeProvider } from "@/components/system/SimpleMode";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${poppins.variable}`}>
       <body className="min-h-dvh bg-canvas text-ink">
-        {children}
-        <ServiceWorkerRegister />
-        <OutboxSync />
+        <LocaleProvider>
+          <SimpleModeProvider>
+            {children}
+            <ServiceWorkerRegister />
+            <OutboxSync />
+          </SimpleModeProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

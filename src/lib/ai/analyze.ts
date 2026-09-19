@@ -128,3 +128,47 @@ const openaiProvider: SummaryProvider = {
 export function getSummaryProvider(): SummaryProvider {
   return process.env.AI_PROVIDER === "openai" ? openaiProvider : mockProvider;
 }
+
+// -----------------------------------------------------------------------------
+// Civic Information AI Explanation
+// -----------------------------------------------------------------------------
+
+export async function explainCivicInfo(text: string, locale: string = "en"): Promise<string> {
+  // Try OpenAI if configured
+  if (process.env.AI_PROVIDER === "openai" && process.env.OPENAI_API_KEY) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: JSON.stringify({
+          model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `You are a civic tech assistant. Rewrite this civic text into plain, simple language at a 5th-grade reading level. Keep it under 3 sentences. Output strictly in the requested language (locale: ${locale}).`
+            },
+            { role: "user", content: text }
+          ],
+          temperature: 0.3
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.choices[0].message.content.trim();
+      }
+    } catch (e) {
+      console.error("OpenAI explain failed, falling back to mock", e);
+    }
+  }
+
+  // Deterministic mock fallback
+  if (locale === "ha") {
+    return `An tsara wannan bayanin don kowa ya gane. Ga abin da ya kamata ku sani game da: ${text.substring(0, 50)}...`;
+  }
+  if (locale === "fr") {
+    return `Voici une explication simplifiée pour que tout le monde puisse comprendre: ${text.substring(0, 50)}...`;
+  }
+  
+  // English mock
+  return `This is a simplified reading of the civic information: ${text.substring(0, 80)}...`;
+}

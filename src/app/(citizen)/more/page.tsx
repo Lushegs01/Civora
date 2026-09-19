@@ -9,6 +9,28 @@ import { Icon } from "@/components/ui/Icon";
 import { ConfirmDialog } from "@/components/ui/Modal";
 import { DemoTag } from "@/components/shell/DemoTag";
 import { getTokens } from "@/lib/offline/db";
+import { LanguageSwitcher } from "@/components/shell/LanguageSwitcher";
+import { useSimpleMode } from "@/components/system/SimpleMode";
+
+function SimpleModeToggle() {
+  const { isSimpleMode, setSimpleMode } = useSimpleMode();
+  return (
+    <button
+      role="switch"
+      aria-checked={isSimpleMode}
+      onClick={() => setSimpleMode(!isSimpleMode)}
+      className={`press relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+        isSimpleMode ? "bg-brand" : "bg-line"
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all ${
+          isSimpleMode ? "left-[22px]" : "left-0.5"
+        }`}
+      />
+    </button>
+  );
+}
 
 export default function MorePage() {
   const router = useRouter();
@@ -82,8 +104,30 @@ export default function MorePage() {
         </section>
 
         <section aria-label="Settings" className="mt-8">
-          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">Settings</h2>
+          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">Language & Display</h2>
           <div className="card mt-3.5 divide-y divide-line">
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <div>
+                <p className="text-[14.5px] font-semibold text-ink">Simple Mode</p>
+                <p className="mt-0.5 text-[13px] text-ink-soft">
+                  Larger text, simpler layout, easier to read.
+                </p>
+              </div>
+              <SimpleModeToggle />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <div>
+                <p className="text-[14.5px] font-semibold text-ink">Language</p>
+                <p className="mt-0.5 text-[13px] text-ink-soft">
+                  Select your preferred language.
+                </p>
+              </div>
+              <div className="w-32">
+                <LanguageSwitcher />
+              </div>
+            </div>
+
             <div className="flex items-center justify-between gap-4 px-5 py-4">
               <div>
                 <p className="text-[14.5px] font-semibold text-ink">Reduce motion</p>
