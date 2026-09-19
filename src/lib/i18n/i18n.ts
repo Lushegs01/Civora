@@ -1,13 +1,13 @@
 import en from "./en";
-import ha from "./ha";
+import sw from "./sw";
 import fr from "./fr";
 
-export type Locale = "en" | "ha" | "fr";
+export type Locale = "en" | "sw" | "fr";
 export type TranslationKey = keyof typeof en;
 
 const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
   en,
-  ha,
+  sw,
   fr
 };
 

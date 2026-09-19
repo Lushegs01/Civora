@@ -1,8 +1,11 @@
+"use client";
+
 import { Icon } from "@/components/ui/Icon";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
+import { useLocale } from "@/components/system/LocaleProvider";
 
-export function VerificationExplainer({ locale = "en" }: { locale?: Locale }) {
+export function VerificationExplainer() {
+  const { locale } = useLocale();
   return (
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mt-8">
       <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-800 mb-3">

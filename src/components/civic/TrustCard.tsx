@@ -1,3 +1,5 @@
+"use client";
+
 import { FreshnessBadge } from "./FreshnessBadge";
 import { JurisdictionBadge } from "./JurisdictionBadge";
 import { NextActionsPanel } from "./NextActionsPanel";
@@ -8,16 +10,15 @@ import { RelativeTime } from "@/components/ui/RelativeTime";
 import type { CivicInfoItem } from "@/lib/civic-types";
 import { CIVIC_CATEGORY_META } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
+import { useLocale } from "@/components/system/LocaleProvider";
 import { cn } from "@/lib/utils";
 
 export function TrustCard({ 
-  item, 
-  locale = "en" 
+  item 
 }: { 
   item: CivicInfoItem; 
-  locale?: Locale;
 }) {
+  const { locale } = useLocale();
   const categoryMeta = CIVIC_CATEGORY_META[item.category];
   
   // Try to use language version if available

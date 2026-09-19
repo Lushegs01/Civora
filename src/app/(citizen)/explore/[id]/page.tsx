@@ -14,8 +14,6 @@ export default async function CivicInfoDetailPage({ params }: { params: { id: st
     notFound();
   }
 
-  const locale = "en";
-
   return (
     <div className="min-h-screen bg-slate-50 pb-20 md:pb-8">
       <TopBar />
@@ -28,9 +26,9 @@ export default async function CivicInfoDetailPage({ params }: { params: { id: st
           <Icon name="chevron-left" className="h-4 w-4" />
           Back to Explorer
         </Link>
-        <TrustCard item={item} locale={locale} />
+        <TrustCard item={item} />
         
-        <VerificationExplainer locale={locale} />
+        <VerificationExplainer />
       </div>
     </div>
   );

@@ -10,22 +10,26 @@ import { useSimpleMode } from "@/components/system/SimpleMode";
 import { Icon } from "@/components/ui/Icon";
 
 const NAV = [
-  { href: "/home", label: "Home", icon: "house" },
-  { href: "/explore", label: "Explore", icon: "search" },
-  { href: "/report", label: "Report an issue", icon: "plus" },
-  { href: "/cases", label: "My cases", icon: "folder" },
-  { href: "/community", label: "Community", icon: "users" },
-  { href: "/resources", label: "Resources", icon: "shield-check" }
+  { href: "/home", labelKey: "nav.home", icon: "house" },
+  { href: "/explore", labelKey: "nav.explore", icon: "search" },
+  { href: "/report", labelKey: "nav.report", icon: "plus" },
+  { href: "/cases", labelKey: "nav.cases", icon: "folder" },
+  { href: "/community", labelKey: "nav.community", icon: "users" },
+  { href: "/resources", labelKey: "nav.resources", icon: "shield-check" }
 ] as const;
 
 const SECONDARY = [
-  { href: "/privacy", label: "Privacy", icon: "eye-off" },
-  { href: "/more", label: "Settings", icon: "settings" }
+  { href: "/privacy", labelKey: "nav.privacy", icon: "eye-off" },
+  { href: "/more", labelKey: "nav.more", icon: "settings" }
 ] as const;
+
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { isSimpleMode, setSimpleMode } = useSimpleMode();
+  const { locale } = useLocale();
   
   return (
     <aside
@@ -41,7 +45,7 @@ export function Sidebar({ className }: { className?: string }) {
       <nav aria-label="Primary" className="flex flex-col gap-1">
         {NAV.map((item) => (
           <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
-            {item.label}
+            {t(item.labelKey as any, locale)}
           </SideLink>
         ))}
       </nav>
@@ -51,7 +55,7 @@ export function Sidebar({ className }: { className?: string }) {
       <nav aria-label="Secondary" className="flex flex-col gap-1">
         {SECONDARY.map((item) => (
           <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
-            {item.label}
+            {t(item.labelKey as any, locale)}
           </SideLink>
         ))}
         

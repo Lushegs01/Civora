@@ -18,7 +18,7 @@ export default async function ExplorePage() {
           </p>
         </div>
 
-        <CivicExplorer initialItems={initialItems} locale="en" />
+        <CivicExplorer initialItems={initialItems} />
       </main>
     </div>
   );

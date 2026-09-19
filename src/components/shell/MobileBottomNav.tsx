@@ -5,15 +5,19 @@ import { usePathname } from "next/navigation";
 import { CivoraLogo } from "@/components/CivoraLogo";
 import { cn } from "@/lib/utils";
 
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
+
 const ITEMS = [
-  { href: "/home", label: "Home", icon: "house" },
-  { href: "/cases", label: "My cases", icon: "folder" },
-  { href: "/explore", label: "Explore", icon: "search" },
-  { href: "/more", label: "More", icon: "settings" }
+  { href: "/home", labelKey: "nav.home", icon: "house" },
+  { href: "/cases", labelKey: "nav.cases", icon: "folder" },
+  { href: "/explore", labelKey: "nav.explore", icon: "search" },
+  { href: "/more", labelKey: "nav.more", icon: "settings" }
 ] as const;
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { locale } = useLocale();
 
   // Hide the global bottom navigation bar on /report so the wizard's
   // dedicated sticky action bar ("Continue", "Back", "Submit") is clearly visible.
@@ -26,23 +30,23 @@ export function MobileBottomNav() {
     >
       <div className="grid w-full grid-cols-5 items-end px-1 pb-1.5 pt-1.5">
         {ITEMS.slice(0, 2).map((item) => (
-          <NavItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
+          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey as any, locale) }} active={pathname.startsWith(item.href)} />
         ))}
 
         {/* Report — visually prominent, centred, still calm */}
         <div className="relative flex w-full justify-center">
           <Link
             href="/report"
-            aria-label="Report an issue"
+            aria-label={t("nav.report", locale)}
             className="press -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand text-white shadow-raise"
           >
             <CivoraLogo size={22} withWordmark={false} dark={true} />
-            <span className="mt-0.5 text-[10px] font-bold tracking-[0.02em] uppercase">Report</span>
+            <span className="mt-0.5 text-[10px] font-bold tracking-[0.02em] uppercase">{t("nav.report", locale)}</span>
           </Link>
         </div>
 
         {ITEMS.slice(2).map((item) => (
-          <NavItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
+          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey as any, locale) }} active={pathname.startsWith(item.href)} />
         ))}
       </div>
     </nav>

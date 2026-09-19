@@ -1,13 +1,8 @@
-// Hausa translations
+// Swahili translations
 import type en from "./en";
 
-const ha: Record<keyof typeof en, string> = {
+const sw: Record<keyof typeof en, string> = {
   // Navigation
-  "nav.home": "Gida",
-  "nav.cases": "Korafe-korafena",
-  "nav.explore": "Bincika",
-  "nav.community": "Al'umma",
-  "nav.report": "Kawo Rahoto",
   "nav.more": "Kari",
   "nav.privacy": "Sirri",
   "nav.resources": "Nemi Taimako",
@@ -183,9 +178,9 @@ const ha: Record<keyof typeof en, string> = {
 
   // Language
   "lang.en": "English",
-  "lang.ha": "Hausa",
+  "lang.sw": "Kiswahili",
   "lang.fr": "Français",
-  "lang.switch": "Yare"
+  "lang.switch": "Lugha",
 };
 
-export default ha;
+export default sw;

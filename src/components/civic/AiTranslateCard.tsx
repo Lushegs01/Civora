@@ -46,7 +46,7 @@ export function AiTranslateCard({
       >
         <div className="flex items-center gap-2 text-indigo-900 font-medium">
           <Icon name="languages" className="h-5 w-5 text-indigo-600" />
-          {t("action.translate", locale) || "Translate to " + (locale === "ha" ? "Hausa" : "French")}
+          {t("action.translate", locale) || "Translate to " + (locale === "sw" ? "Swahili" : "French")}
         </div>
         <Icon name={isOpen ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-indigo-400" />
       </button>

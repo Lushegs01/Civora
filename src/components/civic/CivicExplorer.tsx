@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { CivicInfoCard } from "./CivicInfoCard";
 import type { CivicInfoItem } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
+import { useLocale } from "@/components/system/LocaleProvider";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -19,12 +19,11 @@ const TABS = [
 ] as const;
 
 export function CivicExplorer({ 
-  initialItems, 
-  locale = "en" 
+  initialItems 
 }: { 
   initialItems: CivicInfoItem[]; 
-  locale?: Locale;
 }) {
+  const { locale } = useLocale();
   const [items, setItems] = useState<CivicInfoItem[]>(initialItems);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [query, setQuery] = useState("");

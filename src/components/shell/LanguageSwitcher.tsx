@@ -10,8 +10,8 @@ export function LanguageSwitcher() {
 
   const handleToggle = () => {
     const next: Record<Locale, Locale> = {
-      en: "ha",
-      ha: "fr",
+      en: "sw",
+      sw: "fr",
       fr: "en"
     };
     setLocale(next[locale]);
@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
     >
       <Icon name="globe" className="h-5 w-5 opacity-70" />
       <span className="font-medium text-sm">
-        {locale === "en" ? "English" : locale === "ha" ? "Hausa" : "Français"}
+        {locale === "en" ? "English" : locale === "sw" ? "Swahili" : "Français"}
       </span>
     </button>
   );

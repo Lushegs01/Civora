@@ -184,7 +184,7 @@ const en: Record<string, string> = {
 
   // ── Language ────────────────────────────────────────────────────────────────
   "lang.en": "English",
-  "lang.ha": "Hausa",
+  "lang.sw": "Swahili",
   "lang.fr": "Français",
   "lang.switch": "Language",
 };

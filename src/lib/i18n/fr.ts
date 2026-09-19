@@ -182,8 +182,8 @@ const fr: Record<keyof typeof en, string> = {
   "landing.solution": "Civora rend l'information civique visible, vérifiable et exploitable.",
 
   // Language
-  "lang.en": "English",
-  "lang.ha": "Hausa",
+  "lang.en": "Anglais",
+  "lang.sw": "Swahili",
   "lang.fr": "Français",
   "lang.switch": "Langue"
 };
