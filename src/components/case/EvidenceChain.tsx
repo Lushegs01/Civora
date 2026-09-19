@@ -5,21 +5,23 @@ import { cn, formatDateTime } from "@/lib/utils";
 import type { EvidenceRecord } from "@/lib/types";
 import { Modal } from "@/components/ui/Modal";
 import { Icon } from "@/components/ui/Icon";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 const KIND_STYLE: Record<string, { icon: string; tile: string; label: string }> = {
-  photo: { icon: "camera", tile: "bg-brand-soft text-brand-deep", label: "Photo" },
-  video: { icon: "video", tile: "bg-brand-soft text-brand-deep", label: "Video" },
-  document: { icon: "file-text", tile: "bg-info-soft text-info", label: "Document" },
-  report: { icon: "file-text", tile: "bg-muted text-ink-soft", label: "Report" },
-  official: { icon: "building", tile: "bg-success-soft text-success", label: "Official record" },
-  note: { icon: "message", tile: "bg-warning-soft text-warning", label: "Record note" }
+  photo: { icon: "camera", tile: "bg-brand-soft text-brand-deep", label: "evidence.photo" },
+  video: { icon: "video", tile: "bg-brand-soft text-brand-deep", label: "evidence.video" },
+  document: { icon: "file-text", tile: "bg-info-soft text-info", label: "evidence.document" },
+  report: { icon: "file-text", tile: "bg-muted text-ink-soft", label: "evidence.report" },
+  official: { icon: "building", tile: "bg-success-soft text-success", label: "evidence.official" },
+  note: { icon: "message", tile: "bg-warning-soft text-warning", label: "evidence.note" }
 };
 
 const SOURCE_TYPE_LABEL: Record<string, string> = {
-  primary: "Primary source",
-  corroborating: "Corroborating",
-  official: "Official",
-  citizen: "Citizen-submitted"
+  primary: "evidence.source.primary",
+  corroborating: "evidence.source.corroborating",
+  official: "evidence.source.official",
+  citizen: "evidence.source.citizen"
 };
 
 const SOURCE_TYPE_ICON: Record<string, string> = {
@@ -28,8 +30,6 @@ const SOURCE_TYPE_ICON: Record<string, string> = {
   official: "building",
   citizen: "user"
 };
-
-// Interactive evidence chain: each node opens its full provenance record.
 
 export function EvidenceChain({
   evidence,
@@ -40,6 +40,7 @@ export function EvidenceChain({
   canSeeRestricted?: boolean;
   className?: string;
 }) {
+  const { locale } = useLocale();
   const [openId, setOpenId] = useState<string | null>(null);
   const ordered = useMemo(
     () => [...evidence].sort((a, b) => +new Date(a.submittedAt) - +new Date(b.submittedAt)),
@@ -50,13 +51,13 @@ export function EvidenceChain({
   if (ordered.length === 0) {
     return (
       <section id="evidence-chain" className={cn("card px-5 py-5", className)}>
-        <h2 className="meta-label mb-3">Evidence chain</h2>
+        <h2 className="meta-label mb-3">{t("case.evidenceChain", locale)}</h2>
         <div className="rounded-2xl bg-canvas px-4 py-5 text-center">
           <span className="mb-2 mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-muted text-ink-soft">
             <Icon name="paperclip" className="h-4 w-4" />
           </span>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
-            No supporting evidence yet. Evidence can be added to this case at any time.
+            {t("case.noEvidence", locale)}
           </p>
         </div>
       </section>
@@ -66,9 +67,9 @@ export function EvidenceChain({
   return (
     <section id="evidence-chain" className={cn("card px-5 py-5", className)}>
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="meta-label">Evidence chain</h2>
+        <h2 className="meta-label">{t("case.evidenceChain", locale)}</h2>
         <span className="text-[11.5px] font-medium text-ink-soft/70">
-          {ordered.length} linked item{ordered.length === 1 ? "" : "s"}
+          {ordered.length} {ordered.length === 1 ? t("case.linkedItem", locale) : t("case.linkedItems", locale)}
         </span>
       </div>
 
@@ -99,7 +100,7 @@ export function EvidenceChain({
                   <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                     <span className="inline-flex items-center gap-1 text-[11.5px] text-ink-soft/70">
                       <Icon name={SOURCE_TYPE_ICON[e.sourceType] || "file"} className="h-3 w-3" />
-                      {SOURCE_TYPE_LABEL[e.sourceType]}
+                      {t(SOURCE_TYPE_LABEL[e.sourceType], locale)}
                     </span>
                     <span className="text-[11px] text-ink-soft/40">·</span>
                     <span className="text-[11.5px] tabular-nums text-ink-soft/60">
@@ -109,12 +110,12 @@ export function EvidenceChain({
                 </span>
                 {e.checksum && (
                   <span title="Content checksum recorded" className="hidden shrink-0 items-center gap-1 rounded-lg bg-muted px-2 py-1 text-[11px] font-medium text-ink-soft sm:flex">
-                    <Icon name="key-round" className="h-3 w-3" /> SHA
+                    <Icon name="key-round" className="h-3 w-3" /> {t("case.sha", locale)}
                   </span>
                 )}
                 {isLast && (
                   <span className="hidden shrink-0 items-center gap-1 rounded-lg bg-brand-soft px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-deep sm:flex">
-                    Latest
+                    {t("case.latest", locale)}
                   </span>
                 )}
                 <Icon name="chevron-right" className="h-4 w-4 shrink-0 text-ink-soft/40" />
@@ -124,7 +125,7 @@ export function EvidenceChain({
         })}
       </ol>
 
-      <Modal open={!!open} onClose={() => setOpenId(null)} title={open ? "Evidence detail" : ""}>
+      <Modal open={!!open} onClose={() => setOpenId(null)} title={open ? t("case.evidenceDetail", locale) : ""}>
         {open && <EvidenceDetail e={open} />}
       </Modal>
     </section>
@@ -132,23 +133,24 @@ export function EvidenceChain({
 }
 
 function EvidenceDetail({ e }: { e: EvidenceRecord }) {
+  const { locale } = useLocale();
   const style = KIND_STYLE[e.kind] || KIND_STYLE.report;
   const rows: Array<[string, React.ReactNode]> = [
-    ["Source", e.submittedByLabel],
-    ["Source type", SOURCE_TYPE_LABEL[e.sourceType]],
-    ["Date submitted", formatDateTime(e.submittedAt)]
+    [t("case.source", locale), e.submittedByLabel],
+    [t("case.sourceType", locale), t(SOURCE_TYPE_LABEL[e.sourceType], locale)],
+    [t("case.dateSubmitted", locale), formatDateTime(e.submittedAt)]
   ];
-  if (e.excerpt) rows.push(["Relevant excerpt", <span key="x">"{e.excerpt}"</span>]);
-  if (e.relationship) rows.push(["Relationship to claim", e.relationship]);
+  if (e.excerpt) rows.push([t("case.relevantExcerpt", locale), <span key="x">"{e.excerpt}"</span>]);
+  if (e.relationship) rows.push([t("case.relationshipToClaim", locale), e.relationship]);
   if (e.checksum) {
     rows.push([
-      "Integrity",
+      t("case.integrity", locale),
       <span key="c" className="break-all font-mono text-[11px] text-ink-soft">
         SHA-256 · {e.checksum.slice(0, 24)}{"\u2026"}
       </span>
     ]);
   }
-  if (e.sourceRef) rows.push(["Reference", e.sourceRef]);
+  if (e.sourceRef) rows.push([t("case.reference", locale), e.sourceRef]);
 
   return (
     <div>
@@ -158,7 +160,7 @@ function EvidenceDetail({ e }: { e: EvidenceRecord }) {
         </span>
         <div className="min-w-0">
           <p className="truncate text-[15px] font-semibold text-ink">{e.title}</p>
-          <p className="text-[12px] font-medium text-ink-soft/70">{style.label}</p>
+          <p className="text-[12px] font-medium text-ink-soft/70">{t(style.label, locale)}</p>
         </div>
       </div>
 
@@ -180,12 +182,12 @@ function EvidenceDetail({ e }: { e: EvidenceRecord }) {
             className="press inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[14px] font-medium text-white hover:bg-brand-deep"
           >
             <Icon name="arrow-up-right" className="h-4 w-4" />
-            View original file
+            {t("case.viewOriginalFile", locale)}
           </a>
         )}
         <span className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-line bg-canvas px-5 text-[12.5px] text-ink-soft">
           <Icon name="shield-check" className="h-4 w-4" />
-          {e.publicVisible ? "Public-safe evidence" : "Restricted to authorized viewers"}
+          {e.publicVisible ? t("case.publicSafeEvidence", locale) : t("case.restrictedEvidence", locale)}
         </span>
       </div>
     </div>

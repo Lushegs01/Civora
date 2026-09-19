@@ -15,8 +15,11 @@ import { ResponseSection, EvidenceSummaryRow } from "@/components/case/ResponseS
 import { AiSummaryCard } from "@/components/case/AiSummaryCard";
 import { CaseActionBar } from "@/components/case/CaseActionBar";
 import { getToken } from "@/lib/offline/db";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; backHref: string; backLabel: string }) {
+  const { locale } = useLocale();
   const [reporter, setReporter] = useState(false);
   const [checked, setChecked] = useState(false);
   const c = view.case;
@@ -65,12 +68,12 @@ export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; ba
           </span>
           <span className="chip bg-muted text-ink-soft">
             <Icon name={CATEGORY_META[c.category].icon} className="h-3 w-3" />
-            {CATEGORY_META[c.category].label}
+            {t(CATEGORY_META[c.category].label, locale)}
           </span>
           <PriorityBadge priority={c.priority} />
           {c.disputePathway && (
             <span className="chip bg-info-soft text-info">
-              <Icon name="handshake" className="h-3 w-3" /> Mediation pathway
+              <Icon name="handshake" className="h-3 w-3" /> {t("case.mediationPathway", locale)}
             </span>
           )}
         </div>
@@ -86,7 +89,7 @@ export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; ba
 
         <p className="mt-2 text-[12.5px] text-ink-soft/70">
           {c.locationGeneral ? `${c.locationGeneral} · ` : ""}
-          Reported {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
+          {t("case.reported", locale)} {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
         </p>
 
         <div className="mt-4 border-t border-line/60 pt-4">
@@ -97,7 +100,7 @@ export function CasePageBody({ view, backHref, backLabel }: { view: CaseView; ba
           <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-brand/25 bg-brand-soft/40 px-4 py-3 text-[13px] text-ink">
             <Icon name={c.privacyMode === "anonymous" ? "eye-off" : "lock"} className="h-4 w-4 shrink-0 text-brand-deep" />
             <span>
-              You are following this case{c.privacyMode === "anonymous" ? " — your report is anonymous." : "."}
+              {t("case.following", locale)}{c.privacyMode === "anonymous" ? t("case.anonymousReport", locale) : "."}
             </span>
           </div>
         )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CivoraLogo } from "@/components/CivoraLogo";
@@ -7,13 +9,14 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/#home", label: "Home" },
-  { href: "/report", label: "Report an issue" },
-  { href: "/community", label: "Explore cases" },
-  { href: "/#about", label: "About" }
+  { href: "/#home", labelKey: "nav.landing.home" },
+  { href: "/report", labelKey: "nav.landing.report" },
+  { href: "/community", labelKey: "nav.landing.explore" },
+  { href: "/#about", labelKey: "nav.landing.about" }
 ];
 
 export function LandingNav() {
+  const { locale } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -46,7 +49,7 @@ export function LandingNav() {
               href={item.href}
               className="rounded-full px-3.5 py-2 text-[14px] font-medium text-ink-soft transition-colors hover:bg-muted hover:text-ink"
             >
-              {item.label}
+              {t(item.labelKey, locale) || "Link"}
             </Link>
           ))}
         </div>
@@ -56,19 +59,19 @@ export function LandingNav() {
             href="/responder/access"
             className="press rounded-full px-3.5 py-2 text-[14px] font-medium text-ink-soft transition-colors hover:bg-muted hover:text-ink"
           >
-            Demo mode
+            {t("nav.demo_mode", locale) || "Demo mode"}
           </Link>
           <Link
             href="/home"
             className="press inline-flex min-h-10 items-center justify-center rounded-[14px] bg-ink px-4 text-[14px] font-semibold text-white shadow-card transition-colors hover:bg-black"
           >
-            Open app
+            {t("nav.open_app", locale) || "Open app"}
           </Link>
         </div>
 
         <button
           type="button"
-          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={open ? (t("nav.close_menu", locale) || "Close navigation menu") : (t("nav.open_menu", locale) || "Open navigation menu")}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
           className="press flex h-10 w-10 items-center justify-center rounded-[14px] border border-line bg-surface text-ink md:hidden"
@@ -86,7 +89,7 @@ export function LandingNav() {
               onClick={() => setOpen(false)}
               className="block rounded-[14px] px-4 py-3 text-[15px] font-medium text-ink-soft hover:bg-muted hover:text-ink"
             >
-              {item.label}
+              {t(item.labelKey, locale) || "Link"}
             </Link>
           ))}
           <div className="mt-2 grid grid-cols-2 gap-2 border-t border-line pt-2">
@@ -95,14 +98,14 @@ export function LandingNav() {
               onClick={() => setOpen(false)}
               className="press inline-flex min-h-11 items-center justify-center rounded-[14px] bg-muted px-3 text-[14px] font-semibold text-ink"
             >
-              Demo mode
+              {t("nav.demo_mode", locale) || "Demo mode"}
             </Link>
             <Link
               href="/home"
               onClick={() => setOpen(false)}
               className="press inline-flex min-h-11 items-center justify-center rounded-[14px] bg-ink px-3 text-[14px] font-semibold text-white"
             >
-              Open app
+              {t("nav.open_app", locale) || "Open app"}
             </Link>
           </div>
         </div>

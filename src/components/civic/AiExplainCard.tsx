@@ -1,17 +1,16 @@
 "use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
 
 export function AiExplainCard({ 
-  text, 
-  locale = "en" 
+  text
 }: { 
   text: string; 
-  locale?: Locale;
 }) {
+  const { locale } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [explanation, setExplanation] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +28,7 @@ export function AiExplainCard({
         const data = await res.json();
         setExplanation(data.data.explanation);
       } catch (e) {
-        setExplanation("Failed to generate explanation. Please try again.");
+        setExplanation(t("ai.explain.error", locale) || "Failed to generate explanation. Please try again.");
       } finally {
         setLoading(false);
       }

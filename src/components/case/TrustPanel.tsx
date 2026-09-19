@@ -1,15 +1,16 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { CaseView } from "@/lib/case-view";
 import { Icon } from "@/components/ui/Icon";
-
-// Trust panel — the signature transparency feature. What is known and what
-// remains uncertain are always shown together (Rule 4: never hide uncertainty).
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export function TrustPanel({ view, className }: { view: CaseView; className?: string }) {
+  const { locale } = useLocale();
   const { known, uncertain } = view.case;
   return (
-    <section aria-label="What we know and what remains uncertain" className={cn("space-y-3", className)}>
-      {/* KNOWN — left border in success green */}
+    <section aria-label={t("case.trustPanel.ariaLabel", locale)} className={cn("space-y-3", className)}>
       <div className="card overflow-hidden">
         <div className="flex items-stretch">
           <div className="w-1 shrink-0 bg-success" aria-hidden="true" />
@@ -18,11 +19,11 @@ export function TrustPanel({ view, className }: { view: CaseView; className?: st
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
                 <Icon name="check" className="h-3 w-3" strokeWidth={2.8} />
               </span>
-              What we know
+              {t("case.trustPanel.known", locale)}
             </h2>
             {known.length === 0 ? (
               <p className="mt-2.5 text-[13px] leading-relaxed text-ink-soft">
-                Nothing has been established yet beyond the initial report.
+                {t("case.trustPanel.nothingEstablished", locale)}
               </p>
             ) : (
               <ul className="mt-3 space-y-2">
@@ -38,7 +39,6 @@ export function TrustPanel({ view, className }: { view: CaseView; className?: st
         </div>
       </div>
 
-      {/* UNCERTAIN — left border in warning amber */}
       <div className="card overflow-hidden">
         <div className="flex items-stretch">
           <div className="w-1 shrink-0 bg-warning" aria-hidden="true" />
@@ -47,11 +47,11 @@ export function TrustPanel({ view, className }: { view: CaseView; className?: st
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning-soft text-warning">
                 <Icon name="triangle-alert" className="h-3 w-3" strokeWidth={2.5} />
               </span>
-              What remains uncertain
+              {t("case.trustPanel.uncertain", locale)}
             </h2>
             {uncertain.length === 0 ? (
               <p className="mt-2.5 text-[13px] leading-relaxed text-ink-soft">
-                No open uncertainties are recorded for this case.
+                {t("case.trustPanel.noUncertainties", locale)}
               </p>
             ) : (
               <ul className="mt-3 space-y-2">

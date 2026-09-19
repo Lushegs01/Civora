@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+const landingContent = `
 "use client";
 
 import Link from "next/link";
@@ -501,3 +504,8 @@ export function LandingContent({ demo, demoView, row }: { demo: any, demoView: a
     </div>
   );
 }
+`;
+
+fs.writeFileSync("c:\\Users\\LUSHEGS\\Desktop\\Civora\\src\\components\\landing\\LandingContent.tsx", landingContent.trim() + "\\n");
+
+console.log("LandingContent updated.");

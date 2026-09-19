@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+
+const responderCasePanelContent = `
 "use client";
 
 import { useState } from "react";
@@ -235,7 +239,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
           </span>
           <span className="chip bg-muted text-ink-soft">
             <Icon name={CATEGORY_META[c.category].icon} className="h-3.5 w-3.5" />
-            {t(`category.${c.category}`, locale) || CATEGORY_META[c.category].label}
+            {t(\`category.\${c.category}\`, locale) || CATEGORY_META[c.category].label}
           </span>
           <PriorityBadge priority={c.priority} />
           <VerificationBadge state={c.verification} />
@@ -259,11 +263,11 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                 <Icon name={PRIVACY_META[c.privacyMode].icon} className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-[14px] font-semibold text-ink">{t(`privacy.${c.privacyMode}`, locale) || PRIVACY_META[c.privacyMode].label}</p>
+                <p className="text-[14px] font-semibold text-ink">{t(\`privacy.\${c.privacyMode}\`, locale) || PRIVACY_META[c.privacyMode].label}</p>
                 <p className="mt-0.5 text-[13px] leading-relaxed text-ink-soft">
                   {c.privacyMode === "anonymous"
                     ? t("responder.panel.privacy.anon_desc", locale)
-                    : t(`privacy.${c.privacyMode}.desc`, locale) || PRIVACY_META[c.privacyMode].body}
+                    : t(\`privacy.\${c.privacyMode}.desc\`, locale) || PRIVACY_META[c.privacyMode].body}
                 </p>
                 {c.reporterContact && (
                   <p className="mt-1.5 text-[13px] text-ink">
@@ -336,13 +340,13 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                   key={a.spec.kind}
                   onClick={() => open(a.spec)}
                   disabled={a.disabled}
-                  className={`press flex min-h-11 items-center gap-2.5 rounded-btn px-3.5 text-left text-[14px] font-medium ${
+                  className={\`press flex min-h-11 items-center gap-2.5 rounded-btn px-3.5 text-left text-[14px] font-medium \${
                     a.disabled
                       ? "cursor-not-allowed text-ink-soft/50"
                       : a.primary
                         ? "bg-brand text-white hover:bg-brand-deep"
                         : "bg-surface text-ink ring-1 ring-line hover:bg-muted"
-                  }`}
+                  }\`}
                 >
                   <Icon name={a.icon} className="h-4 w-4 shrink-0" />
                   <span className="flex-1">{a.label}</span>
@@ -359,14 +363,14 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
             <h2 className="meta-label mb-3">{t("responder.panel.verification.title", locale)}</h2>
             <ul className="space-y-2.5">
               {STATE_ORDER.verification.map((s) => (
-                <li key={s} className={`flex gap-2.5 rounded-xl px-3 py-2 ${s === c.verification ? "bg-muted" : ""}`}>
+                <li key={s} className={\`flex gap-2.5 rounded-xl px-3 py-2 \${s === c.verification ? "bg-muted" : ""}\`}>
                   <Icon name={VERIFICATION_META[s].icon} className="mt-0.5 h-4 w-4 shrink-0 text-ink-soft" />
                   <div>
-                    <p className={`text-[13px] font-semibold ${s === c.verification ? "text-ink" : "text-ink-soft"}`}>
-                      {t(`verification.${s}`, locale) || VERIFICATION_META[s].label}
+                    <p className={\`text-[13px] font-semibold \${s === c.verification ? "text-ink" : "text-ink-soft"}\`}>
+                      {t(\`verification.\${s}\`, locale) || VERIFICATION_META[s].label}
                       {s === c.verification && <span className="ml-1.5 text-[11px] font-normal text-brand-deep">{t("responder.panel.verification.current", locale)}</span>}
                     </p>
-                    <p className="text-[12px] leading-snug text-ink-soft">{t(`verification.${s}.desc`, locale) || VERIFICATION_META[s].description}</p>
+                    <p className="text-[12px] leading-snug text-ink-soft">{t(\`verification.\${s}.desc\`, locale) || VERIFICATION_META[s].description}</p>
                   </div>
                 </li>
               ))}
@@ -419,7 +423,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                     .filter((s) => s !== "resolved")
                     .map((s) => (
                       <option key={s} value={s}>
-                        {t(`verification.${s}`, locale) || VERIFICATION_META[s].label}
+                        {t(\`verification.\${s}\`, locale) || VERIFICATION_META[s].label}
                       </option>
                     ))}
                 </select>
@@ -459,7 +463,7 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
                 />
                 <p className="mt-1.5 text-xs text-ink-soft">
                   {publicUpdate.trim()
-                    ? `${t("responder.dialog.field.preview", locale)} “${publicUpdate.trim()}”`
+                    ? \`\${t("responder.dialog.field.preview", locale)} “\${publicUpdate.trim()}”\`
                     : (dialog.kind === "add_update" || dialog.requirePublicUpdate) 
                         ? t("responder.dialog.field.required", locale) 
                         : t("responder.dialog.field.optional", locale)}
@@ -496,3 +500,174 @@ export function ResponderCasePanel({ view, orgs }: { view: CaseView; orgs: Organ
     </main>
   );
 }
+`;
+
+fs.writeFileSync("c:\\Users\\LUSHEGS\\Desktop\\Civora\\src\\components\\responder\\ResponderCasePanel.tsx", responderCasePanelContent.trim() + "\\n");
+
+const topBarContent = `
+"use client";
+
+import Link from "next/link";
+import { CivoraLogo } from "@/components/CivoraLogo";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
+
+export function TopBar({ action }: { action?: React.ReactNode }) {
+  const { locale } = useLocale();
+  return (
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur md:hidden">
+      <div className="flex h-14 items-center justify-between px-4">
+        <Link href="/home" aria-label={t("nav.home", locale) || "Civora home"} className="press rounded-lg">
+          <CivoraLogo size={30} />
+        </Link>
+        {action}
+      </div>
+    </header>
+  );
+}
+`;
+fs.writeFileSync("c:\\Users\\LUSHEGS\\Desktop\\Civora\\src\\components\\shell\\TopBar.tsx", topBarContent.trim() + "\\n");
+
+// For responder/page.tsx, extract to client wrapper ResponderDashboardClient.tsx
+const responderDashboardClientContent = `
+"use client";
+
+import Link from "next/link";
+import { CATEGORY_META, isResolved } from "@/lib/types";
+import { VERIFICATION_META, RESPONSE_META, TONE_STYLES } from "@/lib/states";
+import { VerificationBadge, ResponseBadge, PriorityBadge } from "@/components/ui/Badges";
+import { Icon } from "@/components/ui/Icon";
+import { relativeTime } from "@/lib/utils";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
+
+export function ResponderDashboardClient({ cases, orgCount }: { cases: any[], orgCount: number }) {
+  const { locale } = useLocale();
+
+  const open = cases.filter((c) => !isResolved(c));
+  const metrics = [
+    { label: t("responder.dashboard.metrics.new", locale), value: cases.filter((c) => ["received", "not_assigned"].includes(c.response)).length, tone: "bg-brand-soft text-brand-deep", icon: "inbox" },
+    { label: t("responder.dashboard.metrics.verification", locale), value: cases.filter((c) => c.verification === "unverified" && !isResolved(c)).length, tone: "bg-warning-soft text-warning", icon: "badge-check" },
+    { label: t("responder.dashboard.metrics.assigned", locale), value: cases.filter((c) => c.assignedOrgId && !isResolved(c)).length, tone: "bg-info-soft text-info", icon: "building" },
+    { label: t("responder.dashboard.metrics.in_progress", locale), value: cases.filter((c) => ["in_progress", "action_recorded"].includes(c.response)).length, tone: "bg-info-soft text-info", icon: "loader-circle" },
+    { label: t("responder.dashboard.metrics.resolved", locale), value: cases.filter((c) => isResolved(c)).length, tone: "bg-success-soft text-success", icon: "check-circle-2" }
+  ];
+
+  const sorted = [...cases].sort((a, b) => {
+    const rank = (c: any) =>
+      (c.priority === "urgent" ? 0 : c.priority === "elevated" ? 1 : 2) * 10 +
+      (c.response === "received" || c.response === "not_assigned" ? 0 : 1);
+    return rank(a) - rank(b) || +new Date(b.updatedAt) - +new Date(a.updatedAt);
+  });
+
+  return (
+    <main className="mx-auto max-w-content px-4 py-6 md:px-8 md:py-10">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[24px] font-bold tracking-[-0.02em] text-ink md:text-[28px]">
+            {t("responder.dashboard.title", locale)}
+          </h1>
+          <p className="mt-1.5 text-[14px] text-ink-soft">
+            {open.length} {open.length === 1 ? t("responder.dashboard.open_case", locale) : t("responder.dashboard.open_cases", locale)} {t("responder.dashboard.across", locale)} {orgCount} {t("responder.dashboard.configured_orgs", locale)}
+          </p>
+        </div>
+        <Link
+          href="/cases/CS-1042"
+          className="press inline-flex min-h-10 items-center gap-1.5 rounded-btn bg-brand-soft px-3.5 text-[13px] font-medium text-brand-deep hover:bg-brand/15"
+        >
+          <Icon name="sparkles" className="h-4 w-4" />
+          {t("responder.dashboard.primary_demo", locale)}
+        </Link>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {metrics.map((m) => (
+          <div key={m.label} className="card px-4 py-4">
+            <span className={\`flex h-8 w-8 items-center justify-center rounded-full \${m.tone}\`}>
+              <Icon name={m.icon} className="h-4 w-4" />
+            </span>
+            <p className="mt-3 text-[26px] font-bold leading-none tracking-[-0.02em] text-ink">
+              {m.value}
+            </p>
+            <p className="mt-1.5 text-[12.5px] font-medium text-ink-soft">{m.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="mt-8 text-[18px] font-semibold tracking-[-0.01em] text-ink">{t("responder.dashboard.cases.title", locale)}</h2>
+      <div className="mt-3 card divide-y divide-line overflow-hidden">
+        {sorted.map((c) => {
+          const cat = CATEGORY_META[c.category as keyof typeof CATEGORY_META];
+          const vm = VERIFICATION_META[c.verification as keyof typeof VERIFICATION_META];
+          const rm = RESPONSE_META[c.response as keyof typeof RESPONSE_META];
+          return (
+            <Link
+              key={c.id}
+              href={\`/responder/cases/\${c.id}\`}
+              className="press grid grid-cols-2 items-center gap-x-4 gap-y-2 px-4 py-4 hover:bg-muted/50 sm:grid-cols-[110px_1fr_150px_150px_110px] md:px-5"
+            >
+              <div className="col-span-2 flex items-center gap-2.5 sm:col-span-1">
+                <span className="font-mono text-[13px] font-semibold text-ink">{c.id}</span>
+                <PriorityBadge priority={c.priority} />
+              </div>
+              <div className="col-span-2 min-w-0 sm:col-span-1">
+                <p className="truncate text-[14px] font-semibold text-ink">{c.title}</p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-soft">
+                  <Icon name={cat.icon} className="h-3 w-3" />
+                  {t(\`category.\${c.category}\`, locale) || cat.label}
+                  {c.locationGeneral && <span className="truncate">· {c.locationGeneral}</span>}
+                </p>
+              </div>
+              <div className="col-span-1">
+                <span className={\`chip \${TONE_STYLES[vm.tone].chip} w-full justify-center sm:justify-start\`}>
+                  <Icon name={vm.icon} className="h-3 w-3" />
+                  {t(\`verification.\${c.verification}\`, locale) || vm.label}
+                </span>
+              </div>
+              <div className="col-span-1">
+                <span className={\`chip \${TONE_STYLES[rm.tone].chip} w-full justify-center sm:justify-start\`}>
+                  <Icon name={rm.icon} className="h-3 w-3" />
+                  {t(\`response.\${c.response}\`, locale) || rm.label}
+                </span>
+              </div>
+              <div className="col-span-2 flex items-center justify-between sm:col-span-1 sm:justify-end">
+                <span className="text-xs text-ink-soft sm:text-right">
+                  {relativeTime(c.updatedAt)}
+                </span>
+                <Icon name="chevron-right" className="h-4 w-4 text-ink-soft/60 sm:hidden" />
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+      <p className="mt-3 px-1 text-xs text-ink-soft">
+        {t("responder.dashboard.cases.note", locale)}
+      </p>
+    </main>
+  );
+}
+`;
+fs.writeFileSync("c:\\Users\\LUSHEGS\\Desktop\\Civora\\src\\app\\responder\\ResponderDashboardClient.tsx", responderDashboardClientContent.trim() + "\\n");
+
+const responderServerContent = `
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { isResponder } from "@/lib/auth/session";
+import { readDb } from "@/lib/db/store";
+import { ResponderDashboardClient } from "./ResponderDashboardClient";
+
+export const metadata: Metadata = { title: "Responder workspace" };
+export const dynamic = "force-dynamic";
+
+export default async function ResponderDashboard() {
+  if (!isResponder(cookies())) redirect("/responder/access");
+
+  const db = await readDb();
+
+  return <ResponderDashboardClient cases={db.cases} orgCount={db.orgs.length} />;
+}
+`;
+fs.writeFileSync("c:\\Users\\LUSHEGS\\Desktop\\Civora\\src\\app\\responder\\page.tsx", responderServerContent.trim() + "\\n");
+
+console.log("Complex files part 1 updated.");

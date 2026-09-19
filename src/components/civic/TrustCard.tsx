@@ -39,12 +39,12 @@ export function TrustCard({
             <Icon name={categoryMeta.icon as any} className="h-4 w-4" />
             {t(categoryMeta.labelKey as any, locale)}
           </div>
-          <FreshnessBadge state={item.freshnessState} locale={locale} />
+          <FreshnessBadge state={item.freshnessState} />
         </div>
 
         <h1 className="text-2xl font-bold text-slate-900 mb-4">{localizedContent.title}</h1>
         
-        <JurisdictionBadge jurisdiction={item.jurisdiction} locale={locale} className="mb-4" />
+        <JurisdictionBadge jurisdiction={item.jurisdiction} className="mb-4" />
 
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
           <div className="flex items-center gap-1.5">
@@ -67,14 +67,14 @@ export function TrustCard({
       <div className="p-6">
         <div className="prose prose-slate max-w-none">
           {!hasTranslation && locale !== "en" && (
-            <AiTranslateCard text={`${item.title}\n\n${item.explanation}`} locale={locale} />
+            <AiTranslateCard text={`${item.title}\n\n${item.explanation}`} />
           )}
 
           <p className="text-lg text-slate-700 leading-relaxed">
             {localizedContent.explanation}
           </p>
           
-          <AiExplainCard text={localizedContent.explanation} locale={locale} />
+          <AiExplainCard text={localizedContent.explanation} />
 
           {localizedContent.eligibility && (
             <div className="mt-6">
@@ -120,7 +120,7 @@ export function TrustCard({
       <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h4 className="text-sm font-semibold text-slate-900 mb-1">{t("trustcard.what_you_can_do", locale)}</h4>
-          <NextActionsPanel actions={item.nextActions} locale={locale} />
+          <NextActionsPanel actions={item.nextActions} />
         </div>
         {item.sourceUrl && (
           <a 

@@ -1,17 +1,22 @@
-﻿import type { CaseView } from "@/lib/case-view";
+"use client";
+
+import type { CaseView } from "@/lib/case-view";
 import { formatDateTime } from "@/lib/utils";
 import { ResponseBadge } from "@/components/ui/Badges";
 import { Icon } from "@/components/ui/Icon";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export function EvidenceSummaryRow({ view }: { view: CaseView }) {
+  const { locale } = useLocale();
   const { counts } = view;
   const items = [
-    { label: `${counts.reports} report${counts.reports === 1 ? "" : "s"}`, icon: "file-text" },
+    { label: `${counts.reports} ${counts.reports === 1 ? t("case.reportSingular", locale) : t("case.reportsPlural", locale)}`, icon: "file-text" },
     ...(counts.photos > 0
-      ? [{ label: `${counts.photos} photo${counts.photos === 1 ? "" : "s"}`, icon: "camera" }]
+      ? [{ label: `${counts.photos} ${counts.photos === 1 ? t("case.photoSingular", locale) : t("case.photosPlural", locale)}`, icon: "camera" }]
       : []),
     ...(counts.updates > 0
-      ? [{ label: `${counts.updates} update${counts.updates === 1 ? "" : "s"}`, icon: "scroll-text" }]
+      ? [{ label: `${counts.updates} ${counts.updates === 1 ? t("case.updateSingular", locale) : t("case.updatesPlural", locale)}`, icon: "scroll-text" }]
       : [])
   ];
   return (
@@ -26,7 +31,6 @@ export function EvidenceSummaryRow({ view }: { view: CaseView }) {
   );
 }
 
-// Response section: who is responsible, what they've said, and what's next.
 export function ResponseSection({
   view,
   latestUpdate,
@@ -38,23 +42,23 @@ export function ResponseSection({
   trackHref?: string;
   contactEmail?: string;
 }) {
+  const { locale } = useLocale();
   const c = view.case;
   const closed = c.response === "closed";
 
   return (
-    <section aria-label="Response" className="card px-5 py-5">
-      <h2 className="meta-label mb-4">Response</h2>
+    <section aria-label={t("case.responseTitle", locale)} className="card px-5 py-5">
+      <h2 className="meta-label mb-4">{t("case.responseTitle", locale)}</h2>
 
-      {/* Org + status row */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="meta-label mb-1">Responsible organization</p>
+          <p className="meta-label mb-1">{t("case.responsibleOrg", locale)}</p>
           <p className="text-[14px] font-semibold text-ink">
-            {view.orgName || "Not yet assigned"}
+            {view.orgName || t("case.notAssigned", locale)}
           </p>
         </div>
         <div>
-          <p className="meta-label mb-1">Current status</p>
+          <p className="meta-label mb-1">{t("case.currentStatus", locale)}</p>
           <ResponseBadge state={c.response} />
         </div>
       </div>
@@ -63,7 +67,7 @@ export function ResponseSection({
         {latestUpdate ? (
           <div>
             <p className="meta-label mb-2">
-              Latest update
+              {t("case.latestUpdate", locale)}
             </p>
             <blockquote className="rounded-2xl bg-canvas px-4 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink">"{latestUpdate.body}"</p>
@@ -74,24 +78,24 @@ export function ResponseSection({
           </div>
         ) : (
           <div>
-            <p className="meta-label mb-1">Latest update</p>
+            <p className="meta-label mb-1">{t("case.latestUpdate", locale)}</p>
             <p className="text-[13.5px] text-ink-soft">
-              No official response has been recorded yet.
+              {t("case.noOfficialResponse", locale)}
             </p>
           </div>
         )}
 
         <div>
-          <p className="meta-label mb-1">Next expected update</p>
+          <p className="meta-label mb-1">{t("case.nextExpectedUpdate", locale)}</p>
           <p className="text-[13.5px] text-ink">
             {closed ? (
-              "Case closed — outcome recorded on the timeline."
+              t("case.caseClosedOutcome", locale)
             ) : c.awaitingReporter ? (
-              "Awaiting additional information from the reporter."
+              t("case.awaitingReporterInfo", locale)
             ) : c.nextUpdateAt ? (
               formatDateTime(c.nextUpdateAt)
             ) : (
-              "Not yet scheduled."
+              t("case.notScheduled", locale)
             )}
           </p>
         </div>
@@ -105,7 +109,7 @@ export function ResponseSection({
               className="press inline-flex min-h-10 items-center gap-2 rounded-btn bg-brand-soft px-4 text-[13.5px] font-medium text-brand-deep hover:bg-brand/15"
             >
               <Icon name="eye" className="h-4 w-4" />
-              Track updates
+              {t("case.trackUpdatesButton", locale)}
             </a>
           )}
           {contactEmail && (
@@ -114,7 +118,7 @@ export function ResponseSection({
               className="press inline-flex min-h-10 items-center gap-2 rounded-btn border border-line bg-surface px-4 text-[13.5px] font-medium text-ink hover:bg-muted"
             >
               <Icon name="message" className="h-4 w-4" />
-              Contact response channel
+              {t("case.contactResponseChannel", locale)}
             </a>
           )}
         </div>

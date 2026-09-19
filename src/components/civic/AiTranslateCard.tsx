@@ -1,17 +1,16 @@
 "use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
 import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
 
 export function AiTranslateCard({ 
-  text, 
-  locale 
+  text
 }: { 
   text: string; 
-  locale: Locale;
 }) {
+  const { locale } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [translation, setTranslation] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +28,7 @@ export function AiTranslateCard({
         const data = await res.json();
         setTranslation(data.data.translation);
       } catch (e) {
-        setTranslation("Failed to generate translation. Please try again.");
+        setTranslation(t("ai.translate.error", locale) || "Failed to generate translation. Please try again.");
       } finally {
         setLoading(false);
       }

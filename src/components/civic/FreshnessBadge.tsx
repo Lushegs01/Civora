@@ -1,11 +1,14 @@
+"use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 import { type FreshnessState, FRESHNESS_META } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
 import type { Locale } from "@/lib/i18n/i18n";
 
-export function FreshnessBadge({ state, locale = "en" }: { state: FreshnessState; locale?: Locale }) {
+export function FreshnessBadge({ state }: { state: FreshnessState }) {
+  const { locale } = useLocale();
   const meta = FRESHNESS_META[state];
   const translatedLabel = t(meta.labelKey as any, locale);
 

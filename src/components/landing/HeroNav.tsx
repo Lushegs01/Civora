@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CivoraLogo } from "@/components/CivoraLogo";
@@ -7,14 +9,15 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/", label: "Home", active: true },
-  { href: "/report", label: "Report", active: false },
-  { href: "/community", label: "Cases", active: false },
-  { href: "/#trust", label: "How it works", active: false },
-  { href: "/privacy", label: "Privacy", active: false }
+  { href: "/", labelKey: "nav.home", active: true },
+  { href: "/report", labelKey: "nav.report", active: false },
+  { href: "/community", labelKey: "nav.cases", active: false },
+  { href: "/#trust", labelKey: "nav.how_it_works", active: false },
+  { href: "/privacy", labelKey: "nav.privacy", active: false }
 ];
 
 export function HeroNav() {
+  const { locale } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -54,7 +57,7 @@ export function HeroNav() {
                   : "font-medium text-white/75 hover:bg-white/10 hover:text-white"
               )}
             >
-              {item.label}
+              {t(item.labelKey, locale) || "Link"}
             </Link>
           ))}
         </nav>
@@ -69,13 +72,13 @@ export function HeroNav() {
                 : "text-white/70 hover:text-white"
             )}
           >
-            Responder demo
+            {t("nav.responder_demo", locale) || "Responder demo"}
           </Link>
           <Link
             href="/home"
             className="press group inline-flex min-h-11 items-center gap-2 rounded-full bg-white py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-[#0B1F14] shadow-[0_10px_30px_-12px_rgba(255,255,255,0.4)] transition-all hover:bg-white/90"
           >
-            Get started
+            {t("nav.get_started", locale) || "Get started"}
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B1F14] text-white transition-transform duration-200 group-hover:rotate-45">
               <Icon name="arrow-up-right" className="h-4 w-4" />
             </span>
@@ -88,11 +91,11 @@ export function HeroNav() {
             href="/home"
             className="press inline-flex min-h-10 items-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#0B1F14]"
           >
-            Get started
+            {t("nav.get_started", locale) || "Get started"}
           </Link>
           <button
             type="button"
-            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={open ? (t("nav.close_menu", locale) || "Close navigation menu") : (t("nav.open_menu", locale) || "Open navigation menu")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className="press flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur-xl"
@@ -114,7 +117,7 @@ export function HeroNav() {
                 item.active ? "bg-white/10 font-semibold text-white" : "font-medium text-white/75 hover:bg-white/5 hover:text-white"
               )}
             >
-              {item.label}
+              {t(item.labelKey, locale) || "Link"}
             </Link>
           ))}
           <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/10 pt-2">
@@ -123,14 +126,14 @@ export function HeroNav() {
               onClick={() => setOpen(false)}
               className="press inline-flex min-h-11 items-center justify-center rounded-2xl border border-white/15 px-3 text-[14px] font-semibold text-white"
             >
-              Responder demo
+              {t("nav.responder_demo", locale) || "Responder demo"}
             </Link>
             <Link
               href="/home"
               onClick={() => setOpen(false)}
               className="press inline-flex min-h-11 items-center justify-center rounded-2xl bg-white px-3 text-[14px] font-semibold text-[#0B1F14]"
             >
-              Get started
+              {t("nav.get_started", locale) || "Get started"}
             </Link>
           </div>
         </div>

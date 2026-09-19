@@ -8,20 +8,20 @@ import { YourCases } from "@/components/home/YourCases";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 
-const HOW = [
-  { icon: "file-text", label: "Report", body: "Describe what you saw — with or without your name." },
-  { icon: "badge-check", label: "Verify", body: "Evidence and corroboration build the picture." },
-  { icon: "building", label: "Respond", body: "A responsible organization acts and updates." },
-  { icon: "eye", label: "Track", body: "Anyone can follow status and outcome." }
-];
-
 export function HomeContent({ openCases, awaitingResponse, resolved }: { openCases: number, awaitingResponse: number, resolved: number }) {
   const { locale } = useLocale();
 
+  const HOW = [
+    { icon: "file-text", label: t("home.how.report", locale) || "Report", body: t("home.how.report_desc", locale) || "Describe what you saw — with or without your name." },
+    { icon: "badge-check", label: t("home.how.verify", locale) || "Verify", body: t("home.how.verify_desc", locale) || "Evidence and corroboration build the picture." },
+    { icon: "building", label: t("home.how.respond", locale) || "Respond", body: t("home.how.respond_desc", locale) || "A responsible organization acts and updates." },
+    { icon: "eye", label: t("home.how.track", locale) || "Track", body: t("home.how.track_desc", locale) || "Anyone can follow status and outcome." }
+  ];
+
   const snapshot = [
-    { label: "Active cases", value: openCases, icon: "folder", tone: "bg-brand-soft text-brand-deep" },
-    { label: "Awaiting response", value: awaitingResponse, icon: "inbox", tone: "bg-warning-soft text-warning" },
-    { label: "Resolved", value: resolved, icon: "check-circle-2", tone: "bg-success-soft text-success" }
+    { label: t("home.active_cases", locale) || "Active cases", value: openCases, icon: "folder", tone: "bg-brand-soft text-brand-deep" },
+    { label: t("home.awaiting", locale) || "Awaiting response", value: awaitingResponse, icon: "inbox", tone: "bg-warning-soft text-warning" },
+    { label: t("home.resolved", locale) || "Resolved", value: resolved, icon: "check-circle-2", tone: "bg-success-soft text-success" }
   ];
 
 
@@ -32,7 +32,7 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
         action={
           <Link
             href="/more"
-            aria-label="Settings and more"
+            aria-label={t("home.settings_label", locale) || "Settings and more"}
             className="press flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink-soft hover:bg-canvas hover:text-ink transition-colors"
           >
             <Icon name="settings" className="h-5 w-5" />
@@ -49,26 +49,26 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
           <div className="mb-6 flex items-center justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-[11px] font-medium text-ink-soft shadow-sm backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-              Civic incident platform
+              {t("home.badge", locale) || "Civic incident platform"}
             </div>
           </div>
 
           <h1 className="text-balance text-[40px] font-extrabold leading-[1.05] tracking-[-0.04em] text-ink md:text-[56px] lg:text-[64px]">
-            Report safely.<br />
-            <span className="text-brand">Verify carefully.</span><br />
-            Respond together.
+            {t("home.hero.title1", locale) || "Report safely."}<br />
+            <span className="text-brand">{t("home.hero.title2", locale) || "Verify carefully."}</span><br />
+            {t("home.hero.title3", locale) || "Respond together."}
           </h1>
           
           <p className="mx-auto mt-6 max-w-[600px] text-[15px] leading-relaxed text-ink-soft md:text-[17px]">
-            Civora connects civic reports, evidence, response, and accountability in one traceable workflow — so communities know what's happening and what happens next.
+            {t("home.hero.desc", locale) || "Civora connects civic reports, evidence, response, and accountability in one traceable workflow — so communities know what's happening and what happens next."}
           </p>
           
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button href="/report" size="lg" className="rounded-full px-7 shadow-lg shadow-brand/10" icon="plus">
-              Report an issue
+              {t("home.hero.btn1", locale) || "Report an issue"}
             </Button>
             <Button href="/community" size="lg" variant="secondary" className="rounded-full bg-surface/80 px-7 shadow-sm backdrop-blur">
-              Explore cases
+              {t("home.hero.btn2", locale) || "Explore cases"}
             </Button>
           </div>
         </section>
@@ -77,10 +77,10 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
         <section aria-labelledby="your-cases-heading" className="pb-10">
           <div className="mb-4 flex items-baseline justify-between">
             <h2 id="your-cases-heading" className="text-[17px] font-semibold tracking-[-0.01em] text-ink">
-              Your cases
+              {t("home.your_cases", locale) || "Your cases"}
             </h2>
             <Link href="/cases" className="text-[13px] font-medium text-ink-soft hover:text-ink transition-colors">
-              View all
+              {t("home.view_all", locale) || "View all"}
             </Link>
           </div>
           <YourCases />
@@ -90,10 +90,10 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
         <section aria-labelledby="snapshot-heading" className="pb-10">
           <div className="mb-4 flex items-baseline justify-between">
             <h2 id="snapshot-heading" className="text-[17px] font-semibold tracking-[-0.01em] text-ink">
-              Community snapshot
+              {t("home.snapshot", locale) || "Community snapshot"}
             </h2>
             <Link href="/community" className="text-[13px] font-medium text-ink-soft hover:text-ink transition-colors">
-              Browse cases
+              {t("home.browse_cases", locale) || "Browse cases"}
             </Link>
           </div>
           <div className="card grid grid-cols-3 divide-x divide-line">
@@ -112,7 +112,7 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
         {/* How Civora works */}
         <section aria-labelledby="how-heading" className="pb-10">
           <h2 id="how-heading" className="mb-4 text-[17px] font-semibold tracking-[-0.01em] text-ink">
-            How Civora works
+            {t("home.how_title", locale) || "How Civora works"}
           </h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {HOW.map((h, i) => (
@@ -131,8 +131,7 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
             ))}
           </div>
           <p className="mt-5 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
-            Civora separates reports, evidence, verification, and response so you can clearly see what is
-            known and what is still uncertain.
+            {t("home.how_footer", locale) || "Civora separates reports, evidence, verification, and response so you can clearly see what is known and what is still uncertain."}
           </p>
         </section>
       </main>

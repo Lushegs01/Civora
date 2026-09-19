@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -42,6 +46,7 @@ function CategoryBubble({ icon, label }: { icon: string; label: string }) {
 }
 
 export function HeroDevice() {
+  const { locale } = useLocale();
   return (
     <div className="relative mx-auto w-fit">
       {/* Glow behind device */}
@@ -77,8 +82,8 @@ export function HeroDevice() {
             {/* Greeting */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-[#6F6F6B]">Tuesday · District 4</p>
-                <p className="mt-0.5 text-[17px] font-bold tracking-tight text-[#111111]">Hello, Neighbor</p>
+                <p className="text-[8px] font-medium uppercase tracking-[0.14em] text-[#6F6F6B]">{t("hero.device.greeting.date", locale) || "Tuesday · District 4"}</p>
+                <p className="mt-0.5 text-[17px] font-bold tracking-tight text-[#111111]">{t("hero.device.greeting.title", locale) || "Hello, Neighbor"}</p>
               </div>
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E3EFE7] text-[#2E7D4F]">
                 <Icon name="user" className="h-[18px] w-[18px]" />
@@ -88,48 +93,48 @@ export function HeroDevice() {
             {/* Total reports card */}
             <div className="mt-4 rounded-2xl bg-white p-3.5 shadow-[0_6px_20px_-10px_rgba(17,17,17,0.18)]">
               <div className="flex items-center justify-between">
-                <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[#9A9A94]">Total reports</p>
+                <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[#9A9A94]">{t("hero.device.total_reports", locale) || "Total reports"}</p>
                 <span className="rounded-full bg-[#E7F3EC] px-1.5 py-0.5 text-[8px] font-bold text-[#2E8B57]">+12%</span>
               </div>
               <p className="mt-1 text-[26px] font-bold leading-none tracking-tight text-[#111111]">1,248</p>
-              <p className="mt-1 text-[9px] font-medium text-[#6F6F6B]">in your district this month</p>
+              <p className="mt-1 text-[9px] font-medium text-[#6F6F6B]">{t("hero.device.total_reports.subtitle", locale) || "in your district this month"}</p>
             </div>
 
             {/* Quick actions */}
             <div className="mt-3 grid grid-cols-2 gap-2">
               <span className="flex items-center justify-center gap-1.5 rounded-xl bg-[#EAF0FF] py-2.5 text-[10px] font-bold text-[#4A63D8]">
-                <Icon name="plus" className="h-3.5 w-3.5" /> Report
+                <Icon name="plus" className="h-3.5 w-3.5" /> {t("hero.device.action.report", locale) || "Report"}
               </span>
               <span className="flex items-center justify-center gap-1.5 rounded-xl bg-[#E7F3EC] py-2.5 text-[10px] font-bold text-[#2E8B57]">
-                <Icon name="check" className="h-3.5 w-3.5" /> Verify
+                <Icon name="check" className="h-3.5 w-3.5" /> {t("hero.device.action.verify", locale) || "Verify"}
               </span>
             </div>
 
             {/* Nearby activity */}
             <div className="mt-4">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold text-[#111111]">Nearby activity</p>
-                <span className="text-[8px] font-semibold text-[#9A9A94]">See all</span>
+                <p className="text-[10px] font-bold text-[#111111]">{t("hero.device.nearby", locale) || "Nearby activity"}</p>
+                <span className="text-[8px] font-semibold text-[#9A9A94]">{t("hero.device.see_all", locale) || "See all"}</span>
               </div>
               <div className="mt-2 flex justify-between px-1">
-                <CategoryBubble icon="wrench" label="Roads" />
-                <CategoryBubble icon="siren" label="Safety" />
-                <CategoryBubble icon="hard-hat" label="Utilities" />
-                <CategoryBubble icon="trash" label="Waste" />
+                <CategoryBubble icon="wrench" label={t("hero.device.category.roads", locale) || "Roads"} />
+                <CategoryBubble icon="siren" label={t("hero.device.category.safety", locale) || "Safety"} />
+                <CategoryBubble icon="hard-hat" label={t("hero.device.category.utilities", locale) || "Utilities"} />
+                <CategoryBubble icon="trash" label={t("hero.device.category.waste", locale) || "Waste"} />
               </div>
             </div>
 
             {/* Stats tiles */}
             <div className="mt-4 grid grid-cols-2 gap-2">
               <div className="rounded-2xl bg-white p-3 shadow-[0_6px_20px_-12px_rgba(17,17,17,0.16)]">
-                <p className="text-[8px] font-semibold uppercase tracking-wider text-[#9A9A94]">Verified</p>
+                <p className="text-[8px] font-semibold uppercase tracking-wider text-[#9A9A94]">{t("hero.device.stat.verified", locale) || "Verified"}</p>
                 <p className="mt-0.5 text-[15px] font-bold text-[#111]">1,020</p>
                 <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-[#EDEDEA]">
                   <span className="w-[82%] rounded-full bg-[#2E8B57]" />
                 </div>
               </div>
               <div className="rounded-2xl bg-white p-3 shadow-[0_6px_20px_-12px_rgba(17,17,17,0.16)]">
-                <p className="text-[8px] font-semibold uppercase tracking-wider text-[#9A9A94]">In response</p>
+                <p className="text-[8px] font-semibold uppercase tracking-wider text-[#9A9A94]">{t("hero.device.stat.in_response", locale) || "In response"}</p>
                 <p className="mt-0.5 text-[15px] font-bold text-[#111]">214</p>
                 <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-[#EDEDEA]">
                   <span className="w-[46%] rounded-full bg-[#5B6FE8]" />
@@ -144,10 +149,10 @@ export function HeroDevice() {
                   <Icon name="map-pin" className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[10px] font-bold text-[#111]">Street light out — Elm & 3rd</p>
-                  <p className="text-[8px] font-medium text-[#6F6F6B]">Crew assigned · ETA tomorrow</p>
+                  <p className="truncate text-[10px] font-bold text-[#111]">{t("hero.device.list.item.title", locale) || "Street light out — Elm & 3rd"}</p>
+                  <p className="text-[8px] font-medium text-[#6F6F6B]">{t("hero.device.list.item.subtitle", locale) || "Crew assigned · ETA tomorrow"}</p>
                 </div>
-                <span className="rounded-full bg-[#EAF0FF] px-2 py-0.5 text-[8px] font-bold text-[#4A63D8]">Active</span>
+                <span className="rounded-full bg-[#EAF0FF] px-2 py-0.5 text-[8px] font-bold text-[#4A63D8]">{t("hero.device.list.item.status", locale) || "Active"}</span>
               </div>
             </div>
           </div>
@@ -170,9 +175,9 @@ export function HeroDevice() {
         <div className="flex items-center gap-3">
           <Donut value={80} className="h-11 w-11 shrink-0" />
           <div className="min-w-0">
-            <p className="truncate text-[13px] font-bold text-[#111111]">Case CS-1042</p>
-            <p className="truncate text-[11px] font-medium text-[#6F6F6B]">Fallen power line · 5th Ave</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-[#2E8B57]">Verified by 3 neighbors</p>
+            <p className="truncate text-[13px] font-bold text-[#111111]">{t("hero.device.float1.title", locale) || "Case CS-1042"}</p>
+            <p className="truncate text-[11px] font-medium text-[#6F6F6B]">{t("hero.device.float1.subtitle", locale) || "Fallen power line · 5th Ave"}</p>
+            <p className="mt-0.5 text-[10px] font-semibold text-[#2E8B57]">{t("hero.device.float1.status", locale) || "Verified by 3 neighbors"}</p>
           </div>
         </div>
       </div>
@@ -183,8 +188,8 @@ export function HeroDevice() {
           <Icon name="wrench" className="h-4 w-4" />
         </span>
         <div>
-          <p className="text-[11px] font-bold text-[#111111]">Crew dispatched</p>
-          <p className="text-[10px] font-medium text-[#6F6F6B]">Public Works · 11:15 UTC</p>
+          <p className="text-[11px] font-bold text-[#111111]">{t("hero.device.float2.title", locale) || "Crew dispatched"}</p>
+          <p className="text-[10px] font-medium text-[#6F6F6B]">{t("hero.device.float2.subtitle", locale) || "Public Works · 11:15 UTC"}</p>
         </div>
       </div>
     </div>

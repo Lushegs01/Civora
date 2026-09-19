@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findCase, readDb } from "@/lib/db/store";
 import { buildCaseView } from "@/lib/case-view";
-import { CasePageBody } from "@/components/case/CasePageBody";
+import { TrackedCaseClient } from "./TrackedCaseClient";
 
 export const dynamic = "force-dynamic";
 
@@ -23,5 +23,5 @@ export default async function TrackedCasePage({ params }: { params: { caseId: st
   const c = findCase(db, params.caseId);
   if (!c) notFound();
   const view = buildCaseView(db, c, "public");
-  return <CasePageBody view={view} backHref="/cases" backLabel="My cases" />;
+  return <TrackedCaseClient view={view} />;
 }

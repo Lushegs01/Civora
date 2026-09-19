@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
     >
       <Icon name="globe" className="h-5 w-5 opacity-70" />
       <span className="font-medium text-sm">
-        {locale === "en" ? "English" : locale === "sw" ? "Swahili" : "Français"}
+        {t(`lang.${locale}`, locale)}
       </span>
     </button>
   );

@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { listOutbox } from "@/lib/offline/db";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export function OfflineBanner() {
+  const { locale } = useLocale();
   const [offline, setOffline] = useState<boolean | null>(null);
   const [outboxCount, setOutboxCount] = useState(0);
 
@@ -38,12 +41,12 @@ export function OfflineBanner() {
           <Icon name="wifi-off" className="h-4 w-4" />
         </span>
         <div className="min-w-0 text-[13px] leading-snug">
-          <p className="font-semibold text-ink">No connection</p>
+          <p className="font-semibold text-ink">{t("offline.title", locale) || "No connection"}</p>
           <p className="text-ink-soft">
-            You can keep working. {outboxCount > 0 ? (
-              <span className="font-medium text-warning-deep">{outboxCount} {outboxCount === 1 ? 'draft is' : 'drafts are'} waiting to sync.</span>
+            {t("offline.keep_working", locale) || "You can keep working. "}{outboxCount > 0 ? (
+              <span className="font-medium text-warning-deep">{outboxCount} {outboxCount === 1 ? (t("offline.draft_singular", locale) || 'draft is waiting to sync.') : (t("offline.draft_plural", locale) || 'drafts are waiting to sync.')}</span>
             ) : (
-              "Drafts are saved securely on this device and submitted when you're back online."
+              t("offline.drafts_saved", locale) || "Drafts are saved securely on this device and submitted when you're back online."
             )}
           </p>
         </div>

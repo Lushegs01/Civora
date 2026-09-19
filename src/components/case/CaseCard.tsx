@@ -1,10 +1,14 @@
-﻿import Link from "next/link";
+"use client";
+
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META } from "@/lib/types";
 import type { CaseCategory, ResponseState, VerificationState } from "@/lib/types";
 import { VerificationBadge, ResponseBadge } from "@/components/ui/Badges";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import { Icon } from "@/components/ui/Icon";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 export interface CaseCardRow {
   id: string;
@@ -18,6 +22,7 @@ export interface CaseCardRow {
 }
 
 export function CaseCard({ row, className }: { row: CaseCardRow; className?: string }) {
+  const { locale } = useLocale();
   const cat = CATEGORY_META[row.category];
   return (
     <Link
@@ -34,7 +39,7 @@ export function CaseCard({ row, className }: { row: CaseCardRow; className?: str
           </span>
           <span className="chip bg-muted text-ink-soft">
             <Icon name={cat.icon} className="h-3 w-3" />
-            {cat.label}
+            {t(cat.label, locale)}
           </span>
         </div>
         <Icon name="chevron-right" className="h-4 w-4 shrink-0 text-ink-soft/60" />
@@ -48,7 +53,7 @@ export function CaseCard({ row, className }: { row: CaseCardRow; className?: str
       </div>
 
       <p className="mt-3 flex items-center gap-1 text-[12px] text-ink-soft/70">
-        <RelativeTime iso={row.updatedAt} prefix="Updated" />
+        <RelativeTime iso={row.updatedAt} prefix={t("case.updated", locale)} />
         {row.locationGeneral && (
           <>
             <span className="text-[10px] text-ink-soft/40">·</span>
@@ -61,6 +66,7 @@ export function CaseCard({ row, className }: { row: CaseCardRow; className?: str
 }
 
 export function PublicCaseCard({ row }: { row: CaseCardRow }) {
+  const { locale } = useLocale();
   const cat = CATEGORY_META[row.category];
   return (
     <Link href={row.href} className="press card block px-5 py-[18px] hover:shadow-raise">
@@ -70,7 +76,7 @@ export function PublicCaseCard({ row }: { row: CaseCardRow }) {
             <span className="font-mono text-[12px] font-semibold tracking-wide text-ink-soft uppercase">{row.id}</span>
             <span className="chip bg-muted text-ink-soft">
               <Icon name={cat.icon} className="h-3 w-3" />
-              {cat.label}
+              {t(cat.label, locale)}
             </span>
           </div>
           <h3 className="mt-2.5 text-[15px] font-semibold leading-snug tracking-[-0.01em] text-ink">{row.title}</h3>
@@ -90,7 +96,7 @@ export function PublicCaseCard({ row }: { row: CaseCardRow }) {
             <span className="text-[10px] text-ink-soft/40">·</span>
           </>
         )}
-        <RelativeTime iso={row.updatedAt} prefix="Updated" />
+        <RelativeTime iso={row.updatedAt} prefix={t("case.updated", locale)} />
       </p>
     </Link>
   );

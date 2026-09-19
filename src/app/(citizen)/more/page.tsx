@@ -11,6 +11,8 @@ import { DemoTag } from "@/components/shell/DemoTag";
 import { getTokens } from "@/lib/offline/db";
 import { LanguageSwitcher } from "@/components/shell/LanguageSwitcher";
 import { useSimpleMode } from "@/components/system/SimpleMode";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 function SimpleModeToggle() {
   const { isSimpleMode, setSimpleMode } = useSimpleMode();
@@ -33,6 +35,7 @@ function SimpleModeToggle() {
 }
 
 export default function MorePage() {
+  const { locale } = useLocale();
   const router = useRouter();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
@@ -61,16 +64,16 @@ export default function MorePage() {
     indexedDB.deleteDatabase("civora");
     localStorage.removeItem("civora_demo_tracking_seeded_v1");
     setClearedNotice(
-      "Device-local tracking cleared. Demo tracking will re-seed on your next visit to Home."
+      t("more.clear_notice", locale)
     );
     router.refresh();
   }
 
   const links = [
-    { href: "/privacy", icon: "eye-off", label: "Privacy", body: "How identity and evidence are handled" },
-    { href: "/resources", icon: "shield-check", label: "Get help", body: "Emergency guidance and referral pathways" },
-    { href: "/community", icon: "users", label: "Community cases", body: "Browse public case progress" },
-    { href: "/responder", icon: "building", label: "Responder workspace", body: "Demo access for institutional responders" }
+    { href: "/privacy", icon: "eye-off", label: t("more.link.privacy.label", locale), body: t("more.link.privacy.body", locale) },
+    { href: "/resources", icon: "shield-check", label: t("more.link.help.label", locale), body: t("more.link.help.body", locale) },
+    { href: "/community", icon: "users", label: t("more.link.community.label", locale), body: t("more.link.community.body", locale) },
+    { href: "/responder", icon: "building", label: t("more.link.responder.label", locale), body: t("more.link.responder.body", locale) }
   ];
 
   return (
@@ -81,7 +84,7 @@ export default function MorePage() {
           More
         </h1>
         <p className="mt-2 text-[14.5px] text-ink-soft">
-          Settings, guidance and demo tools.
+          {t("more.subtitle", locale)}
         </p>
 
         <section aria-label="Civora links" className="mt-6 space-y-2.5">
@@ -104,13 +107,13 @@ export default function MorePage() {
         </section>
 
         <section aria-label="Settings" className="mt-8">
-          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">Language & Display</h2>
+          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">{t("more.settings.title", locale)}</h2>
           <div className="card mt-3.5 divide-y divide-line">
             <div className="flex items-center justify-between gap-4 px-5 py-4">
               <div>
-                <p className="text-[14.5px] font-semibold text-ink">Simple Mode</p>
+                <p className="text-[14.5px] font-semibold text-ink">{t("more.settings.simple.title", locale)}</p>
                 <p className="mt-0.5 text-[13px] text-ink-soft">
-                  Larger text, simpler layout, easier to read.
+                  {t("more.settings.simple.desc", locale)}
                 </p>
               </div>
               <SimpleModeToggle />
@@ -118,9 +121,9 @@ export default function MorePage() {
 
             <div className="flex items-center justify-between gap-4 px-5 py-4">
               <div>
-                <p className="text-[14.5px] font-semibold text-ink">Language</p>
+                <p className="text-[14.5px] font-semibold text-ink">{t("more.settings.lang.title", locale)}</p>
                 <p className="mt-0.5 text-[13px] text-ink-soft">
-                  Select your preferred language.
+                  {t("more.settings.lang.desc", locale)}
                 </p>
               </div>
               <div className="w-32">
@@ -130,9 +133,9 @@ export default function MorePage() {
 
             <div className="flex items-center justify-between gap-4 px-5 py-4">
               <div>
-                <p className="text-[14.5px] font-semibold text-ink">Reduce motion</p>
+                <p className="text-[14.5px] font-semibold text-ink">{t("more.settings.motion.title", locale)}</p>
                 <p className="mt-0.5 text-[13px] text-ink-soft">
-                  Minimize transitions. Follows your system preference automatically.
+                  {t("more.settings.motion.desc", locale)}
                 </p>
               </div>
               <button
@@ -158,13 +161,13 @@ export default function MorePage() {
         </section>
 
         <section aria-label="Demo tools" className="mt-8">
-          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">Demo tools</h2>
+          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">{t("more.demo.title", locale)}</h2>
           <div className="mt-3.5">
             <DemoTag />
           </div>
           {resetDone && (
             <p role="status" className="mt-3 rounded-xl bg-success-soft px-3.5 py-2.5 text-[13px] font-medium text-success">
-              Demo data restored to the original fictional dataset.
+              {t("more.demo.reset_done", locale)}
             </p>
           )}
           {clearedNotice && (
@@ -173,26 +176,19 @@ export default function MorePage() {
             </p>
           )}
           <div className="mt-3.5 flex flex-wrap gap-2.5">
-            <Button variant="secondary" icon="refresh" onClick={() => setResetOpen(true)}>
-              Reset demo data
-            </Button>
-            <Button variant="ghost" icon="trash" onClick={clearLocal}>
-              Clear device tracking
-            </Button>
+            <Button variant="secondary" icon="refresh" onClick={() => setResetOpen(true)}>{t("more.demo.reset_btn", locale)}</Button>
+            <Button variant="ghost" icon="trash" onClick={clearLocal}>{t("more.demo.clear_btn", locale)}</Button>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-            Reset restores the seeded fictional cases — useful before a demo run. Clearing device
-            tracking removes this device's case links (drafts kept).
+            {t("more.demo.hint", locale)}
           </p>
         </section>
 
         <section aria-label="About" className="mt-8">
-          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">About Civora</h2>
+          <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-ink">{t("more.about.title", locale)}</h2>
           <div className="card mt-3.5 px-5 py-5 text-[13.5px] leading-relaxed text-ink-soft">
             <p>
-              Civora is a trusted civic incident platform: report community problems safely, preserve
-              and organize evidence, coordinate appropriate response, and transparently track what
-              happens next.
+              {t("more.about.p1", locale)}
             </p>
             <p className="mt-3">
               It separates <strong className="font-semibold text-ink">reported</strong>,{" "}
@@ -209,9 +205,9 @@ export default function MorePage() {
           onClose={() => setResetOpen(false)}
           onConfirm={resetDemo}
           busy={resetBusy}
-          title="Reset demo data?"
-          description="All cases return to the original fictional dataset, including the primary demo case CS-1042. Reports you submitted in this session will be removed."
-          confirmLabel="Reset demo data"
+          title={t("more.dialog.title", locale)}
+          description={t("more.dialog.desc", locale)}
+          confirmLabel={t("more.dialog.confirm", locale)}
         />
       </main>
     </>

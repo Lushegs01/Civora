@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { listOutbox, removeFromOutbox, saveToken } from "@/lib/offline/db";
 import { Icon } from "@/components/ui/Icon";
-
-// Watches the submission outbox. When the device comes back online, queued
-// reports are submitted automatically and the result is surfaced once.
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 interface SyncNotice {
   kind: "success" | "error";
@@ -14,6 +13,7 @@ interface SyncNotice {
 }
 
 export function OutboxSync() {
+  const { locale } = useLocale();
   const [notice, setNotice] = useState<SyncNotice | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const syncing = useRef(false);
@@ -56,15 +56,15 @@ export function OutboxSync() {
           kind: "success",
           caseId: successCount === 1 ? lastCaseId : undefined,
           message: successCount === 1 
-            ? (linked ? "Your saved report was submitted after reconnecting and linked to an existing case." : "Your saved report was submitted automatically after reconnecting.")
-            : `${successCount} saved reports were submitted automatically.`
+            ? (linked ? (t("outbox.success.linked", locale) || "Your saved report was submitted after reconnecting and linked to an existing case.") : (t("outbox.success.single", locale) || "Your saved report was submitted automatically after reconnecting."))
+            : (t("outbox.success.multiple", locale) || `${successCount} saved reports were submitted automatically.`).replace("{count}", successCount.toString())
         });
       }
     } finally {
       syncing.current = false;
       setIsSyncing(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     flush();
@@ -75,8 +75,8 @@ export function OutboxSync() {
 
   useEffect(() => {
     if (!notice) return;
-    const t = setTimeout(() => setNotice(null), 10_000);
-    return () => clearTimeout(t);
+    const t_timer = setTimeout(() => setNotice(null), 10_000);
+    return () => clearTimeout(t_timer);
   }, [notice]);
 
   if (!notice && !isSyncing) return null;
@@ -103,14 +103,14 @@ export function OutboxSync() {
         </span>
         <div className="min-w-0 flex-1 text-sm">
           <p className="font-medium text-ink">
-            {isSyncing ? "Syncing drafts..." : notice?.kind === "success" ? "Report submitted" : "Submission problem"}
+            {isSyncing ? (t("outbox.syncing", locale) || "Syncing drafts...") : notice?.kind === "success" ? (t("outbox.submitted", locale) || "Report submitted") : (t("outbox.problem", locale) || "Submission problem")}
           </p>
           <p className="mt-0.5 leading-relaxed text-ink-soft">
-            {isSyncing ? "Please wait while your offline reports are submitted." : notice?.message}
+            {isSyncing ? (t("outbox.wait", locale) || "Please wait while your offline reports are submitted.") : notice?.message}
             {notice?.caseId && !isSyncing && (
               <>
                 {" "}
-                Case{" "}
+                {t("outbox.case", locale) || "Case"}{" "}
                 <a className="font-medium text-brand-deep underline underline-offset-2" href={`/cases/${notice.caseId}`}>
                   #{notice.caseId}
                 </a>
@@ -122,7 +122,7 @@ export function OutboxSync() {
         {!isSyncing && (
           <button
             onClick={() => setNotice(null)}
-            aria-label="Dismiss notification"
+            aria-label={t("outbox.dismiss", locale) || "Dismiss notification"}
             className="rounded-full p-1.5 text-ink-soft hover:bg-muted hover:text-ink"
           >
             <Icon name="x" className="h-4 w-4" />

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 import { useMemo, useState } from "react";
 import type { CaseCardRow } from "@/components/case/CaseCard";
 import { PublicCaseCard } from "@/components/case/CaseCard";
@@ -8,11 +10,11 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 const FILTERS = [
-  { key: "all", label: "All" },
-  { key: "safety", label: "Safety" },
-  { key: "service", label: "Services" },
-  { key: "infrastructure", label: "Infrastructure" },
-  { key: "community", label: "Community" }
+  { key: "all", labelKey: "community.filter.all" },
+  { key: "safety", labelKey: "community.filter.safety" },
+  { key: "service", labelKey: "community.filter.services" },
+  { key: "infrastructure", labelKey: "community.filter.infrastructure" },
+  { key: "community", labelKey: "community.filter.community" }
 ] as const;
 
 type FilterKey = (typeof FILTERS)[number]["key"];
@@ -25,6 +27,7 @@ const FILTER_MAP: Record<Exclude<FilterKey, "all">, string[]> = {
 };
 
 export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "href">> }) {
+  const { locale } = useLocale();
   const [filter, setFilter] = useState<FilterKey>("all");
   const [query, setQuery] = useState("");
 
@@ -45,7 +48,7 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
     <div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="relative flex-1">
-          <span className="sr-only">Search cases</span>
+          <span className="sr-only">{t("community.search.label", locale) || "Search cases"}</span>
           <Icon
             name="search"
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
@@ -53,14 +56,14 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by ID, title or area"
+            placeholder={t("community.search.placeholder", locale) || "Search by ID, title or area"}
             className="field pl-10"
             type="search"
           />
         </label>
       </div>
 
-      <div className="mt-4 flex gap-1.5 overflow-x-auto scroll-hide pb-1" role="tablist" aria-label="Filter cases">
+      <div className="mt-4 flex gap-1.5 overflow-x-auto scroll-hide pb-1" role="tablist" aria-label={t("community.filter.aria_label", locale) || "Filter cases"}>
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -74,7 +77,7 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
                 : "border-line bg-surface text-ink-soft hover:border-ink-soft/40 hover:text-ink"
             )}
           >
-            {f.label}
+            {t(f.labelKey, locale) || f.key}
           </button>
         ))}
       </div>
@@ -83,11 +86,11 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
         {filtered.length === 0 ? (
           <EmptyState
             icon="search"
-            title="No cases match"
+            title={t("community.empty.title", locale) || "No cases match"}
             body={
               query
-                ? `Nothing matches "${query}". Try a case ID like CS-1042, or clear the filters.`
-                : "No public cases in this filter yet."
+                ? `${t("community.empty.body_query_start", locale) || 'Nothing matches "'}${query}${t("community.empty.body_query_end", locale) || '". Try a case ID like CS-1042, or clear the filters.'}`
+                : t("community.empty.body_no_query", locale) || "No public cases in this filter yet."
             }
           />
         ) : (

@@ -1,7 +1,11 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { CaseView } from "@/lib/case-view";
 import { formatDateTime } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { useLocale } from "@/components/system/LocaleProvider";
+import { t } from "@/lib/i18n/i18n";
 
 const EVENT_STYLE: Record<string, { icon: string; tone: string }> = {
   REPORT_SUBMITTED: { icon: "file-text", tone: "bg-brand-soft text-brand-deep" },
@@ -18,7 +22,6 @@ const EVENT_STYLE: Record<string, { icon: string; tone: string }> = {
   CASE_CLOSED: { icon: "check-circle-2", tone: "bg-success-soft text-success" }
 };
 
-// Vertical case timeline — the audit spine of every civic case.
 export function CaseTimeline({
   view,
   showRestricted = false,
@@ -28,21 +31,22 @@ export function CaseTimeline({
   showRestricted?: boolean;
   className?: string;
 }) {
+  const { locale } = useLocale();
   const events = showRestricted
     ? view.events
     : view.events.filter((e) => e.visibility === "public");
-  const ordered = [...events].reverse(); // newest first
+  const ordered = [...events].reverse();
 
   return (
-    <section aria-label="Case timeline" className={cn("card px-5 py-5", className)}>
+    <section aria-label={t("case.timeline", locale)} className={cn("card px-5 py-5", className)}>
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="meta-label">Case timeline</h2>
+        <h2 className="meta-label">{t("case.timeline", locale)}</h2>
         {ordered.length > 0 && (
-          <span className="text-[11.5px] text-ink-soft/70">{ordered.length} event{ordered.length === 1 ? "" : "s"}</span>
+          <span className="text-[11.5px] text-ink-soft/70">{ordered.length} {ordered.length === 1 ? t("case.event", locale) : t("case.events", locale)}</span>
         )}
       </div>
       {ordered.length === 0 ? (
-        <p className="text-[13.5px] leading-relaxed text-ink-soft">No recorded activity yet.</p>
+        <p className="text-[13.5px] leading-relaxed text-ink-soft">{t("case.noActivity", locale)}</p>
       ) : (
         <ol className="relative space-y-0">
           <span aria-hidden="true" className="timeline-rail" />
@@ -51,7 +55,6 @@ export function CaseTimeline({
             const isFirst = i === 0;
             return (
               <li key={e.id} className="relative pb-6 pl-11 last:pb-0">
-                {/* Icon marker */}
                 <span
                   aria-hidden="true"
                   className={cn(
@@ -79,12 +82,12 @@ export function CaseTimeline({
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {isFirst && (
                         <span className="inline-flex items-center rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-widest text-brand-deep uppercase">
-                          Latest
+                          {t("case.latest", locale)}
                         </span>
                       )}
                       {e.visibility === "restricted" && (
                         <span className="chip bg-warning-soft text-warning">
-                          <Icon name="lock" className="h-3 w-3" /> Responder only
+                          <Icon name="lock" className="h-3 w-3" /> {t("case.responderOnly", locale)}
                         </span>
                       )}
                     </div>

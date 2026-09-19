@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/system/LocaleProvider";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import Link from "next/link";
@@ -5,7 +8,8 @@ import type { NextAction } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
 import type { Locale } from "@/lib/i18n/i18n";
 
-export function NextActionsPanel({ actions, locale = "en" }: { actions: NextAction[]; locale?: Locale }) {
+export function NextActionsPanel({ actions }: { actions: NextAction[] }) {
+  const { locale } = useLocale();
   if (!actions || actions.length === 0) return null;
 
   return (
