@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { CivicInfoCard } from "./CivicInfoCard";
-import type { CivicInfoItem } from "@/lib/civic-types";
+import type { CivicInfoView } from "@/lib/dto/civic";
 import { t } from "@/lib/i18n/i18n";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { cn } from "@/lib/utils";
@@ -21,40 +21,53 @@ const TABS = [
 export function CivicExplorer({ 
   initialItems 
 }: { 
-  initialItems: CivicInfoItem[]; 
+  initialItems: CivicInfoView[]; 
 }) {
   const { locale } = useLocale();
-  const [items, setItems] = useState<CivicInfoItem[]>(initialItems);
+  const [items, setItems] = useState<CivicInfoView[]>(initialItems);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [query, setQuery] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const [failed, setFailed] = useState(false);
+  // Skip the first run: the server already rendered `initialItems`.
+  const firstRun = useRef(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchFiltered() {
       setIsPending(true);
       try {
         const url = new URL("/api/civic", window.location.origin);
         if (activeTab !== "all") url.searchParams.set("category", activeTab);
         if (query) url.searchParams.set("q", query);
-        
-        const res = await fetch(url.toString());
+
+        const res = await fetch(url.toString(), { signal: controller.signal });
         if (res.ok) {
-          const data = await res.json();
-          setItems(data.data || []);
+          const data = (await res.json()) as { items?: CivicInfoView[] };
+          setItems(data.items ?? []);
+          setFailed(false);
+        } else {
+          setFailed(true);
         }
       } catch (err) {
-        console.error("Failed to fetch filtered civic info", err);
+        if ((err as Error)?.name !== "AbortError") setFailed(true);
       } finally {
         setIsPending(false);
       }
     }
 
-    // Debounce the search
-    const timer = setTimeout(() => {
-      fetchFiltered();
-    }, 300);
+    if (firstRun.current && activeTab === "all" && query === "") {
+      firstRun.current = false;
+      return () => controller.abort();
+    }
+    firstRun.current = false;
 
-    return () => clearTimeout(timer);
+    // Debounce so a search doesn't fire a request per keystroke.
+    const timer = setTimeout(fetchFiltered, 300);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [activeTab, query]);
 
   return (
@@ -77,6 +90,8 @@ export function CivicExplorer({
             {TABS.map((tab) => (
               <button
                 key={tab.id}
+                type="button"
+                aria-pressed={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
@@ -85,7 +100,7 @@ export function CivicExplorer({
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 )}
               >
-                {t(tab.labelKey as any, locale)}
+                {t(tab.labelKey, locale)}
               </button>
             ))}
           </div>
@@ -93,8 +108,21 @@ export function CivicExplorer({
       </div>
 
       {/* Results */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {isPending
+          ? t("system.loading", locale)
+          : `${items.length} ${items.length === 1 ? "result" : "results"}`}
+      </p>
+
       <div className={cn("transition-opacity duration-200", isPending && "opacity-50")}>
-        {items.length === 0 ? (
+        {failed ? (
+          <div role="alert" className="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 border-dashed">
+            <Icon name="wifi-off" className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-slate-900">
+              {t("system.load_failed", locale) || "Couldn't load civic information"}
+            </h3>
+          </div>
+        ) : items.length === 0 ? (
           <div className="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 border-dashed">
             <Icon name="search-x" className="h-10 w-10 text-slate-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-slate-900">{t("system.no_results", locale)}</h3>

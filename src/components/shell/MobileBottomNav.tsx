@@ -30,7 +30,7 @@ export function MobileBottomNav() {
     >
       <div className="grid w-full grid-cols-5 items-end px-1 pb-1.5 pt-1.5">
         {ITEMS.slice(0, 2).map((item) => (
-          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey as any, locale) }} active={pathname.startsWith(item.href)} />
+          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey, locale) }} active={pathname.startsWith(item.href)} />
         ))}
 
         {/* Report — visually prominent, centred, still calm */}
@@ -46,7 +46,7 @@ export function MobileBottomNav() {
         </div>
 
         {ITEMS.slice(2).map((item) => (
-          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey as any, locale) }} active={pathname.startsWith(item.href)} />
+          <NavItem key={item.href} item={{ ...item, label: t(item.labelKey, locale) }} active={pathname.startsWith(item.href)} />
         ))}
       </div>
     </nav>

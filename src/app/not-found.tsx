@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { CivoraLogo } from "@/components/CivoraLogo";
 import { Button } from "@/components/ui/Button";
 import { useLocale } from "@/components/system/LocaleProvider";

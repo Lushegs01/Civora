@@ -5,7 +5,6 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 import type { Jurisdiction } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
 
 export function JurisdictionBadge({ 
   jurisdiction, 

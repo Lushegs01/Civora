@@ -5,12 +5,11 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 import { type FreshnessState, FRESHNESS_META } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
 
 export function FreshnessBadge({ state }: { state: FreshnessState }) {
   const { locale } = useLocale();
   const meta = FRESHNESS_META[state];
-  const translatedLabel = t(meta.labelKey as any, locale);
+  const translatedLabel = t(meta.labelKey, locale);
 
   return (
     <span
@@ -21,7 +20,7 @@ export function FreshnessBadge({ state }: { state: FreshnessState }) {
         meta.tone === "danger" && "border border-red-200 bg-red-50 text-red-700"
       )}
     >
-      <Icon name={meta.icon as any} className="h-3.5 w-3.5" />
+      <Icon name={meta.icon} className="h-3.5 w-3.5" />
       {translatedLabel}
     </span>
   );

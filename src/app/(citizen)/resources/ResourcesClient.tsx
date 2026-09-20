@@ -108,7 +108,7 @@ export function ResourcesClient({ contacts }: { contacts: Array<{ name: string; 
             ].map(([icon, name, desc]) => (
               <div key={name} className="card flex items-center gap-3.5 px-5 py-4">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-ink-soft">
-                  <Icon name={icon as any} className="h-4 w-4" />
+                  <Icon name={icon} className="h-4 w-4" />
                 </span>
                 <div>
                   <h3 className="text-[14px] font-semibold text-ink">{name}</h3>

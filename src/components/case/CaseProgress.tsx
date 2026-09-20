@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { CaseView } from "@/lib/case-view";
+import type { PublicCaseView } from "@/lib/dto/case";
 import { Icon } from "@/components/ui/Icon";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 
-export function CaseProgress({ view, className }: { view: CaseView; className?: string }) {
+export function CaseProgress({ view, className }: { view: PublicCaseView; className?: string }) {
   const { locale } = useLocale();
   return (
     <section aria-label={t("case.progress", locale)} className={cn("card px-5 py-5", className)}>
@@ -48,15 +48,15 @@ export function CaseProgress({ view, className }: { view: CaseView; className?: 
                 step.done ? "text-ink" : step.current ? "font-semibold text-ink" : "text-ink-soft/50"
               )}
             >
-              {t(step.label, locale) || step.label}
+              {t(step.labelKey, locale) || step.label}
             </span>
           </li>
         ))}
       </ol>
       <p className="sr-only">
-        {view.progress.filter((s) => s.done).map((s) => t(s.label, locale) || s.label).join(", ")} {t("case.completed", locale)}
+        {view.progress.filter((s) => s.done).map((s) => t(s.labelKey, locale) || s.label).join(", ")} {t("case.completed", locale)}
         {view.progress.find((s) => !s.done) &&
-          `${t("case.currentlyAt", locale)}${t(view.progress.find((s) => !s.done)!.label, locale) || view.progress.find((s) => !s.done)!.label}.`}
+          `${t("case.currentlyAt", locale)}${t(view.progress.find((s) => !s.done)!.labelKey, locale) || view.progress.find((s) => !s.done)!.label}.`}
       </p>
     </section>
   );

@@ -63,12 +63,18 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
         </label>
       </div>
 
-      <div className="mt-4 flex gap-1.5 overflow-x-auto scroll-hide pb-1" role="tablist" aria-label={t("community.filter.aria_label", locale) || "Filter cases"}>
+      {/* Filter buttons, not tabs: there is one result list below, not one
+          panel per filter, so the pressed-button pattern is the honest one. */}
+      <div
+        className="mt-4 flex gap-1.5 overflow-x-auto scroll-hide pb-1"
+        role="group"
+        aria-label={t("community.filter.aria_label", locale) || "Filter cases"}
+      >
         {FILTERS.map((f) => (
           <button
             key={f.key}
-            role="tab"
-            aria-selected={filter === f.key}
+            type="button"
+            aria-pressed={filter === f.key}
             onClick={() => setFilter(f.key)}
             className={cn(
               "press min-h-10 shrink-0 rounded-full border px-4 text-[13.5px] font-medium transition-colors",
@@ -81,6 +87,10 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
           </button>
         ))}
       </div>
+
+      <p role="status" aria-live="polite" className="sr-only">
+        {filtered.length} {filtered.length === 1 ? "case" : "cases"}
+      </p>
 
       <div className="mt-5 space-y-2.5">
         {filtered.length === 0 ? (

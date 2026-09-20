@@ -17,7 +17,7 @@ export function VerificationExplainer() {
           <strong>Official Source:</strong> Information is directly sourced from authorized government or civic bodies.
         </p>
         <p>
-          <strong>Freshness Checked:</strong> We track the last verified date to ensure requirements haven't changed.
+          <strong>Freshness Checked:</strong> We track the last verified date to ensure requirements haven&rsquo;t changed.
         </p>
         <p>
           <strong>Transparent Uncertainty:</strong> If procedures are unclear or currently failing in practice, we document it clearly rather than hiding it.

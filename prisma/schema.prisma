@@ -1,10 +1,14 @@
-// Reference relational schema for Civora.
+// Civora relational schema.
 //
-// The demo runtime persists to a JSON file store (src/lib/db/store.ts) shaped
-// exactly like this model, so the app runs with zero infrastructure. To move
-// to PostgreSQL: `npm i prisma @prisma/client`, run `prisma migrate dev`, and
-// swap the read/write helpers in store.ts for Prisma queries — domain logic,
-// API routes and UI stay unchanged.
+// PostgreSQL is the authoritative runtime store. Nothing in the running system
+// reads or writes a JSON file: see src/lib/db/prisma.ts for the client and
+// src/lib/db/repository.ts for every query the application makes.
+//
+// Two rules are encoded structurally rather than left to convention:
+//   1. Reporter identity lives in its own table (ReporterContact) so no public
+//      query can accidentally select it alongside a case.
+//   2. Matching (CaseLink) is separate from verification (Case.verification):
+//      a heuristic can only ever *propose* a link; a person confirms it.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,8 +16,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
+
+// ---------------------------------------------------------------- enums
 
 enum PrivacyMode {
   anonymous
@@ -36,6 +41,16 @@ enum ResponseState {
   in_progress
   action_recorded
   closed
+}
+
+/// Whether a case is shown on the public transparency surface. A case is never
+/// public merely because it was submitted — see src/lib/publication.ts.
+enum PublicationState {
+  private_case
+  screening
+  public_case
+  restricted
+  archived
 }
 
 enum CaseCategory {
@@ -72,15 +87,19 @@ enum EvidenceSourceType {
 enum EventType {
   REPORT_SUBMITTED
   EVIDENCE_ADDED
-  CORROBORATION_RECEIVED
+  POSSIBLE_MATCH_FOUND
+  CORROBORATION_CONFIRMED
+  CORROBORATION_REJECTED
   VERIFICATION_UPDATED
   CASE_ASSIGNED
   CASE_ACKNOWLEDGED
   RESPONSE_IN_PROGRESS
   INFO_REQUESTED
+  INFO_PROVIDED
   PUBLIC_UPDATE_ADDED
   ACTION_RECORDED
   UPDATE_REQUESTED
+  PUBLICATION_CHANGED
   CASE_CLOSED
 }
 
@@ -89,155 +108,419 @@ enum Visibility {
   restricted
 }
 
+enum ActorType {
+  system
+  reporter
+  responder
+  organization
+  matching_rule
+}
+
 enum Role {
   citizen
   responder
-  admin
+  organization_admin
+  platform_admin
+}
+
+enum UserStatus {
+  active
+  suspended
+}
+
+enum LinkStatus {
+  proposed
+  confirmed
+  rejected
+}
+
+enum InfoRequestStatus {
+  open
+  answered
+  cancelled
+}
+
+enum CivicCategory {
+  service
+  right
+  policy
+  opportunity
+  project
+  safety
+  procedure
+}
+
+enum JurisdictionLevel {
+  federal
+  state
+  local
+}
+
+// ---------------------------------------------------------------- identity
+
+model Organization {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String
+  contactEmail String?
+  active       Boolean  @default(true)
+  /// Fictional demo organization — surfaced in the UI so nothing reads as real.
+  fictional    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  users       User[]
+  cases       Case[]
+  assignments CaseAssignment[]
+  events      CaseEvent[]
+  updates     CaseUpdate[]
+
+  @@index([active])
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  role      Role     @default(citizen)
-  orgId     String?
-  org       Organization? @relation(fields: [orgId], references: [id])
-  reports   Report[]
+  id           String     @id @default(cuid())
+  email        String     @unique
+  displayName  String
+  role         Role       @default(citizen)
+  status       UserStatus @default(active)
+  /// scrypt hash — see src/lib/auth/password.ts. Null for accounts that can
+  /// only be reached through the explicitly gated demo access code.
+  passwordHash String?
+  /// True only for seeded demo accounts; refused sign-in outside demo mode.
+  isDemo       Boolean    @default(false)
+  orgId        String?
+  org          Organization? @relation(fields: [orgId], references: [id])
+  createdAt    DateTime   @default(now())
+  lastLoginAt  DateTime?
+
+  sessions        Session[]
+  events          CaseEvent[]
+  updates         CaseUpdate[]
+  notes           InternalNote[]
+  assignmentsMade CaseAssignment[]
+  linkDecisions   CaseLink[]
+  infoRequests    InfoRequest[]
+
+  @@index([orgId, role])
 }
 
-model Organization {
+/// Server-side session records. Only the SHA-256 of the session token is
+/// stored, so a database read cannot be replayed as a login.
+model Session {
   id          String   @id @default(cuid())
-  name        String
-  description String
-  contactEmail String?
+  tokenHash   String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
-  users       User[]
-  cases       Case[]
+  lastSeenAt  DateTime @default(now())
+  expiresAt   DateTime
+  absoluteExpiresAt DateTime
+  revokedAt   DateTime?
+  /// Truncated SHA-256 of IP + user agent; used to detect obvious theft, never
+  /// to profile. Never logged.
+  bindingHash String?
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
 }
+
+// ---------------------------------------------------------------- cases
 
 model Case {
-  id                String      @id @default(cuid()) // internal id — never exposed
-  publicCaseId      String      @unique // e.g. "CS-1042" — the only id shown anywhere
-  title             String
-  description       String
-  category          CaseCategory
-  locationGeneral   String?
-  lat               Float?
-  lng               Float?
-  incidentAt        DateTime
-  privacyMode       PrivacyMode
-  verification      VerificationState @default(unverified)
-  response          ResponseState     @default(received)
-  priority          CasePriority      @default(standard)
-  assignedOrgId     String?
-  assignedOrg       Organization? @relation(fields: [assignedOrgId], references: [id])
-  nextUpdateAt      DateTime?
-  awaitingReporter  Boolean       @default(false)
-  disputePathway    Boolean       @default(false)
-  publicVisible     Boolean       @default(true)
-  known             String[] // "what we know" bullet list
-  uncertain         String[] // "what remains uncertain" bullet list
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  resolvedAt        DateTime?
+  id           String @id @default(cuid())
+  /// The only identifier ever shown: "CS-1042". Allocated from a Postgres
+  /// sequence inside the creating transaction, so it is concurrency safe.
+  publicCaseId String @unique
+  caseNumber   Int    @unique
 
-  reports  Report[]
-  evidence CaseEvidence[]
-  events   CaseEvent[]
-  updates  CaseUpdate[]
-  notes    InternalNote[]
-  assignments CaseAssignment[]
+  title String
+  /// Intentionally publishable text. Never the raw report body.
+  publicSummary    String
+  /// Full reporter-supplied narrative. Restricted to the reporter and
+  /// authorized handlers; it may contain names, threats or other detail the
+  /// reporter did not intend to publish.
+  privateDescription String
+  category         CaseCategory
+  locationGeneral  String?
+  lat              Float?
+  lng              Float?
+  incidentAt       DateTime
+  privacyMode      PrivacyMode
+
+  verification       VerificationState @default(unverified)
+  verificationReason String?
+  /// The verification state held immediately before closure, so reopening a
+  /// case restores what was actually established rather than guessing.
+  preClosureVerification VerificationState?
+  response           ResponseState     @default(received)
+  priority           CasePriority      @default(standard)
+  publicationState   PublicationState  @default(screening)
+  /// Denormalized `publicationState == public_case`, kept in step by
+  /// src/lib/publication.ts so list queries stay a single index scan.
+  publicVisible      Boolean           @default(false)
+  /// Why publication is held back (e.g. "safety", "personal-data").
+  screeningFlags     String[]
+
+  assignedOrgId    String?
+  assignedOrg      Organization? @relation(fields: [assignedOrgId], references: [id])
+  nextUpdateAt     DateTime?
+  awaitingReporter Boolean       @default(false)
+  disputePathway   Boolean       @default(false)
+
+  known     String[]
+  uncertain String[]
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  closedAt   DateTime?
+  resolvedAt DateTime?
+  /// Retention horizon for evidence attached to this case.
+  retainUntil DateTime?
+
+  reports      Report[]
+  evidence     Evidence[]
+  events       CaseEvent[]
+  updates      CaseUpdate[]
+  notes        InternalNote[]
+  assignments  CaseAssignment[]
+  infoRequests InfoRequest[]
+  linksFrom    CaseLink[] @relation("linkSource")
+  linksTo      CaseLink[] @relation("linkTarget")
+
+  @@index([publicVisible, updatedAt])
+  @@index([response, updatedAt])
+  @@index([verification])
+  @@index([assignedOrgId, response])
+  @@index([category, incidentAt])
+  @@index([updatedAt])
 }
 
 model Report {
-  id          String     @id @default(cuid())
+  id          String      @id @default(cuid())
   caseId      String
-  case        Case       @relation(fields: [caseId], references: [id])
-  reporterId  String? // null for anonymous
-  reporter    User?      @relation(fields: [reporterId], references: [id])
-  role        String // "initial" | "corroborating"
+  case        Case        @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  role        String      @default("initial") // "initial" | "corroborating" | "info_response"
   privacyMode PrivacyMode
-  trackingTokenHash String? // SHA-256 of the reporter's tracking token
-  reporterContact String? // PRIVATE reporter data — responder views only
+  /// SHA-256 of the reporter's tracking token. The token itself never touches
+  /// the database, the logs or any URL.
+  trackingTokenHash String  @unique
+  /// SHA-256 of an optional recovery code the reporter chose to export.
+  recoveryCodeHash  String?
+  /// This report's own narrative, kept private for the same reason as
+  /// Case.privateDescription.
+  narrative   String
   areaNote    String?
-  receivedAt  DateTime   @default(now())
-  @@index([caseId])
+  receivedAt  DateTime @default(now())
+  /// Hashed, salted client IP — abuse investigation only, never displayed.
+  submitterHash String?
+
+  contact ReporterContact?
+  links   CaseLink[]
+
+  @@index([caseId, receivedAt])
+  @@index([trackingTokenHash])
+}
+
+/// Reporter identity, deliberately in its own table. Public and reporter DTOs
+/// never join it; only an authorized handler on the case can read it.
+model ReporterContact {
+  id        String  @id @default(cuid())
+  reportId  String  @unique
+  report    Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  name      String?
+  email     String?
+  phone     String?
+  preferredChannel String?
+  createdAt DateTime @default(now())
 }
 
 model Evidence {
-  id            String            @id @default(cuid())
-  kind          EvidenceKind
-  title         String
-  sourceType    EvidenceSourceType
-  submittedByLabel String // privacy-aware label, never raw identity
-  excerpt       String?
-  relationship  String // relationship to the claim
-  fileName      String?
-  mimeType      String?
-  sizeBytes     Int?
-  checksum      String? // SHA-256 of content
-  storageKey    String? // object-storage key (S3/MinIO/local in demo)
-  sourceRef     String? // citation for official/primary sources
-  publicVisible Boolean           @default(true)
-  submittedAt   DateTime          @default(now())
-
-  cases CaseEvidence[]
-}
-
-model CaseEvidence {
+  id         String             @id @default(cuid())
   caseId     String
-  case       Case    @relation(fields: [caseId], references: [id])
-  evidenceId String
-  evidence   Evidence @relation(fields: [evidenceId], references: [id])
-  addedAt    DateTime @default(now())
-  @@id([caseId, evidenceId])
+  case       Case               @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  kind       EvidenceKind
+  title      String
+  sourceType EvidenceSourceType
+  /// Privacy-aware label ("Confidential reporter"), never a person's name.
+  submittedByLabel String
+  submittedById    String?
+  excerpt      String?
+  relationship String
+  fileName     String?
+  mimeType     String?
+  sizeBytes    Int?
+  checksum     String?
+  /// Key inside the private object store. Never returned to a client.
+  storageKey    String?
+  storageDriver String?
+  publicVisible Boolean @default(false)
+  sourceRef     String?
+  submittedAt   DateTime @default(now())
+  retainUntil   DateTime?
+  deletedAt     DateTime?
+
+  @@index([caseId, submittedAt])
+  @@index([caseId, publicVisible])
 }
 
 model CaseEvent {
-  id         String     @id @default(cuid())
-  caseId     String
-  case       Case       @relation(fields: [caseId], references: [id])
-  type       EventType
-  actor      String
-  visibility Visibility @default(public)
-  title      String
-  detail     String?
-  at         DateTime   @default(now())
+  id     String @id @default(cuid())
+  caseId String
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  type   EventType
+  /// Who acted. actorLabel is display text chosen by the server from a fixed
+  /// vocabulary — clients can never supply it.
+  actorType      ActorType
+  actorId        String?
+  actor          User?         @relation(fields: [actorId], references: [id])
+  actorLabel     String
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  visibility     Visibility    @default(public)
+  title          String
+  detail         String?
+  at             DateTime      @default(now())
+
   @@index([caseId, at])
+  @@index([caseId, visibility, at])
 }
 
 model CaseUpdate {
-  id          String   @id @default(cuid())
-  caseId      String
-  case        Case     @relation(fields: [caseId], references: [id])
-  authorLabel String
-  body        String
-  at          DateTime @default(now())
+  id             String        @id @default(cuid())
+  caseId         String
+  case           Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorLabel    String
+  authorId       String?
+  author         User?         @relation(fields: [authorId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  body           String
+  at             DateTime      @default(now())
+
   @@index([caseId, at])
 }
 
 model InternalNote {
   id          String   @id @default(cuid())
   caseId      String
-  case        Case     @relation(fields: [caseId], references: [id])
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
   authorLabel String
   body        String
   at          DateTime @default(now())
+
+  @@index([caseId, at])
 }
 
 model CaseAssignment {
-  id        String   @id @default(cuid())
-  caseId    String
-  case      Case     @relation(fields: [caseId], references: [id])
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
-  assignedBy String
-  assignedAt DateTime @default(now())
-  active     Boolean  @default(true)
+  id           String   @id @default(cuid())
+  caseId       String
+  case         Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  orgId        String
+  org          Organization @relation(fields: [orgId], references: [id])
+  assignedById String?
+  assignedBy   User?    @relation(fields: [assignedById], references: [id])
+  assignedAt   DateTime @default(now())
+  unassignedAt DateTime?
+  active       Boolean  @default(true)
+
+  @@index([caseId, active])
+  @@index([orgId, active])
 }
 
-model PublicCaseView {
-  id        String   @id @default(cuid())
-  caseId    String
-  viewedAt  DateTime @default(now())
-  @@index([caseId])
+/// A *possible* relationship between a new report and an existing case.
+/// Created by the matching engine, never by a client, and never by itself a
+/// statement that anything is verified.
+model CaseLink {
+  id           String     @id @default(cuid())
+  sourceCaseId String
+  sourceCase   Case       @relation("linkSource", fields: [sourceCaseId], references: [id], onDelete: Cascade)
+  targetCaseId String
+  targetCase   Case       @relation("linkTarget", fields: [targetCaseId], references: [id], onDelete: Cascade)
+  reportId     String?
+  report       Report?    @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  score        Float
+  /// Per-signal breakdown so a handler can see *why* it was proposed.
+  signals      Json
+  status       LinkStatus @default(proposed)
+  decidedById  String?
+  decidedBy    User?      @relation(fields: [decidedById], references: [id])
+  decidedAt    DateTime?
+  decisionNote String?
+  createdAt    DateTime   @default(now())
+
+  @@unique([sourceCaseId, targetCaseId])
+  @@index([targetCaseId, status])
+  @@index([status, createdAt])
+}
+
+/// A responder asking the reporter for more detail, and the reporter's answer.
+model InfoRequest {
+  id           String            @id @default(cuid())
+  caseId       String
+  case         Case              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  requestedById String?
+  requestedBy   User?            @relation(fields: [requestedById], references: [id])
+  requestedByLabel String
+  /// Shown to the reporter; written by a responder, so it is public-safe text.
+  message      String
+  status       InfoRequestStatus @default(open)
+  createdAt    DateTime          @default(now())
+  answeredAt   DateTime?
+  answerBody   String?
+
+  @@index([caseId, status])
+}
+
+// ---------------------------------------------------------------- civic info
+
+model CivicInfoItem {
+  id                    String    @id
+  title                 String
+  category              CivicCategory
+  country               String
+  region                String?
+  locality              String?
+  level                 JurisdictionLevel
+  explanation           String
+  officialSource        String
+  sourceUrl             String?
+  sourceAuthority       String
+  publishedAt           DateTime
+  lastVerifiedAt        DateTime
+  freshnessThresholdDays Int      @default(180)
+  verificationMethod    String?
+  eligibility           String?
+  requirements          String[]
+  fees                  String?
+  deadlines             String?
+  contactInfo           String?
+  nextActions           Json
+  relatedCaseIds        String[]
+  relatedCivicIds       String[]
+  whatRemainsUncertain  String[]
+  languageVersions      Json
+  /// True for the seeded demo corpus. The UI labels these unmistakably.
+  fictional             Boolean   @default(true)
+  tags                  String[]
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([category, lastVerifiedAt])
+  @@index([level, locality])
+}
+
+// ---------------------------------------------------------------- infra
+
+/// Shared fixed-window rate limiter. Used when no Redis-compatible endpoint is
+/// configured, so a multi-instance deployment still shares one counter.
+model RateLimitCounter {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime
+  expiresAt   DateTime
+
+  @@index([expiresAt])
 }

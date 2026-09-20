@@ -52,7 +52,7 @@ export function PrivacyClient() {
             return (
               <div key={key} className="card flex items-start gap-4 px-5 py-5">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-ink-soft">
-                  <Icon name={m.icon as any} className="h-5 w-5" />
+                  <Icon name={m.icon} className="h-5 w-5" />
                 </span>
                 <div>
                   <h3 className="text-[15px] font-semibold text-ink">{m.label}</h3>
@@ -73,7 +73,7 @@ export function PrivacyClient() {
             {PRINCIPLES.map((p) => (
               <div key={p.title} className="card px-5 py-5">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-soft text-brand-deep">
-                  <Icon name={p.icon as any} className="h-4 w-4" />
+                  <Icon name={p.icon} className="h-4 w-4" />
                 </span>
                 <h3 className="mt-3 text-[15px] font-semibold leading-snug text-ink">{p.title}</h3>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">{p.body}</p>

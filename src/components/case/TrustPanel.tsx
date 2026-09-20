@@ -1,14 +1,14 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { CaseView } from "@/lib/case-view";
+import type { PublicCaseView } from "@/lib/dto/case";
 import { Icon } from "@/components/ui/Icon";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 
-export function TrustPanel({ view, className }: { view: CaseView; className?: string }) {
+export function TrustPanel({ view, className }: { view: PublicCaseView; className?: string }) {
   const { locale } = useLocale();
-  const { known, uncertain } = view.case;
+  const { known, uncertain } = view;
   return (
     <section aria-label={t("case.trustPanel.ariaLabel", locale)} className={cn("space-y-3", className)}>
       <div className="card overflow-hidden">

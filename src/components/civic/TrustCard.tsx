@@ -7,16 +7,15 @@ import { AiTranslateCard } from "./AiTranslateCard";
 import { AiExplainCard } from "./AiExplainCard";
 import { Icon } from "@/components/ui/Icon";
 import { RelativeTime } from "@/components/ui/RelativeTime";
-import type { CivicInfoItem } from "@/lib/civic-types";
+import type { CivicInfoView } from "@/lib/dto/civic";
 import { CIVIC_CATEGORY_META } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
 import { useLocale } from "@/components/system/LocaleProvider";
-import { cn } from "@/lib/utils";
 
 export function TrustCard({ 
   item 
 }: { 
-  item: CivicInfoItem; 
+  item: CivicInfoView; 
 }) {
   const { locale } = useLocale();
   const categoryMeta = CIVIC_CATEGORY_META[item.category];
@@ -36,8 +35,8 @@ export function TrustCard({
       <div className="p-6 border-b border-slate-100">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 font-medium uppercase tracking-wider">
-            <Icon name={categoryMeta.icon as any} className="h-4 w-4" />
-            {t(categoryMeta.labelKey as any, locale)}
+            <Icon name={categoryMeta.icon} className="h-4 w-4" />
+            {t(categoryMeta.labelKey, locale)}
           </div>
           <FreshnessBadge state={item.freshnessState} />
         </div>
