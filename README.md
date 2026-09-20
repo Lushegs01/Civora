@@ -371,14 +371,24 @@ Vercel runs `vercel-build` in preference to `build`. That script applies
 present — so a preview from a fork still builds, and reports its missing
 configuration at `/api/health` rather than failing the deploy.
 
-Seeding is never automatic, because it deletes existing data. Run it deliberately
-when you want the fictional corpus:
+Seeding is never automatic, because it rewrites existing data. When you want the
+fictional corpus on the hosted database, pull the connected store's URL and seed
+against it:
 
 ```bash
-CIVORA_DEMO_MODE=true npm run db:seed
+vercel env pull .env.vercel
+DOTENV_CONFIG_PATH=.env.vercel npm run db:seed
 ```
 
-Check the result with `curl https://your-deployment/api/health`.
+The seed prints a generated responder password once, and it is the only thing
+that creates accounts — without it a fresh deployment has no users at all, so
+there is no way to sign in as a responder. Seeding does not turn demo mode on;
+`CIVORA_DEMO_MODE` and `ENABLE_DEMO_TOOLS` are separate switches that a
+production deployment should leave off.
+
+Check the result with `curl https://your-deployment/api/health`. It reports
+`status`, whether the database is reachable, which storage driver resolved, and
+a warning for anything still missing.
 
 Nothing depends on the local filesystem or on process memory for authoritative
 state. `OBJECT_STORAGE_DRIVER=local` is refused when `NODE_ENV=production`.

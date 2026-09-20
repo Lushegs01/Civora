@@ -3,9 +3,10 @@ node_modules
 out
 data/civora-db.json
 data/uploads
-.env*.local
+# Every env file except the annotated template — a pulled
+# deployment environment must never be committed.
+.env*
+!.env.example
 *.tsbuildinfo
 .DS_Store
-.env
-.env.local
 .data
