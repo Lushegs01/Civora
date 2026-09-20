@@ -2,14 +2,26 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { databaseUrl, isProduction } from "../config";
 
-// Safe singleton for Next.js. In development the module graph is re-evaluated
-// on every hot reload, which would otherwise open a new pool per reload until
-// PostgreSQL refuses connections.
+// Safe singleton for Next.js.
+//
+// The client is built on first use rather than on import. Two reasons:
+//
+//   1. `next build` imports every route module to collect page data. An eager
+//      client would make the *build* require a live DATABASE_URL, so a
+//      deployment could not be built without one — which is exactly how this
+//      broke the first Vercel preview.
+//   2. Tests, scripts and lint passes can import anything under src/lib
+//      without needing database configuration.
+//
+// Configuration is still validated the moment a query is actually attempted,
+// so a missing URL fails loudly rather than silently connecting to nothing.
 
 declare global {
   // eslint-disable-next-line no-var
   var __civoraPrisma: PrismaClient | undefined;
 }
+
+let instance: PrismaClient | undefined;
 
 function create(): PrismaClient {
   const adapter = new PrismaPg({
@@ -20,15 +32,35 @@ function create(): PrismaClient {
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000
   });
-  return new PrismaClient({
-    adapter,
-    log: isProduction ? ["warn", "error"] : ["warn", "error"]
-  });
+  return new PrismaClient({ adapter, log: ["warn", "error"] });
 }
 
-export const prisma: PrismaClient = globalThis.__civoraPrisma ?? create();
+function client(): PrismaClient {
+  if (instance) return instance;
+  // In development the module graph is re-evaluated on every hot reload, which
+  // would otherwise open a new pool per reload until PostgreSQL refuses.
+  instance = globalThis.__civoraPrisma ?? create();
+  if (!isProduction) globalThis.__civoraPrisma = instance;
+  return instance;
+}
 
-if (!isProduction) globalThis.__civoraPrisma = prisma;
+/**
+ * The application's Prisma client.
+ *
+ * A proxy so that importing this module has no side effects; the first
+ * property access builds the real client. Functions are bound to that client
+ * so `$transaction`, `$queryRaw` and the model delegates behave normally.
+ */
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const target = client() as unknown as Record<string | symbol, unknown>;
+    const value = target[property];
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+  has(_target, property) {
+    return property in (client() as unknown as object);
+  }
+});
 
 /** Transaction client type — what repository helpers accept. */
 export type Tx = Omit<
