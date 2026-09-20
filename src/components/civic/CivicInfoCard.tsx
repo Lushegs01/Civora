@@ -5,12 +5,11 @@ import Link from "next/link";
 import { FreshnessBadge } from "./FreshnessBadge";
 import { JurisdictionBadge } from "./JurisdictionBadge";
 import { Icon } from "@/components/ui/Icon";
-import type { CivicInfoItem } from "@/lib/civic-types";
+import type { CivicInfoView } from "@/lib/dto/civic";
 import { CIVIC_CATEGORY_META } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
-import type { Locale } from "@/lib/i18n/i18n";
 
-export function CivicInfoCard({ item }: { item: CivicInfoItem }) {
+export function CivicInfoCard({ item }: { item: CivicInfoView }) {
   const { locale } = useLocale();
   const categoryMeta = CIVIC_CATEGORY_META[item.category];
   const localizedTitle = item.languageVersions[locale]?.title || item.title;
@@ -23,8 +22,8 @@ export function CivicInfoCard({ item }: { item: CivicInfoItem }) {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-slate-500">
-          <Icon name={categoryMeta.icon as any} className="h-3.5 w-3.5" />
-          {t(categoryMeta.labelKey as any, locale)}
+          <Icon name={categoryMeta.icon} className="h-3.5 w-3.5" />
+          {t(categoryMeta.labelKey, locale)}
         </div>
         <FreshnessBadge state={item.freshnessState} />
       </div>

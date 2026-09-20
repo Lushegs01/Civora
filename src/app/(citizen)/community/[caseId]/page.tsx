@@ -1,27 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findCase, readDb } from "@/lib/db/store";
-import { buildCaseView } from "@/lib/case-view";
+import { findCaseByPublicId } from "@/lib/db/repository";
+import { toPublicCaseView } from "@/lib/dto/case";
 import { PublicCaseClient } from "./PublicCaseClient";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params
-}: {
-  params: { caseId: string };
-}): Promise<Metadata> {
-  const db = await readDb();
-  const c = findCase(db, params.caseId);
-  return { title: c ? `Case ${c.id} — public view` : "Case not found" };
+export async function generateMetadata({ params }: { params: { caseId: string } }): Promise<Metadata> {
+  const record = await findCaseByPublicId(params.caseId);
+  return {
+    title: record && record.publicVisible ? `Case ${record.publicCaseId} — public view` : "Case not found",
+    robots: { index: false }
+  };
 }
 
-// Public case page: what is known, what remains uncertain, what has happened,
-// and what happens next — with reporter identity never exposed.
+/**
+ * Public case page: what is known, what remains uncertain, what has happened,
+ * and what happens next. Built from the public DTO, so there is no field to
+ * strip — the private ones were never selected.
+ */
 export default async function PublicCasePage({ params }: { params: { caseId: string } }) {
-  const db = await readDb();
-  const c = findCase(db, params.caseId);
-  if (!c || !c.publicVisible) notFound();
-  const view = buildCaseView(db, c, "public");
-  return <PublicCaseClient view={view} />;
+  const record = await findCaseByPublicId(params.caseId);
+  if (!record || !record.publicVisible) notFound();
+  return <PublicCaseClient view={toPublicCaseView(record)} />;
 }

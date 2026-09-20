@@ -7,9 +7,9 @@ import { TrustCard } from "@/components/civic/TrustCard";
 import { VerificationExplainer } from "@/components/civic/VerificationExplainer";
 import { TopBar } from "@/components/shell/TopBar";
 import { Icon } from "@/components/ui/Icon";
-import { CivicInfoItem } from "@/lib/civic-types";
+import type { CivicInfoView } from "@/lib/dto/civic";
 
-export function ExploreIdClient({ item }: { item: CivicInfoItem }) {
+export function ExploreIdClient({ item }: { item: CivicInfoView }) {
   const { locale } = useLocale();
 
   return (

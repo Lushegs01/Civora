@@ -45,7 +45,7 @@ export function Sidebar({ className }: { className?: string }) {
       <nav aria-label="Primary" className="flex flex-col gap-1">
         {NAV.map((item) => (
           <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
-            {t(item.labelKey as any, locale)}
+            {t(item.labelKey, locale)}
           </SideLink>
         ))}
       </nav>
@@ -55,7 +55,7 @@ export function Sidebar({ className }: { className?: string }) {
       <nav aria-label="Secondary" className="flex flex-col gap-1">
         {SECONDARY.map((item) => (
           <SideLink key={item.href} href={item.href} icon={item.icon} active={pathname.startsWith(item.href)}>
-            {t(item.labelKey as any, locale)}
+            {t(item.labelKey, locale)}
           </SideLink>
         ))}
         

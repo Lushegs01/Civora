@@ -4,9 +4,9 @@ import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 import { TopBar } from "@/components/shell/TopBar";
 import { CivicExplorer } from "@/components/civic/CivicExplorer";
-import { CivicInfoItem } from "@/lib/civic-types";
+import type { CivicInfoView } from "@/lib/dto/civic";
 
-export function ExploreClient({ initialItems }: { initialItems: CivicInfoItem[] }) {
+export function ExploreClient({ initialItems }: { initialItems: CivicInfoView[] }) {
   const { locale } = useLocale();
 
   return (

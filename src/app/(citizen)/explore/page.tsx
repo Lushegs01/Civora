@@ -1,9 +1,17 @@
-import { readDb } from "@/lib/db/store";
+import type { Metadata } from "next";
+import { prisma } from "@/lib/db/prisma";
+import { toCivicInfoView } from "@/lib/dto/civic";
 import { ExploreClient } from "./ExploreClient";
 
-export default async function ExplorePage() {
-  const db = await readDb();
-  const initialItems = db.civicInfo || [];
+export const metadata: Metadata = { title: "Civic explorer" };
+export const dynamic = "force-dynamic";
 
-  return <ExploreClient initialItems={initialItems} />;
+const PAGE_SIZE = 24;
+
+export default async function ExplorePage() {
+  const items = await prisma.civicInfoItem.findMany({
+    orderBy: [{ lastVerifiedAt: "desc" }, { id: "asc" }],
+    take: PAGE_SIZE
+  });
+  return <ExploreClient initialItems={items.map(toCivicInfoView)} />;
 }

@@ -4,33 +4,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn, relativeTime } from "@/lib/utils";
 import { CATEGORY_META, PRIVACY_META } from "@/lib/types";
 import type { CaseCategory, PrivacyMode } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { fileError, prepareFile } from "@/lib/client/upload";
+import { fileError, prepareFile, uploadEvidence, type PreparedFile } from "@/lib/client/upload";
 import {
   clearDraft,
-  getTokens,
   loadDraft,
+  persistenceMode,
   queueSubmission,
   saveDraft,
   saveToken
 } from "@/lib/offline/db";
+import { SUBMITTED_EVENT } from "@/lib/offline/sync";
 
 // ---------------------------------------------------------------- state model
-
-interface EvidenceItem {
-  localId: string;
-  fileName: string;
-  mimeType: string;
-  sizeBytes: number;
-  dataBase64: string;
-  previewUrl?: string;
-}
 
 interface WizardData {
   category?: CaseCategory;
@@ -41,7 +32,13 @@ interface WizardData {
   customAt: string; // datetime-local value
   privacyMode?: PrivacyMode;
   contactName: string;
-  evidence: EvidenceItem[];
+  contactEmail: string;
+  contactPhone: string;
+  preferredChannel: "email" | "phone" | "none";
+  /** Reporter opted in to a one-time code for regaining access elsewhere. */
+  withRecoveryCode: boolean;
+  /** Files are held as Blobs and uploaded as binary, never as base64 JSON. */
+  evidence: PreparedFile[];
 }
 
 const EMPTY: WizardData = {
@@ -50,19 +47,33 @@ const EMPTY: WizardData = {
   incidentChoice: "now",
   customAt: "",
   contactName: "",
+  contactEmail: "",
+  contactPhone: "",
+  preferredChannel: "none",
+  withRecoveryCode: false,
   evidence: []
 };
 
 const STEPS = ["Category", "Description", "Location", "Time", "Evidence", "Privacy", "Review"] as const;
 
+interface SubmittedOutcome {
+  kind: "submitted";
+  caseId: string;
+  at: string;
+  recoveryCode?: string;
+  publicVisible: boolean;
+  publicationState: string;
+  possibleMatches: Array<{ caseId: string; score: number }>;
+  attachmentsFailed: number;
+}
+
 type SubmitOutcome =
-  | { kind: "submitted"; caseId: string; linkedTo: boolean; at: string }
-  | { kind: "queued"; at: string }
+  | SubmittedOutcome
+  | { kind: "queued"; at: string; durable: boolean }
   | { kind: "error"; message: string };
 
 export function ReportWizard() {
   const { locale } = useLocale();
-  const router = useRouter();
   const [step, setStep] = useState(0);
   const [data, setData] = useState<WizardData>(EMPTY);
   const [stepError, setStepError] = useState<string | null>(null);
@@ -71,6 +82,7 @@ export function ReportWizard() {
   const [outcome, setOutcome] = useState<SubmitOutcome | null>(null);
   const [online, setOnline] = useState(true);
   const [leaveOpen, setLeaveOpen] = useState(false);
+  const [storageDegraded, setStorageDegraded] = useState(false);
   const restoredRef = useRef(false);
 
   // ---- draft restore
@@ -79,7 +91,7 @@ export function ReportWizard() {
     restoredRef.current = true;
     (async () => {
       const d = await loadDraft();
-      if (d && (d.category || d.description || (d.evidenceMeta && d.evidenceMeta.length > 0))) {
+      if (d && (d.category || d.description || (d.evidence && d.evidence.length > 0))) {
         setData({
           ...EMPTY,
           category: d.category as CaseCategory | undefined,
@@ -89,12 +101,23 @@ export function ReportWizard() {
           incidentChoice: d.incidentChoice || "now",
           customAt: d.incidentAt ? toLocalInput(d.incidentAt) : "",
           privacyMode: d.privacyMode as PrivacyMode | undefined,
-          contactName: d.contactName || "",
-          evidence: (d.evidenceMeta || []).map((f) => ({ ...f, localId: f.id }))
+          contactName: d.contact?.name || "",
+          contactEmail: d.contact?.email || "",
+          contactPhone: d.contact?.phone || "",
+          preferredChannel: (d.contact?.preferredChannel as WizardData["preferredChannel"]) || "none",
+          evidence: (d.evidence || []).map((f) => ({
+            id: f.id,
+            fileName: f.fileName,
+            mimeType: f.mimeType,
+            sizeBytes: f.sizeBytes,
+            blob: f.blob,
+            previewUrl: f.mimeType.startsWith("image/") ? URL.createObjectURL(f.blob) : undefined
+          }))
         });
         setDraftRestored(d.savedAt);
       }
       setOnline(navigator.onLine);
+      setStorageDegraded(persistenceMode() === "memory");
     })();
   }, []);
 
@@ -109,20 +132,31 @@ export function ReportWizard() {
     };
   }, []);
 
-  // ---- auto-submission result when returning online (fired by OutboxSync)
+  // A queued report can complete while this screen is open — in this tab or
+  // another one. The sync engine broadcasts the outcome; we show it here.
   useEffect(() => {
     const onSubmitted = (e: Event) => {
-      const detail = (e as CustomEvent).detail || {};
-      setOutcome({
-        kind: "submitted",
-        caseId: detail.linkedTo || detail.caseId,
-        linkedTo: Boolean(detail.linkedTo),
-        at: new Date().toISOString()
-      });
-      clearDraft();
+      const detail = (e as CustomEvent).detail as
+        | { ok?: boolean; caseId?: string; possibleMatches?: Array<{ caseId: string; score: number }>; error?: string }
+        | undefined;
+      if (!detail) return;
+      if (detail.ok && detail.caseId) {
+        setOutcome({
+          kind: "submitted",
+          caseId: detail.caseId,
+          at: new Date().toISOString(),
+          publicVisible: false,
+          publicationState: "screening",
+          possibleMatches: detail.possibleMatches || [],
+          attachmentsFailed: 0
+        });
+        void clearDraft();
+      } else if (detail.error) {
+        setOutcome({ kind: "error", message: detail.error });
+      }
     };
-    window.addEventListener("civora:submitted", onSubmitted);
-    return () => window.removeEventListener("civora:submitted", onSubmitted);
+    window.addEventListener(SUBMITTED_EVENT, onSubmitted);
+    return () => window.removeEventListener(SUBMITTED_EVENT, onSubmitted);
   }, []);
 
   // ---- draft autosave (debounced)
@@ -137,16 +171,18 @@ export function ReportWizard() {
         incidentChoice: data.incidentChoice,
         incidentAt: resolveIncidentAt(data),
         privacyMode: data.privacyMode,
-        contactName: data.contactName,
-        evidenceMeta: data.evidence.map((f) => ({
-          id: f.localId,
+        contact: contactFor(data),
+        evidence: data.evidence.map((f) => ({
+          id: f.id,
           fileName: f.fileName,
           mimeType: f.mimeType,
           sizeBytes: f.sizeBytes,
-          dataBase64: f.dataBase64
+          blob: f.blob
         })),
         step
-      }).catch(() => {});
+      })
+        .then(() => setStorageDegraded(persistenceMode() === "memory"))
+        .catch(() => setStorageDegraded(true));
     }, 500);
     return () => clearTimeout(t);
   }, [data, step, outcome]);
@@ -205,39 +241,44 @@ export function ReportWizard() {
 
   // ---- submission ----------------------------------------------------------
 
-  async function buildPayload() {
-    const evidence = [];
-    for (const f of data.evidence) {
-      evidence.push({
-        fileName: f.fileName,
-        mimeType: f.mimeType,
-        sizeBytes: f.sizeBytes,
-        dataBase64: f.dataBase64
-      });
-    }
-    const incidentAt = resolveIncidentAt(data);
+  /**
+   * Report metadata only.
+   *
+   * Files are uploaded separately once the case exists, so a six-photo report
+   * is six bounded requests rather than one very large base64 body that a weak
+   * connection is likely to drop.
+   */
+  function buildPayload() {
     return {
       category: data.category,
       description: data.description.trim(),
       locationGeneral: data.locationGeneral.trim() || undefined,
       coordinates: data.coordinates,
-      incidentAt,
+      incidentAt: resolveIncidentAt(data),
       privacyMode: data.privacyMode,
-      contactName: data.privacyMode === "identified" ? data.contactName.trim() || undefined : undefined,
-      evidence
+      contact: data.privacyMode === "anonymous" ? undefined : contactFor(data),
+      withRecoveryCode: data.withRecoveryCode,
+      plannedEvidenceCount: data.evidence.length
     };
+  }
+
+  function queuedFiles() {
+    return data.evidence.map((f) => ({
+      id: f.id,
+      fileName: f.fileName,
+      mimeType: f.mimeType,
+      blob: f.blob
+    }));
   }
 
   async function submit() {
     if (submitting) return;
     setSubmitting(true);
     setStepError(null);
+    const payload = buildPayload();
     try {
-      const payload = await buildPayload();
       if (!navigator.onLine) {
-        await queueSubmission(payload);
-        setOutcome({ kind: "queued", at: new Date().toISOString() });
-        await clearDraft();
+        await queueOffline(payload);
         return;
       }
       const res = await fetch("/api/reports", {
@@ -250,21 +291,32 @@ export function ReportWizard() {
         setOutcome({ kind: "error", message: result?.error || t("report.error.submit", locale) });
         return;
       }
+
+      // The tracking token is returned once. Store it before anything else, so
+      // a later failure can never cost the reporter access to their own case.
       if (result.token) await saveToken(result.caseId, result.token);
+
+      let attachmentsFailed = 0;
+      for (const file of data.evidence) {
+        const upload = await uploadEvidence(result.caseId, result.token, file);
+        if (!upload.ok) attachmentsFailed += 1;
+      }
+
       await clearDraft();
       setOutcome({
         kind: "submitted",
-        caseId: result.linkedTo || result.caseId,
-        linkedTo: Boolean(result.linkedTo),
-        at: new Date().toISOString()
+        caseId: result.caseId,
+        at: new Date().toISOString(),
+        recoveryCode: result.recoveryCode,
+        publicVisible: Boolean(result.publicVisible),
+        publicationState: String(result.publicationState || "screening"),
+        possibleMatches: result.possibleMatches || [],
+        attachmentsFailed
       });
     } catch {
-      // network failure mid-flight → queue for automatic retry
+      // Lost the network mid-flight — queue it rather than losing the report.
       try {
-        const payload = await buildPayload();
-        await queueSubmission(payload);
-        setOutcome({ kind: "queued", at: new Date().toISOString() });
-        await clearDraft();
+        await queueOffline(payload);
       } catch {
         setOutcome({ kind: "error", message: t("report.error.submit", locale) });
       }
@@ -273,10 +325,13 @@ export function ReportWizard() {
     }
   }
 
-  async function queueNow() {
-    const payload = await buildPayload();
-    await queueSubmission(payload);
-    setOutcome({ kind: "queued", at: new Date().toISOString() });
+  async function queueOffline(payload: ReturnType<typeof buildPayload>) {
+    await queueSubmission(payload, queuedFiles());
+    setOutcome({
+      kind: "queued",
+      at: new Date().toISOString(),
+      durable: persistenceMode() === "indexeddb"
+    });
     await clearDraft();
   }
 
@@ -298,7 +353,9 @@ export function ReportWizard() {
         >
           <Icon name="chevron-left" className="h-5 w-5" />
         </button>
-        <p className="text-[13px] font-medium text-ink-soft">
+        {/* Announced on change so a screen-reader user hears which step they
+            moved to, rather than only seeing the progress bar. */}
+        <p role="status" aria-live="polite" className="text-[13px] font-medium text-ink-soft">
           Step {step + 1} of {STEPS.length} · {STEPS[step]}
         </p>
         <span className="w-10" aria-hidden="true" />
@@ -316,6 +373,17 @@ export function ReportWizard() {
           <Icon name="wifi-off" className="h-4 w-4 shrink-0 text-warning" />
           <span>
             <strong className="font-semibold">{t("report.no_connection.title", locale)}</strong> {t("report.no_connection.desc", locale)}
+          </span>
+        </div>
+      )}
+
+      {storageDegraded && (
+        <div role="status" className="mb-5 flex items-start gap-2.5 rounded-2xl border border-warning/40 bg-warning-soft/50 px-4 py-3 text-[13px] text-ink">
+          <Icon name="triangle-alert" className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+          <span>
+            <strong className="font-semibold">{t("report.storage.title", locale) || "This browser isn't saving your draft."}</strong>{" "}
+            {t("report.storage.desc", locale) ||
+              "Private browsing or a storage restriction is blocking on-device saving. Your report is kept in memory only — please finish and submit it without closing this tab."}
           </span>
         </div>
       )}
@@ -392,6 +460,18 @@ export function ReportWizard() {
 }
 
 // ---------------------------------------------------------------- helpers
+
+/** Only the fields the reporter actually filled in; anonymous sends nothing. */
+function contactFor(data: WizardData) {
+  if (data.privacyMode === "anonymous" || !data.privacyMode) return undefined;
+  const contact = {
+    name: data.contactName.trim() || undefined,
+    email: data.contactEmail.trim() || undefined,
+    phone: data.contactPhone.trim() || undefined,
+    preferredChannel: data.preferredChannel
+  };
+  return contact.name || contact.email || contact.phone ? contact : undefined;
+}
 
 function resolveIncidentAt(data: WizardData): string | undefined {
   if (data.incidentChoice === "now") return new Date().toISOString();
@@ -554,7 +634,7 @@ function LocationStep({ data, onChange }: { data: WizardData; onChange: (p: Part
             <span className="block text-[14.5px] font-semibold text-ink">{t("report.location.use_current", locale)}</span>
             <span className="block text-xs text-ink-soft">
               {data.coordinates
-                ? `{t("report.location.shared", locale)} ${data.coordinates.lat}, ${data.coordinates.lng}`
+                ? `${t("report.location.shared", locale)} ${data.coordinates.lat}, ${data.coordinates.lng}`
                 : t("report.location.adds_approx", locale)}
             </span>
           </span>
@@ -663,22 +743,14 @@ function EvidenceStep({ data, onChange }: { data: WizardData; onChange: (p: Part
     setPreparing(true);
     setError(null);
     try {
-      const next: EvidenceItem[] = [];
+      const next: PreparedFile[] = [];
       for (const f of Array.from(files).slice(0, 6)) {
         const err = fileError(f);
         if (err) {
           setError(err);
           continue;
         }
-        const prepared = await prepareFile(f);
-        next.push({
-          localId: crypto.randomUUID(),
-          fileName: prepared.fileName,
-          mimeType: prepared.mimeType,
-          sizeBytes: prepared.sizeBytes,
-          dataBase64: prepared.dataBase64,
-          previewUrl: prepared.mimeType.startsWith("image/") ? URL.createObjectURL(f) : undefined
-        });
+        next.push(await prepareFile(f));
       }
       onChange({ evidence: [...data.evidence, ...next].slice(0, 6) });
     } finally {
@@ -688,7 +760,9 @@ function EvidenceStep({ data, onChange }: { data: WizardData; onChange: (p: Part
   }
 
   function remove(id: string) {
-    onChange({ evidence: data.evidence.filter((f) => f.localId !== id) });
+    const removed = data.evidence.find((f) => f.id === id);
+    if (removed?.previewUrl) URL.revokeObjectURL(removed.previewUrl);
+    onChange({ evidence: data.evidence.filter((f) => f.id !== id) });
   }
 
   return (
@@ -731,7 +805,7 @@ function EvidenceStep({ data, onChange }: { data: WizardData; onChange: (p: Part
       {data.evidence.length > 0 && (
         <ul className="mt-4 space-y-2.5">
           {data.evidence.map((f) => (
-            <li key={f.localId} className="flex items-center gap-3 rounded-card border border-line bg-surface px-3.5 py-3">
+            <li key={f.id} className="flex items-center gap-3 rounded-card border border-line bg-surface px-3.5 py-3">
               {f.previewUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={f.previewUrl} alt="" className="h-12 w-12 rounded-xl object-cover" />
@@ -747,7 +821,7 @@ function EvidenceStep({ data, onChange }: { data: WizardData; onChange: (p: Part
                 </span>
               </span>
               <button
-                onClick={() => remove(f.localId)}
+                onClick={() => remove(f.id)}
                 aria-label={`${t("report.evidence.remove", locale)} ${f.fileName}`}
                 className="press rounded-full p-2 text-ink-soft hover:bg-muted hover:text-ink"
               >
@@ -761,6 +835,11 @@ function EvidenceStep({ data, onChange }: { data: WizardData; onChange: (p: Part
       <p className="mt-4 flex gap-2 text-[12.5px] leading-relaxed text-ink-soft">
         <Icon name="shield-check" className="mt-0.5 h-4 w-4 shrink-0 text-success" />
         {t("report.evidence.integrity", locale)}
+      </p>
+      <p className="mt-2 flex gap-2 text-[12.5px] leading-relaxed text-ink-soft">
+        <Icon name="lock" className="mt-0.5 h-4 w-4 shrink-0" />
+        {t("report.evidence.visibility", locale) ||
+          "Attachments start restricted: only you and the organization handling the case can open them. A case handler decides whether anything is safe to publish."}
       </p>
     </div>
   );
@@ -812,6 +891,12 @@ function PrivacyStep({ data, onChange }: { data: WizardData; onChange: (p: Parti
 
         {(data.privacyMode === "identified" || data.privacyMode === "confidential") && (
           <div className="rounded-card border border-line bg-surface px-4 py-4">
+            <p className="mb-3 flex gap-2 text-xs leading-relaxed text-ink-soft">
+              <Icon name="lock" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              {t("report.privacy.contact_intro", locale) ||
+                "Share only what you're comfortable with — every field here is optional. Contact details are stored separately from the case and are never shown publicly."}
+            </p>
+
             <label htmlFor="report-contact" className="meta-label mb-1.5 block">
               {t("report.privacy.name_label", locale)}
             </label>
@@ -820,14 +905,91 @@ function PrivacyStep({ data, onChange }: { data: WizardData; onChange: (p: Parti
               value={data.contactName}
               onChange={(e) => onChange({ contactName: e.target.value })}
               maxLength={120}
+              autoComplete="name"
               className="field"
               placeholder={t("report.privacy.name_placeholder", locale)}
             />
-            <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+
+            <label htmlFor="report-contact-email" className="meta-label mb-1.5 mt-3.5 block">
+              {t("report.privacy.email_label", locale) || "Email (optional)"}
+            </label>
+            <input
+              id="report-contact-email"
+              type="email"
+              value={data.contactEmail}
+              onChange={(e) => onChange({ contactEmail: e.target.value })}
+              maxLength={200}
+              autoComplete="email"
+              className="field"
+              placeholder="you@example.com"
+            />
+
+            <label htmlFor="report-contact-phone" className="meta-label mb-1.5 mt-3.5 block">
+              {t("report.privacy.phone_label", locale) || "Phone (optional)"}
+            </label>
+            <input
+              id="report-contact-phone"
+              type="tel"
+              value={data.contactPhone}
+              onChange={(e) => onChange({ contactPhone: e.target.value })}
+              maxLength={40}
+              autoComplete="tel"
+              className="field"
+            />
+
+            <fieldset className="mt-4">
+              <legend className="meta-label mb-1.5">
+                {t("report.privacy.channel_label", locale) || "How should they reach you?"}
+              </legend>
+              <div className="flex flex-wrap gap-2">
+                {(["email", "phone", "none"] as const).map((channel) => (
+                  <button
+                    key={channel}
+                    type="button"
+                    onClick={() => onChange({ preferredChannel: channel })}
+                    aria-pressed={data.preferredChannel === channel}
+                    className={cn(
+                      "press min-h-10 rounded-btn px-3.5 text-[13px] font-medium",
+                      data.preferredChannel === channel
+                        ? "bg-brand text-white"
+                        : "bg-muted text-ink-soft hover:text-ink"
+                    )}
+                  >
+                    {channel === "email"
+                      ? t("report.privacy.channel_email", locale) || "Email"
+                      : channel === "phone"
+                        ? t("report.privacy.channel_phone", locale) || "Phone"
+                        : t("report.privacy.channel_none", locale) || "Don't contact me"}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <p className="mt-3 text-xs leading-relaxed text-ink-soft">
               {t("report.privacy.name_hint", locale)}
             </p>
           </div>
         )}
+
+        <div className="rounded-card border border-line bg-surface px-4 py-4">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={data.withRecoveryCode}
+              onChange={(e) => onChange({ withRecoveryCode: e.target.checked })}
+              className="mt-0.5 h-5 w-5 shrink-0 rounded border-line text-brand focus:ring-brand"
+            />
+            <span>
+              <span className="block text-[14.5px] font-semibold text-ink">
+                {t("report.privacy.recovery_label", locale) || "Give me a recovery code"}
+              </span>
+              <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
+                {t("report.privacy.recovery_hint", locale) ||
+                  "Your case is tracked on this device only. A one-time code lets you open it from another device if you lose this one — write it down, because it is shown once and we only store a hash of it."}
+              </span>
+            </span>
+          </label>
+        </div>
       </div>
     </div>
   );
@@ -876,6 +1038,8 @@ function ReviewStep({ data, onEdit }: { data: WizardData; onEdit: (step: number)
     }
   ];
 
+  const sensitive = data.category === "safety" || data.category === "dispute";
+
   return (
     <div>
       <StepTitle title={t("report.review.title", locale)} hint={t("report.review.hint", locale)} />
@@ -895,15 +1059,71 @@ function ReviewStep({ data, onEdit }: { data: WizardData; onEdit: (step: number)
         ))}
       </div>
 
-      <div className="mt-4 rounded-card bg-muted px-4 py-3.5 text-[12.5px] leading-relaxed text-ink-soft">
+      {/* What actually happens to this text, in plain words. The description
+          is not published as written — a handler writes the public summary. */}
+      <div className="mt-4 rounded-card border border-line bg-surface px-4 py-4">
+        <h2 className="flex items-center gap-2 text-[14px] font-semibold text-ink">
+          <Icon name="eye" className="h-4 w-4 text-brand-deep" />
+          {t("report.review.whoSees.title", locale) || "Who will see what you wrote"}
+        </h2>
+        <ul className="mt-3 space-y-2.5 text-[12.5px] leading-relaxed text-ink-soft">
+          <li className="flex gap-2">
+            <Icon name="lock" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
+            <span>
+              <strong className="font-semibold text-ink">
+                {t("report.review.whoSees.descriptionTitle", locale) || "Your description stays private."}
+              </strong>{" "}
+              {t("report.review.whoSees.description", locale) ||
+                "It goes to the organization handling the case, and back to you on your case page. It is never copied onto the public board as you wrote it."}
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <Icon name="scroll-text" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
+            <span>
+              <strong className="font-semibold text-ink">
+                {t("report.review.whoSees.publicTitle", locale) || "A short public summary may be published."}
+              </strong>{" "}
+              {t("report.review.whoSees.public", locale) ||
+                "A case handler writes it, based on the category and area — not on your wording."}
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <Icon name="paperclip" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
+            <span>
+              {t("report.review.whoSees.evidence", locale) ||
+                "Anything you attach starts restricted and is only published if a handler decides it is safe to."}
+            </span>
+          </li>
+          {sensitive && (
+            <li className="flex gap-2 rounded-xl bg-warning-soft/60 px-3 py-2">
+              <Icon name="triangle-alert" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
+              <span className="text-ink">
+                {t("report.review.whoSees.sensitive", locale) ||
+                  "Because of what you're reporting, this case is held for review before it can appear publicly at all."}
+              </span>
+            </li>
+          )}
+          <li className="flex gap-2">
+            <Icon name="user-round" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
+            <span>
+              {data.privacyMode
+                ? PRIVACY_META[data.privacyMode].publicLine
+                : t("report.review.whoSees.choosePrivacy", locale) || "Choose a privacy option above."}
+              {". "}
+              {t("report.review.whoSees.namesWarning", locale) ||
+                "If you named someone in your description, that stays in the private text — but consider whether it needs to be there at all."}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div className="mt-3 rounded-card bg-muted px-4 py-3.5 text-[12.5px] leading-relaxed text-ink-soft">
         <p className="flex gap-2">
-          <Icon name="lock" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink" />
-          {t("report.review.privacy_note", locale)}
-        </p>
-        <p className="mt-2 flex gap-2">
           <Icon name="info" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          {t("report.review.unverified_note_1", locale)}{" "}
-          <strong className="font-semibold text-ink">{t("report.review.unverified_note_2", locale)}</strong>
+          <span>
+            {t("report.review.unverified_note_1", locale)}{" "}
+            <strong className="font-semibold text-ink">{t("report.review.unverified_note_2", locale)}</strong>
+          </span>
         </p>
       </div>
     </div>
@@ -912,24 +1132,41 @@ function ReviewStep({ data, onEdit }: { data: WizardData; onEdit: (step: number)
 
 // ---------------------------------------------------------------- outcome
 
-function OutcomeScreen({ outcome, category, privacyMode }: { outcome: SubmitOutcome; category?: CaseCategory; privacyMode?: PrivacyMode; }) {
+function OutcomeScreen({
+  outcome,
+  category,
+  privacyMode
+}: {
+  outcome: SubmitOutcome;
+  category?: CaseCategory;
+  privacyMode?: PrivacyMode;
+}) {
   const { locale } = useLocale();
+
   if (outcome.kind === "queued") {
     return (
       <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-4 py-12 text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-warning-soft text-warning">
           <Icon name="wifi-off" className="h-7 w-7" />
         </span>
-        <h1 className="mt-5 text-[24px] font-bold tracking-[-0.02em] text-ink">{t("report.outcome.queued.title", locale)}</h1>
+        <h1 className="mt-5 text-[24px] font-bold tracking-[-0.02em] text-ink">
+          {t("report.outcome.queued.title", locale)}
+        </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
           {t("report.outcome.queued.desc", locale)}
         </p>
+        {!outcome.durable && (
+          <p role="alert" className="mt-4 rounded-2xl bg-warning-soft px-4 py-3 text-[13px] leading-relaxed text-ink">
+            {t("report.outcome.queued.memory", locale) ||
+              "This browser isn't letting Civora save data on your device, so the queued report will be lost if you close this tab. Keep it open until you reconnect."}
+          </p>
+        )}
         <div className="mt-7 flex w-full flex-col gap-2.5">
           <Button href="/home" size="lg">
-            Back to home
+            {t("report.outcome.back_home", locale) || "Back to home"}
           </Button>
           <Button href="/cases" size="lg" variant="secondary">
-            Your cases
+            {t("cases.title", locale) || "Your cases"}
           </Button>
         </div>
       </div>
@@ -943,15 +1180,15 @@ function OutcomeScreen({ outcome, category, privacyMode }: { outcome: SubmitOutc
           <Icon name="circle-alert" className="h-7 w-7" />
         </span>
         <h1 className="mt-5 text-[22px] font-bold tracking-[-0.02em] text-ink">
-          Something went wrong while submitting your report.
+          {t("report.outcome.error.title", locale) || "Something went wrong while submitting your report."}
         </h1>
         <p className="mt-3 text-[14.5px] leading-relaxed text-ink-soft">{outcome.message}</p>
         <div className="mt-7 flex w-full flex-col gap-2.5">
           <Button size="lg" onClick={() => window.location.reload()}>
-            Try again
+            {t("report.outcome.try_again", locale) || "Try again"}
           </Button>
           <Button size="lg" variant="secondary" href="/home">
-            Back to home
+            {t("report.outcome.back_home", locale) || "Back to home"}
           </Button>
         </div>
       </div>
@@ -959,6 +1196,7 @@ function OutcomeScreen({ outcome, category, privacyMode }: { outcome: SubmitOutc
   }
 
   const meta = privacyMode ? PRIVACY_META[privacyMode] : null;
+
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-4 py-12 text-center">
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success">
@@ -968,14 +1206,69 @@ function OutcomeScreen({ outcome, category, privacyMode }: { outcome: SubmitOutc
         {t("report.outcome.success.title", locale)}
       </h1>
       <p className="mt-2.5 font-mono text-[15px] font-semibold text-ink">
-        {t("report.outcome.success.case", locale)}{outcome.caseId}
+        {t("report.outcome.success.case", locale)}
+        {outcome.caseId}
       </p>
       <p className="mt-3 text-[14.5px] leading-relaxed text-ink-soft">
-        {outcome.linkedTo
-          ? t("report.outcome.success.linked_desc", locale)
-          : t("report.outcome.success.new_desc", locale)}{" "}
-        {t("report.outcome.success.not_verified_1", locale)} <strong className="font-semibold text-ink">{t("report.outcome.success.not_verified_2", locale)}</strong> {t("report.outcome.success.not_verified_3", locale)}
+        {t("report.outcome.success.new_desc", locale)}{" "}
+        {t("report.outcome.success.not_verified_1", locale)}{" "}
+        <strong className="font-semibold text-ink">{t("report.outcome.success.not_verified_2", locale)}</strong>{" "}
+        {t("report.outcome.success.not_verified_3", locale)}
       </p>
+
+      {/* Possible corroboration is reported as exactly that: a candidate a
+          person still has to confirm. It is never announced as verification. */}
+      {outcome.possibleMatches.length > 0 && (
+        <div className="mt-5 w-full rounded-card border border-info/30 bg-info-soft/40 px-4 py-3.5 text-left">
+          <p className="flex gap-2 text-[13px] leading-relaxed text-ink">
+            <Icon name="search" className="mt-0.5 h-4 w-4 shrink-0 text-info" />
+            <span>
+              <strong className="font-semibold">
+                {t("report.outcome.match.title", locale) || "This may relate to an existing case."}
+              </strong>{" "}
+              {(t("report.outcome.match.desc", locale) ||
+                "Civora found {ids} nearby in time and place. A case handler reviews the link — until they confirm it, nothing is treated as corroborated.").replace(
+                "{ids}",
+                outcome.possibleMatches.map((m) => m.caseId).join(", ")
+              )}
+            </span>
+          </p>
+        </div>
+      )}
+
+      {!outcome.publicVisible && (
+        <p className="mt-4 w-full rounded-card bg-muted px-4 py-3 text-left text-[12.5px] leading-relaxed text-ink-soft">
+          <Icon name="eye-off" className="mr-1.5 inline h-3.5 w-3.5" />
+          {t("report.outcome.screening", locale) ||
+            "Your case is not on the public board. It is held for review first — you can always see it here, and so can the organization handling it."}
+        </p>
+      )}
+
+      {outcome.attachmentsFailed > 0 && (
+        <p role="alert" className="mt-4 w-full rounded-card bg-warning-soft px-4 py-3 text-left text-[12.5px] leading-relaxed text-ink">
+          <Icon name="triangle-alert" className="mr-1.5 inline h-3.5 w-3.5 text-warning" />
+          {(t("report.outcome.attachments_failed", locale) ||
+            "{count} attachment(s) didn't upload. Your report was recorded — open the case to attach them again.").replace(
+            "{count}",
+            String(outcome.attachmentsFailed)
+          )}
+        </p>
+      )}
+
+      {outcome.recoveryCode && (
+        <div className="mt-5 w-full rounded-card border border-brand/30 bg-brand-soft/40 px-4 py-4 text-left">
+          <p className="text-[13px] font-semibold text-ink">
+            {t("report.outcome.recovery.title", locale) || "Your one-time recovery code"}
+          </p>
+          <p className="mt-2 select-all rounded-xl bg-surface px-3 py-2.5 text-center font-mono text-[18px] font-bold tracking-widest text-ink">
+            {outcome.recoveryCode}
+          </p>
+          <p className="mt-2 text-[12px] leading-relaxed text-ink-soft">
+            {t("report.outcome.recovery.hint", locale) ||
+              "Write this down now. It is shown once and only its hash is stored, so nobody — including us — can recover it for you. It lets you open this case from another device."}
+          </p>
+        </div>
+      )}
 
       <div className="mt-5 flex flex-wrap justify-center gap-2">
         {meta && (
@@ -986,21 +1279,26 @@ function OutcomeScreen({ outcome, category, privacyMode }: { outcome: SubmitOutc
         {category && (
           <span className="chip bg-muted text-ink-soft">
             <Icon name={CATEGORY_META[category].icon} className="h-3.5 w-3.5" />
-            {CATEGORY_META[category].label}
+            {t(CATEGORY_META[category].labelKey, locale) || CATEGORY_META[category].label}
           </span>
         )}
         <span className="chip bg-muted text-ink-soft">
           <Icon name="clock" className="h-3.5 w-3.5" />
-          {new Date(outcome.at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+          {new Date(outcome.at).toLocaleString("en-GB", {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+          })}
         </span>
       </div>
 
       <div className="mt-8 flex w-full flex-col gap-2.5">
         <Button href={`/cases/${outcome.caseId}`} size="lg">
-          View case
+          {t("report.outcome.view_case", locale) || "View case"}
         </Button>
         <Button href="/home" size="lg" variant="secondary">
-          Back to home
+          {t("report.outcome.back_home", locale) || "Back to home"}
         </Button>
       </div>
     </div>

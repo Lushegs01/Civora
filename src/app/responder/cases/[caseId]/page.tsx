@@ -1,24 +1,37 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
-import { isResponder } from "@/lib/auth/session";
-import { findCase, readDb } from "@/lib/db/store";
-import { buildCaseView } from "@/lib/case-view";
+import { notFound, redirect } from "next/navigation";
+import { requestActor } from "@/lib/auth/actor";
+import { canAccessWorkspace, canViewCase, isPlatformAdmin } from "@/lib/authz";
+import { findCaseByPublicId, listOrganizations } from "@/lib/db/repository";
+import { toResponderCaseView } from "@/lib/dto/case";
 import { ResponderCasePanel } from "@/components/responder/ResponderCasePanel";
+import { log } from "@/lib/log";
 
-export const metadata: Metadata = { title: "Case workspace" };
+export const metadata: Metadata = { title: "Case workspace", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-export default async function ResponderCasePage({
-  params
-}: {
-  params: { caseId: string };
-}) {
-  if (!isResponder(cookies())) redirect("/responder/access");
-  const db = await readDb();
-  const c = findCase(db, params.caseId);
-  if (!c) notFound();
-  const view = buildCaseView(db, c, "responder");
-  return <ResponderCasePanel view={view} orgs={db.orgs} />;
+export default async function ResponderCasePage({ params }: { params: { caseId: string } }) {
+  const actor = await requestActor();
+  if (!canAccessWorkspace(actor)) redirect("/responder/access");
+
+  const record = await findCaseByPublicId(params.caseId);
+  if (!record) notFound();
+
+  // Organization scoping is enforced here, not in the component: a case
+  // belonging to another organization's queue is never rendered at all.
+  if (!canViewCase(actor, { assignedOrgId: record.assignedOrgId })) {
+    log.warn("responder.case_access_denied", { userId: actor?.userId, caseId: record.publicCaseId });
+    notFound();
+  }
+
+  const orgs = await listOrganizations();
+  const view = toResponderCaseView(record, isPlatformAdmin(actor) ? "admin" : "responder");
+
+  return (
+    <ResponderCasePanel
+      view={view}
+      orgs={orgs}
+      viewer={{ displayName: actor!.displayName, role: actor!.role, orgId: actor!.orgId }}
+    />
+  );
 }

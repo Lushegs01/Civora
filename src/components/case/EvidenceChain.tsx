@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { cn, formatDateTime } from "@/lib/utils";
-import type { EvidenceRecord } from "@/lib/types";
+import type { PublicEvidenceView } from "@/lib/dto/case";
 import { Modal } from "@/components/ui/Modal";
 import { Icon } from "@/components/ui/Icon";
 import { useLocale } from "@/components/system/LocaleProvider";
@@ -33,11 +33,12 @@ const SOURCE_TYPE_ICON: Record<string, string> = {
 
 export function EvidenceChain({
   evidence,
-  canSeeRestricted,
+  viewerToken,
   className
 }: {
-  evidence: EvidenceRecord[];
-  canSeeRestricted?: boolean;
+  evidence: PublicEvidenceView[];
+  /** Reporter's tracking token, when they are viewing their own case. */
+  viewerToken?: string;
   className?: string;
 }) {
   const { locale } = useLocale();
@@ -77,7 +78,9 @@ export function EvidenceChain({
         <span aria-hidden="true" className="timeline-rail" />
         {ordered.map((e, index) => {
           const style = KIND_STYLE[e.kind] || KIND_STYLE.report;
-          const restricted = !e.publicVisible && !canSeeRestricted;
+          // The DTO decides what this viewer can see; "restricted" here only
+          // marks items that are not on the public record.
+          const restricted = !e.publicVisible;
           const isLast = index === ordered.length - 1;
           return (
             <li key={e.id} className="relative">
@@ -126,13 +129,13 @@ export function EvidenceChain({
       </ol>
 
       <Modal open={!!open} onClose={() => setOpenId(null)} title={open ? t("case.evidenceDetail", locale) : ""}>
-        {open && <EvidenceDetail e={open} />}
+        {open && <EvidenceDetail e={open} viewerToken={viewerToken} />}
       </Modal>
     </section>
   );
 }
 
-function EvidenceDetail({ e }: { e: EvidenceRecord }) {
+function EvidenceDetail({ e, viewerToken }: { e: PublicEvidenceView; viewerToken?: string }) {
   const { locale } = useLocale();
   const style = KIND_STYLE[e.kind] || KIND_STYLE.report;
   const rows: Array<[string, React.ReactNode]> = [
@@ -140,7 +143,7 @@ function EvidenceDetail({ e }: { e: EvidenceRecord }) {
     [t("case.sourceType", locale), t(SOURCE_TYPE_LABEL[e.sourceType], locale)],
     [t("case.dateSubmitted", locale), formatDateTime(e.submittedAt)]
   ];
-  if (e.excerpt) rows.push([t("case.relevantExcerpt", locale), <span key="x">"{e.excerpt}"</span>]);
+  if (e.excerpt) rows.push([t("case.relevantExcerpt", locale), <span key="x">&ldquo;{e.excerpt}&rdquo;</span>]);
   if (e.relationship) rows.push([t("case.relationshipToClaim", locale), e.relationship]);
   if (e.checksum) {
     rows.push([
@@ -174,22 +177,82 @@ function EvidenceDetail({ e }: { e: EvidenceRecord }) {
       </dl>
 
       <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
-        {e.storageKey && (
-          <a
-            href={`/api/evidence-file/${e.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="press inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[14px] font-medium text-white hover:bg-brand-deep"
-          >
-            <Icon name="arrow-up-right" className="h-4 w-4" />
-            {t("case.viewOriginalFile", locale)}
-          </a>
-        )}
+        {e.hasFile && <EvidenceFileLink evidence={e} viewerToken={viewerToken} />}
         <span className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-line bg-canvas px-5 text-[12.5px] text-ink-soft">
           <Icon name="shield-check" className="h-4 w-4" />
           {e.publicVisible ? t("case.publicSafeEvidence", locale) : t("case.restrictedEvidence", locale)}
         </span>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Opens an evidence file.
+ *
+ * Public evidence is a plain link. Restricted evidence is fetched with the
+ * tracking token in a request header and handed to the browser as an object
+ * URL, so the token never appears in a URL, the referrer or browser history.
+ */
+function EvidenceFileLink({
+  evidence,
+  viewerToken
+}: {
+  evidence: PublicEvidenceView;
+  viewerToken?: string;
+}) {
+  const { locale } = useLocale();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const className =
+    "press inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-brand px-5 text-[14px] font-medium text-white hover:bg-brand-deep disabled:opacity-60";
+
+  if (evidence.publicVisible || !viewerToken) {
+    return (
+      <a
+        href={`/api/evidence-file/${evidence.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        <Icon name="arrow-up-right" className="h-4 w-4" />
+        {t("case.viewOriginalFile", locale)}
+      </a>
+    );
+  }
+
+  async function open() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/evidence-file/${evidence.id}`, {
+        headers: { "x-civora-tracking-token": viewerToken! }
+      });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      // Give the new tab time to load before releasing the object URL.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch {
+      setError(t("case.fileUnavailable", locale) || "That file couldn't be opened right now.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex-1">
+      <button onClick={open} disabled={busy} className={`${className} w-full`}>
+        <Icon name={busy ? "loader-circle" : "arrow-up-right"} className={busy ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+        {t("case.viewOriginalFile", locale)}
+      </button>
+      {error && (
+        <p role="alert" className="mt-1.5 text-[12px] text-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

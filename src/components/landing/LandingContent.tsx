@@ -1,5 +1,6 @@
 "use client";
 
+import type { PublicCaseView } from "@/lib/dto/case";
 import Link from "next/link";
 import { CivoraLogo } from "@/components/CivoraLogo";
 import { HeroNav } from "@/components/landing/HeroNav";
@@ -19,7 +20,7 @@ const LOOP = [
   { label: "landing.loop.7.label", detail: "landing.loop.7.detail" }
 ];
 
-export function LandingContent({ demo, demoView, row }: { demo: any, demoView: any, row: any }) {
+export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
   const { locale } = useLocale();
 
   return (
@@ -128,7 +129,7 @@ export function LandingContent({ demo, demoView, row }: { demo: any, demoView: a
         </div>
       </section>
 
-      {demo && demoView && row && (
+      {demo && (
         <section className="relative mx-auto max-w-3xl px-4 pb-20 pt-4 md:pb-28">
           <p className="mb-6 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2E7D4F]">
             {t("landing.live.title", locale)}
@@ -150,7 +151,7 @@ export function LandingContent({ demo, demoView, row }: { demo: any, demoView: a
                 <ResponseBadge state={demo.response} className="bg-white border border-[#DCE5DC] shadow-xs" />
               </div>
               <div className="mt-8 space-y-4 border-t border-[#E3EAE2] pt-6">
-                {demoView.case.known.slice(0, 2).map((k: string, i: number) => (
+                {demo.known.slice(0, 2).map((k: string, i: number) => (
                   <p key={i} className="flex items-start gap-3 text-[15px] leading-relaxed text-ink-soft">
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
                       <Icon name="check" className="h-3 w-3" />
@@ -162,7 +163,7 @@ export function LandingContent({ demo, demoView, row }: { demo: any, demoView: a
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning/15 text-warning">
                     <Icon name="triangle-alert" className="h-3 w-3" />
                   </span>
-                  {demoView.case.uncertain[0]}
+                  {demo.uncertain[0]}
                 </p>
               </div>
               <div className="mt-8 flex items-center justify-between border-t border-[#E3EAE2] pt-6">

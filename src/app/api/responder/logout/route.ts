@@ -1,11 +1,13 @@
 import { cookies } from "next/headers";
-import { RESPONDER_COOKIE } from "@/lib/auth/session";
-import { ok } from "@/lib/api-helpers";
+import { revokeSession } from "@/lib/auth/session";
+import { NO_STORE_HEADERS } from "@/lib/api/respond";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
+/** Revokes the session server-side, not just in the browser. */
 export async function POST() {
-  const store = cookies();
-  store.delete(RESPONDER_COOKIE);
-  return ok({ ok: true });
+  await revokeSession(cookies());
+  return NextResponse.json({ ok: true }, { headers: NO_STORE_HEADERS });
 }

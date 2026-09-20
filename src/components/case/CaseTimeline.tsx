@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { CaseView } from "@/lib/case-view";
+import type { PublicCaseView } from "@/lib/dto/case";
 import { formatDateTime } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
 import { useLocale } from "@/components/system/LocaleProvider";
@@ -10,7 +10,11 @@ import { t } from "@/lib/i18n/i18n";
 const EVENT_STYLE: Record<string, { icon: string; tone: string }> = {
   REPORT_SUBMITTED: { icon: "file-text", tone: "bg-brand-soft text-brand-deep" },
   EVIDENCE_ADDED: { icon: "paperclip", tone: "bg-brand-soft text-brand-deep" },
-  CORROBORATION_RECEIVED: { icon: "users", tone: "bg-info-soft text-info" },
+  POSSIBLE_MATCH_FOUND: { icon: "search", tone: "bg-muted text-ink-soft" },
+  CORROBORATION_CONFIRMED: { icon: "users", tone: "bg-info-soft text-info" },
+  CORROBORATION_REJECTED: { icon: "x", tone: "bg-muted text-ink-soft" },
+  INFO_PROVIDED: { icon: "message", tone: "bg-brand-soft text-brand-deep" },
+  PUBLICATION_CHANGED: { icon: "eye", tone: "bg-muted text-ink-soft" },
   VERIFICATION_UPDATED: { icon: "badge-check", tone: "bg-info-soft text-info" },
   CASE_ASSIGNED: { icon: "building", tone: "bg-brand text-white" },
   CASE_ACKNOWLEDGED: { icon: "mail-check", tone: "bg-brand text-white" },
@@ -24,18 +28,15 @@ const EVENT_STYLE: Record<string, { icon: string; tone: string }> = {
 
 export function CaseTimeline({
   view,
-  showRestricted = false,
   className
 }: {
-  view: CaseView;
-  showRestricted?: boolean;
+  view: PublicCaseView;
   className?: string;
 }) {
   const { locale } = useLocale();
-  const events = showRestricted
-    ? view.events
-    : view.events.filter((e) => e.visibility === "public");
-  const ordered = [...events].reverse();
+  // The DTO already contains only the events this viewer is allowed to see;
+  // the component does no filtering of its own.
+  const ordered = [...view.events].reverse();
 
   return (
     <section aria-label={t("case.timeline", locale)} className={cn("card px-5 py-5", className)}>
@@ -72,7 +73,7 @@ export function CaseTimeline({
                       {formatDateTime(e.at)}
                     </time>
                   </div>
-                  <p className="mt-0.5 text-[12px] font-medium text-ink-soft/70">{e.actor}</p>
+                  <p className="mt-0.5 text-[12px] font-medium text-ink-soft/70">{e.actorLabel}</p>
                   {e.detail && (
                     <p className="mt-1.5 rounded-xl bg-canvas px-3 py-2 text-[12.5px] leading-relaxed text-ink-soft">
                       {e.detail}

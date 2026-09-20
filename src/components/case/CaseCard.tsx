@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { CATEGORY_META } from "@/lib/types";
-import type { CaseCategory, ResponseState, VerificationState } from "@/lib/types";
+import type { CaseCategory, CasePriority, ResponseState, VerificationState } from "@/lib/types";
 import { VerificationBadge, ResponseBadge } from "@/components/ui/Badges";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import { Icon } from "@/components/ui/Icon";
@@ -16,9 +16,14 @@ export interface CaseCardRow {
   category: CaseCategory;
   verification: VerificationState;
   response: ResponseState;
+  priority: CasePriority;
   updatedAt: string;
   locationGeneral?: string;
+  resolved?: boolean;
+  dispute?: boolean;
   href: string;
+  /** True only when the server matched this device's tracking token. */
+  reporter?: boolean;
 }
 
 export function CaseCard({ row, className }: { row: CaseCardRow; className?: string }) {
@@ -39,7 +44,7 @@ export function CaseCard({ row, className }: { row: CaseCardRow; className?: str
           </span>
           <span className="chip bg-muted text-ink-soft">
             <Icon name={cat.icon} className="h-3 w-3" />
-            {t(cat.label, locale)}
+            {t(cat.labelKey, locale) || cat.label}
           </span>
         </div>
         <Icon name="chevron-right" className="h-4 w-4 shrink-0 text-ink-soft/60" />
@@ -76,7 +81,7 @@ export function PublicCaseCard({ row }: { row: CaseCardRow }) {
             <span className="font-mono text-[12px] font-semibold tracking-wide text-ink-soft uppercase">{row.id}</span>
             <span className="chip bg-muted text-ink-soft">
               <Icon name={cat.icon} className="h-3 w-3" />
-              {t(cat.label, locale)}
+              {t(cat.labelKey, locale) || cat.label}
             </span>
           </div>
           <h3 className="mt-2.5 text-[15px] font-semibold leading-snug tracking-[-0.01em] text-ink">{row.title}</h3>

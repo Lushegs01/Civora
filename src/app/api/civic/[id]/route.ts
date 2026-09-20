@@ -1,22 +1,30 @@
-import { NextResponse } from "next/server";
-import { readDb, findCivicInfo } from "@/lib/db/store";
-import { ok, fail } from "@/lib/api-helpers";
+import type { NextRequest } from "next/server";
+import { prisma } from "@/lib/db/prisma";
+import { toCivicInfoView } from "@/lib/dto/civic";
+import { clientIp, enforceRateLimit, fail, ok, serverError } from "@/lib/api/respond";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const limited = await enforceRateLimit({
+    rule: RATE_LIMITS.civicSearch,
+    identity: clientIp(req),
+    message: "Too many requests from this connection. Please wait a moment."
+  });
+  if (limited) return limited;
+
+  const id = params.id?.toUpperCase();
+  if (!id || !/^[A-Z0-9-]{3,40}$/.test(id)) {
+    return fail("Civic information not found", { status: 404 });
+  }
+
   try {
-    const db = await readDb();
-    const item = findCivicInfo(db, params.id);
-
-    if (!item) {
-      return fail("Civic information not found", 404);
-    }
-
-    return ok(item);
+    const item = await prisma.civicInfoItem.findUnique({ where: { id } });
+    if (!item) return fail("Civic information not found", { status: 404 });
+    return ok({ item: toCivicInfoView(item) });
   } catch (error) {
-    console.error("Error fetching civic info detail:", error);
-    return fail("Failed to fetch civic information detail", 500);
+    return serverError("civic.detail_failed", error, "That civic information couldn't be loaded.");
   }
 }

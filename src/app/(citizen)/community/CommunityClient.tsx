@@ -6,7 +6,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { CommunityExplorer } from "@/components/community/CommunityExplorer";
 import type { CaseCardRow } from "@/components/case/CaseCard";
 
-export function CommunityClient({ rows }: { rows: CaseCardRow[] }) {
+export function CommunityClient({ rows, hasMore }: { rows: CaseCardRow[]; hasMore?: boolean }) {
   const { locale } = useLocale();
   return (
     <>
@@ -20,6 +20,12 @@ export function CommunityClient({ rows }: { rows: CaseCardRow[] }) {
         </p>
         <div className="mt-6">
           <CommunityExplorer rows={rows} />
+          {hasMore && (
+            <p className="mt-5 text-center text-[13px] text-ink-soft">
+              {t("community.more", locale) ||
+                "Showing the most recently updated cases. Use search and filters to narrow the list."}
+            </p>
+          )}
         </div>
       </main>
     </>

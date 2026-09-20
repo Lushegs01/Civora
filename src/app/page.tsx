@@ -1,28 +1,18 @@
-import { readDb, findCase } from "@/lib/db/store";
-import { buildCaseView, publicCaseRow } from "@/lib/case-view";
+import { findCaseByPublicId } from "@/lib/db/repository";
+import { toPublicCaseView } from "@/lib/dto/case";
 import { LandingContent } from "@/components/landing/LandingContent";
-import { Icon } from "@/components/ui/Icon";
 
 export const dynamic = "force-dynamic";
 
-const LOOP = [
-  { label: "Report", detail: "Safely, with or without your name." },
-  { label: "Protect", detail: "Privacy-first by design." },
-  { label: "Verify", detail: "Evidence and corroboration, carefully." },
-  { label: "Coordinate", detail: "Routed to a responsible organization." },
-  { label: "Respond", detail: "Acknowledged, acted on, recorded." },
-  { label: "Account", detail: "Status and timeline, in the open." },
-  { label: "Inform", detail: "Everyone knows what happens next." }
-];
-
-
-
-
+/**
+ * Landing page.
+ *
+ * The preview it shows is built from the same public DTO the community board
+ * uses, so the marketing surface cannot display anything a visitor could not
+ * already see on the case page itself.
+ */
 export default async function LandingPage() {
-  const db = await readDb();
-  const demo = findCase(db, "CS-1042");
-  const demoView = demo ? buildCaseView(db, demo, "public") : null;
-  const row = demo ? publicCaseRow(db, demo) : null;
-
-  return <LandingContent demo={demo} demoView={demoView} row={row} />;
+  const record = await findCaseByPublicId("CS-1042");
+  const demo = record && record.publicVisible ? toPublicCaseView(record) : null;
+  return <LandingContent demo={demo} />;
 }

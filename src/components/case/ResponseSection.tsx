@@ -1,13 +1,13 @@
 "use client";
 
-import type { CaseView } from "@/lib/case-view";
+import type { PublicCaseView } from "@/lib/dto/case";
 import { formatDateTime } from "@/lib/utils";
 import { ResponseBadge } from "@/components/ui/Badges";
 import { Icon } from "@/components/ui/Icon";
 import { useLocale } from "@/components/system/LocaleProvider";
 import { t } from "@/lib/i18n/i18n";
 
-export function EvidenceSummaryRow({ view }: { view: CaseView }) {
+export function EvidenceSummaryRow({ view }: { view: PublicCaseView }) {
   const { locale } = useLocale();
   const { counts } = view;
   const items = [
@@ -37,14 +37,13 @@ export function ResponseSection({
   trackHref,
   contactEmail
 }: {
-  view: CaseView;
+  view: PublicCaseView;
   latestUpdate?: { at: string; body: string; authorLabel: string };
   trackHref?: string;
   contactEmail?: string;
 }) {
   const { locale } = useLocale();
-  const c = view.case;
-  const closed = c.response === "closed";
+  const closed = view.response === "closed";
 
   return (
     <section aria-label={t("case.responseTitle", locale)} className="card px-5 py-5">
@@ -59,7 +58,7 @@ export function ResponseSection({
         </div>
         <div>
           <p className="meta-label mb-1">{t("case.currentStatus", locale)}</p>
-          <ResponseBadge state={c.response} />
+          <ResponseBadge state={view.response} />
         </div>
       </div>
 
@@ -70,7 +69,7 @@ export function ResponseSection({
               {t("case.latestUpdate", locale)}
             </p>
             <blockquote className="rounded-2xl bg-canvas px-4 py-3.5">
-              <p className="text-[13.5px] leading-relaxed text-ink">"{latestUpdate.body}"</p>
+              <p className="text-[13.5px] leading-relaxed text-ink">&ldquo;{latestUpdate.body}&rdquo;</p>
               <footer className="mt-1.5 text-[11.5px] font-medium text-ink-soft/70">
                 — {latestUpdate.authorLabel} · {formatDateTime(latestUpdate.at)}
               </footer>
@@ -90,10 +89,10 @@ export function ResponseSection({
           <p className="text-[13.5px] text-ink">
             {closed ? (
               t("case.caseClosedOutcome", locale)
-            ) : c.awaitingReporter ? (
+            ) : view.awaitingReporter ? (
               t("case.awaitingReporterInfo", locale)
-            ) : c.nextUpdateAt ? (
-              formatDateTime(c.nextUpdateAt)
+            ) : view.nextUpdateAt ? (
+              formatDateTime(view.nextUpdateAt)
             ) : (
               t("case.notScheduled", locale)
             )}
@@ -114,7 +113,7 @@ export function ResponseSection({
           )}
           {contactEmail && (
             <a
-              href={`mailto:${contactEmail}?subject=${encodeURIComponent("Inquiry about case " + c.id)}`}
+              href={`mailto:${contactEmail}?subject=${encodeURIComponent("Inquiry about case " + view.id)}`}
               className="press inline-flex min-h-10 items-center gap-2 rounded-btn border border-line bg-surface px-4 text-[13.5px] font-medium text-ink hover:bg-muted"
             >
               <Icon name="message" className="h-4 w-4" />

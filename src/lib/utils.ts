@@ -42,25 +42,3 @@ export function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
   return text.slice(0, max - 1).trimEnd() + "…";
 }
-
-export function normalizeArea(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-export function tokenOverlap(a: string, b: string): number {
-  const setA = new Set(normalizeArea(a).split(" ").filter((t) => t.length > 2));
-  const setB = new Set(normalizeArea(b).split(" ").filter((t) => t.length > 2));
-  if (setA.size === 0 || setB.size === 0) return 0;
-  let inter = 0;
-  for (const t of setA) if (setB.has(t)) inter += 1;
-  return inter / Math.min(setA.size, setB.size);
-}
-
-export function similarity(a: string, b: string): number {
-  const wa = normalizeArea(a).split(" ");
-  const wb = new Set(normalizeArea(b).split(" "));
-  if (wa.length === 0 || wb.size === 0) return 0;
-  let hits = 0;
-  for (const t of wa) if (t.length > 3 && wb.has(t)) hits += 1;
-  return hits / Math.max(4, Math.min(wa.length, 12));
-}
