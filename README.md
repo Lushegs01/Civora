@@ -348,6 +348,38 @@ Requirements:
 - Optionally a Redis-compatible endpoint for rate limiting
 - `CIVORA_DEMO_MODE` and `ENABLE_DEMO_TOOLS` left off
 
+### On Vercel
+
+Connect a **Postgres** store and a **Blob** store to the project. Vercel injects
+`POSTGRES_URL`, `POSTGRES_URL_NON_POOLING` and `BLOB_READ_WRITE_TOKEN`, which
+Civora reads directly — so neither the database nor the storage driver needs a
+variable set by hand.
+
+That leaves exactly one to add yourself:
+
+```bash
+vercel env add SESSION_SECRET production   # paste: openssl rand -hex 32
+vercel env add SESSION_SECRET preview      # a different value
+```
+
+Generate the value locally rather than pasting one from elsewhere; it is the key
+that signs session binding, and it should never have existed in a chat log, a
+terminal history you share, or a ticket.
+
+Vercel runs `vercel-build` in preference to `build`. That script applies
+`prisma migrate deploy` before building, but only when a connection string is
+present — so a preview from a fork still builds, and reports its missing
+configuration at `/api/health` rather than failing the deploy.
+
+Seeding is never automatic, because it deletes existing data. Run it deliberately
+when you want the fictional corpus:
+
+```bash
+CIVORA_DEMO_MODE=true npm run db:seed
+```
+
+Check the result with `curl https://your-deployment/api/health`.
+
 Nothing depends on the local filesystem or on process memory for authoritative
 state. `OBJECT_STORAGE_DRIVER=local` is refused when `NODE_ENV=production`.
 
