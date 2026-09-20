@@ -17,9 +17,18 @@ import { hashPassword } from "../src/lib/auth/password";
 // Idempotent: running it twice leaves the same dataset. Timestamps are
 // generated relative to the moment of seeding so the demo always looks live.
 
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
+// Prefers an unpooled connection for the bulk writes, and accepts the names
+// Vercel's Postgres integration injects so `vercel env pull` is enough to seed
+// a hosted database from a laptop.
+const connectionString =
+  process.env.DIRECT_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL;
 if (!connectionString) {
-  throw new Error("DATABASE_URL is required to seed.");
+  throw new Error(
+    "A database connection string is required to seed. Set DATABASE_URL, or pull one from a connected Postgres store."
+  );
 }
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });

@@ -73,12 +73,37 @@ export function sessionSecret(): string {
   return cachedSessionSecret;
 }
 
+/**
+ * Pooled connection used at runtime.
+ *
+ * Vercel's Postgres integration injects its own variable names rather than
+ * DATABASE_URL, so those are accepted as fallbacks and a Vercel-native
+ * deployment needs no database configuration set by hand. POSTGRES_URL is
+ * preferred over POSTGRES_PRISMA_URL because the latter carries Prisma-specific
+ * query parameters (pgbouncer, connect_timeout) that mean nothing to the
+ * node-postgres adapter this app uses.
+ */
 export function databaseUrl(): string {
-  const url = process.env.DATABASE_URL?.trim();
+  const url =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim() ||
+    process.env.POSTGRES_PRISMA_URL?.trim();
   if (!url) {
-    throw new ConfigError("DATABASE_URL", "Point it at your PostgreSQL instance.");
+    throw new ConfigError(
+      "DATABASE_URL",
+      "Point it at your PostgreSQL instance, or connect a Vercel Postgres store."
+    );
   }
   return url;
+}
+
+/** True when a database connection string is available under any known name. */
+export function hasDatabaseUrl(): boolean {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() ||
+      process.env.POSTGRES_URL?.trim() ||
+      process.env.POSTGRES_PRISMA_URL?.trim()
+  );
 }
 
 export const uploads = {
@@ -115,8 +140,23 @@ export const ai = {
 /** True when a real model can actually be reached. */
 export const aiLive = ai.provider === "openai" && ai.apiKey.length > 0;
 
+/**
+ * Evidence storage driver.
+ *
+ * An explicit OBJECT_STORAGE_DRIVER always wins. Otherwise a Vercel Blob store
+ * is detected from the token Vercel injects when one is connected, so that
+ * deployment needs no storage configuration by hand either. Development with
+ * neither falls back to the local disk, which production refuses.
+ */
+function resolveStorageDriver(): string {
+  const explicit = process.env.OBJECT_STORAGE_DRIVER?.trim().toLowerCase();
+  if (explicit) return explicit;
+  if (process.env.BLOB_READ_WRITE_TOKEN?.trim()) return "vercel-blob";
+  return isProduction ? "" : "local";
+}
+
 export const storage = {
-  driver: (process.env.OBJECT_STORAGE_DRIVER || (isProduction ? "" : "local")).trim().toLowerCase(),
+  driver: resolveStorageDriver(),
   localDir: process.env.OBJECT_STORAGE_LOCAL_DIR || ".data/evidence",
   bucket: process.env.OBJECT_STORAGE_BUCKET?.trim() || "",
   region: process.env.OBJECT_STORAGE_REGION?.trim() || "auto",
@@ -132,7 +172,24 @@ export const redis = {
   token: process.env.REDIS_REST_TOKEN?.trim() || ""
 };
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+/**
+ * The deployment's own origin, used for metadata and the same-origin check.
+ *
+ * Vercel injects the deployment host, so this resolves without configuration
+ * there. The production domain is preferred over the per-deployment URL, which
+ * changes on every push.
+ */
+function resolveSiteUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) return configured;
+  const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (productionHost) return `https://${productionHost}`;
+  const deploymentHost = process.env.VERCEL_URL?.trim();
+  if (deploymentHost) return `https://${deploymentHost}`;
+  return "http://localhost:3000";
+}
+
+export const siteUrl = resolveSiteUrl();
 
 export interface EmergencyContact {
   name: string;
@@ -173,8 +230,12 @@ export function configurationWarnings(): string[] {
   if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
     warnings.push("SESSION_SECRET is missing or shorter than 32 characters.");
   }
-  if (!process.env.DATABASE_URL) warnings.push("DATABASE_URL is not set.");
-  if (!storage.driver) warnings.push("OBJECT_STORAGE_DRIVER is not set; evidence uploads are disabled.");
+  if (!hasDatabaseUrl()) {
+    warnings.push("No database connection string (DATABASE_URL or a Vercel Postgres store).");
+  }
+  if (!storage.driver) {
+    warnings.push("No evidence storage configured; uploads are disabled. Set OBJECT_STORAGE_DRIVER or connect a Vercel Blob store.");
+  }
   if (storage.driver === "local") {
     warnings.push("OBJECT_STORAGE_DRIVER=local is not durable in production; use s3 or vercel-blob.");
   }
