@@ -13,5 +13,5 @@ export default async function ExplorePage() {
     orderBy: [{ lastVerifiedAt: "desc" }, { id: "asc" }],
     take: PAGE_SIZE
   });
-  return <ExploreClient initialItems={items.map(toCivicInfoView)} />;
+  return <ExploreClient initialItems={items.map((item) => toCivicInfoView(item))} />;
 }

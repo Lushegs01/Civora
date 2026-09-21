@@ -79,6 +79,41 @@ export async function listPublicCases(options: PublicCaseListOptions = {}) {
   });
 }
 
+/**
+ * Resolves the case ids a civic item names, to public cases only.
+ *
+ * The filter is the point: an item may cite a case that is private, in
+ * screening or restricted, and none of those may be confirmed to exist from a
+ * civic page. A case that fails the check is simply absent — the reader is not
+ * told that something was withheld, because that is itself a disclosure.
+ */
+export async function findPublicCasesByIds(publicCaseIds: string[]) {
+  const ids = [...new Set(publicCaseIds.map(normalizeCaseId))].filter(Boolean);
+  if (ids.length === 0) return [];
+  return prisma.case.findMany({
+    where: { publicCaseId: { in: ids }, publicVisible: true },
+    select: { publicCaseId: true, title: true, verification: true, response: true, updatedAt: true },
+    orderBy: [{ updatedAt: "desc" }]
+  });
+}
+
+/**
+ * The reverse direction: civic information that cites this case.
+ *
+ * Nothing is filtered here — civic items are public by construction — but the
+ * case reaching this function has already been checked for public visibility
+ * by its caller.
+ */
+export async function findCivicItemsCitingCase(publicCaseId: string) {
+  const id = normalizeCaseId(publicCaseId);
+  if (!id) return [];
+  return prisma.civicInfoItem.findMany({
+    where: { relatedCaseIds: { has: id } },
+    select: { id: true, title: true, category: true, lastVerifiedAt: true, freshnessThresholdDays: true },
+    orderBy: [{ lastVerifiedAt: "desc" }]
+  });
+}
+
 /** Cases an actor may work on: their organization's plus the unassigned queue. */
 export async function listWorkspaceCases(scope: { orgId: string | null; all: boolean }, take = 100) {
   return prisma.case.findMany({

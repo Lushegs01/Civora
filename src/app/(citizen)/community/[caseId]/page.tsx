@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findCaseByPublicId } from "@/lib/db/repository";
+import { findCaseByPublicId, findCivicItemsCitingCase } from "@/lib/db/repository";
+import { computeFreshness } from "@/lib/civic-types";
 import { toPublicCaseView } from "@/lib/dto/case";
 import { PublicCaseClient } from "./PublicCaseClient";
 
@@ -22,5 +23,18 @@ export async function generateMetadata({ params }: { params: { caseId: string } 
 export default async function PublicCasePage({ params }: { params: { caseId: string } }) {
   const record = await findCaseByPublicId(params.caseId);
   if (!record || !record.publicVisible) notFound();
-  return <PublicCaseClient view={toPublicCaseView(record)} />;
+  // Only reached once the case is known to be public, so nothing here can
+  // disclose a case a reader was not already looking at.
+  const citing = await findCivicItemsCitingCase(record.publicCaseId);
+  return (
+    <PublicCaseClient
+      view={toPublicCaseView(record)}
+      citedBy={citing.map((c) => ({
+        id: c.id,
+        title: c.title,
+        category: c.category,
+        freshnessState: computeFreshness(c.lastVerifiedAt.toISOString(), c.freshnessThresholdDays)
+      }))}
+    />
+  );
 }

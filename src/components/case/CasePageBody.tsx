@@ -26,7 +26,8 @@ export function CasePageBody({
   backHref,
   backLabel,
   token,
-  onRefresh
+  onRefresh,
+  after
 }: {
   view: PublicCaseView | ReporterCaseView;
   backHref: string;
@@ -34,6 +35,9 @@ export function CasePageBody({
   /** Present only in the reporter view; used to authorize follow-up actions. */
   token?: string;
   onRefresh?: () => void;
+  /** Rendered under the side column. Used for context the case itself does
+   *  not own — civic information citing it, for instance. */
+  after?: React.ReactNode;
 }) {
   const { locale } = useLocale();
   const reporter = isReporterView(view);
@@ -143,6 +147,7 @@ export function CasePageBody({
             contactEmail={view.orgContactEmail}
           />
           <CaseActionBar view={view} token={token} onChanged={onRefresh} />
+          {after}
         </div>
       </div>
     </div>
