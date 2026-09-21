@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { relativeTime } from "@/lib/utils";
+import { formatDateTime, relativeTime } from "@/lib/utils";
+import { useLocale } from "@/components/system/LocaleProvider";
 
 // Renders a stable absolute date on the server, then upgrades to a relative
 // label after mount — no hydration mismatch, no layout shift.
@@ -16,20 +17,16 @@ export function RelativeTime({
   className?: string;
   title?: boolean;
 }) {
+  const { locale } = useLocale();
   const [label, setLabel] = useState<string | null>(null);
   useEffect(() => {
-    const update = () => setLabel(relativeTime(iso));
+    const update = () => setLabel(relativeTime(iso, Date.now(), locale));
     update();
     const t = setInterval(update, 30_000);
     return () => clearInterval(t);
-  }, [iso]);
+  }, [iso, locale]);
 
-  const abs = new Date(iso).toLocaleString("en-GB", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const abs = formatDateTime(iso, locale);
 
   return (
     <time dateTime={iso} className={className} suppressHydrationWarning title={title ? abs : undefined}>

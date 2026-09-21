@@ -328,8 +328,8 @@ export function ResponderCasePanel({
         </h1>
         <p className="mt-1.5 text-[13px] text-ink-soft">
           {view.locationGeneral || t("responder.panel.no_location", locale)} ·{" "}
-          {t("responder.panel.reported", locale)} {formatDateTime(view.createdAt)} ·{" "}
-          {t("responder.panel.updated", locale)} {formatDateTime(view.updatedAt)}
+          {t("responder.panel.reported", locale)} {formatDateTime(view.createdAt, locale)} ·{" "}
+          {t("responder.panel.updated", locale)} {formatDateTime(view.updatedAt, locale)}
         </p>
       </header>
 
@@ -427,7 +427,7 @@ export function ResponderCasePanel({
             <div className="mt-4 grid gap-2 border-t border-line pt-4 text-[13px] text-ink-soft sm:grid-cols-2">
               <p>
                 <span className="meta-label block">{t("responder.panel.summary.incident_at", locale)}</span>
-                {formatDateTime(view.incidentAt)}
+                {formatDateTime(view.incidentAt, locale)}
               </p>
               <p>
                 <span className="meta-label block">{t("responder.panel.summary.area", locale)}</span>
@@ -462,7 +462,7 @@ export function ResponderCasePanel({
                   <li key={n.id} className="rounded-2xl bg-muted px-4 py-3">
                     <p className="text-[13.5px] leading-relaxed text-ink">{n.body}</p>
                     <p className="mt-1.5 text-xs text-ink-soft">
-                      {n.authorLabel} · {formatDateTime(n.at)}
+                      {n.authorLabel} · {formatDateTime(n.at, locale)}
                     </p>
                   </li>
                 ))}
@@ -512,7 +512,7 @@ export function ResponderCasePanel({
                           ? t("responder.panel.info.answered", locale) || "Answered"
                           : t("responder.panel.info.open", locale) || "Awaiting reporter"}
                       </span>
-                      <time className="text-[11px] text-ink-soft">{formatDateTime(r.createdAt)}</time>
+                      <time className="text-[11px] text-ink-soft">{formatDateTime(r.createdAt, locale)}</time>
                     </div>
                     <p className="mt-2 text-[13px] leading-relaxed text-ink">{r.message}</p>
                     {r.answerBody && (

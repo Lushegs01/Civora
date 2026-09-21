@@ -47,8 +47,10 @@ export function ResponseBadge({
   const meta = RESPONSE_META[state];
   const tone = TONE_STYLES[meta.tone];
 
-  const label = t(`response.${state}`, locale) || meta.label;
-  const description = t(`response.${state}.desc`, locale) || meta.description;
+  // `t` degrades an unknown key to a humanized last segment, which is truthy —
+  // so `||` never reaches a fallback. The fallback belongs in the call.
+  const label = t(`response.${state}`, locale, meta.label);
+  const description = t(`response.${state}.desc`, locale, meta.description);
 
   return (
     <span
@@ -70,7 +72,7 @@ const PRIORITY_STYLES: Record<string, { chip: string; icon: string; label: strin
 export function PriorityBadge({ priority, className }: { priority: string; className?: string }) {
   const { locale } = useLocale();
   const p = PRIORITY_STYLES[priority] || PRIORITY_STYLES.standard;
-  const label = t(`priority.${priority}`, locale) || p.label;
+  const label = t(`priority.${priority}`, locale, p.label);
   
   return (
     <span className={cn("chip", p.chip, className)}>

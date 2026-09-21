@@ -68,7 +68,7 @@ export function Sidebar({ className }: { className?: string }) {
           className="press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium text-ink-soft hover:bg-muted/50 hover:text-ink transition-colors w-full text-left"
         >
           <Icon name="eye" className="h-[18px] w-[18px] text-ink-soft" />
-          {isSimpleMode ? "Standard view" : "Simple view"}
+          {isSimpleMode ? t("simple.disable", locale) : t("simple.enable", locale)}
         </button>
       </nav>
 
@@ -83,7 +83,7 @@ export function Sidebar({ className }: { className?: string }) {
               <path d="M22.5 9.5a9 9 0 1 0 0 13" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
             </svg>
           </span>
-          Responder workspace
+          {t("nav.responder_workspace", locale)}
         </Link>
       </div>
     </aside>

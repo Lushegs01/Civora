@@ -274,7 +274,7 @@ export async function reseedDemoDataset(): Promise<{
           relatedCaseIds: item.relatedCaseIds ?? [],
           relatedCivicIds: [],
           whatRemainsUncertain: item.whatRemainsUncertain ?? [],
-          languageVersions: {} as Prisma.InputJsonValue,
+          languageVersions: (item.languageVersions ?? {}) as unknown as Prisma.InputJsonValue,
           fictional: true,
           tags: item.tags ?? []
         }

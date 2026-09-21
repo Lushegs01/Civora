@@ -21,12 +21,17 @@ export function TrustCard({
   const categoryMeta = CIVIC_CATEGORY_META[item.category];
   
   // Try to use language version if available
-  const hasTranslation = !!item.languageVersions[locale];
-  const localizedContent = item.languageVersions[locale] || {
-    title: item.title,
-    explanation: item.explanation,
-    eligibility: item.eligibility,
-    requirements: item.requirements
+  const translation = item.languageVersions[locale];
+  const hasTranslation = !!translation;
+  const localizedContent = {
+    title: translation?.title ?? item.title,
+    explanation: translation?.explanation ?? item.explanation,
+    eligibility: translation?.eligibility ?? item.eligibility,
+    requirements: translation?.requirements ?? item.requirements,
+    // Each field falls back on its own. A translation that covers the body but
+    // not the caveats should still show the caveats, in the source language,
+    // rather than dropping them.
+    whatRemainsUncertain: translation?.whatRemainsUncertain ?? item.whatRemainsUncertain
   };
 
   return (
@@ -69,6 +74,23 @@ export function TrustCard({
             <AiTranslateCard text={`${item.title}\n\n${item.explanation}`} />
           )}
 
+          {/*
+            A reader who has switched language needs to know which kind of text
+            they are looking at. This wording was supplied with the source
+            information and reviewed; the machine translation offered above,
+            when no written version exists, is not the same thing and does not
+            claim to be.
+          */}
+          {hasTranslation && locale !== "en" && (
+            <p
+              className="not-prose mb-4 inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-[12px] font-medium text-green-700"
+              title={t("civic.translation.written.desc", locale)}
+            >
+              <Icon name="languages" className="h-3.5 w-3.5" />
+              {t("civic.translation.written", locale)}
+            </p>
+          )}
+
           <p className="text-lg text-slate-700 leading-relaxed">
             {localizedContent.explanation}
           </p>
@@ -99,14 +121,14 @@ export function TrustCard({
             </div>
           )}
 
-          {item.whatRemainsUncertain && item.whatRemainsUncertain.length > 0 && (
+          {localizedContent.whatRemainsUncertain && localizedContent.whatRemainsUncertain.length > 0 && (
             <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-100">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-orange-800 flex items-center gap-2">
                 <Icon name="help-circle" className="h-4 w-4" />
                 {t("trustcard.what_uncertain", locale)}
               </h3>
               <ul className="mt-2 text-orange-900 list-disc pl-5">
-                {item.whatRemainsUncertain.map((unc, i) => (
+                {localizedContent.whatRemainsUncertain.map((unc, i) => (
                   <li key={i}>{unc}</li>
                 ))}
               </ul>

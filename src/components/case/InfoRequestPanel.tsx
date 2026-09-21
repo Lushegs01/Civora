@@ -89,7 +89,7 @@ export function InfoRequestPanel({
             {t("case.info.title", locale) || "The response team asked you a question"}
           </h2>
           <p className="mt-0.5 text-[12.5px] text-ink-soft">
-            {active.requestedByLabel} · {formatDateTime(active.createdAt)}
+            {active.requestedByLabel} · {formatDateTime(active.createdAt, locale)}
           </p>
         </div>
       </div>

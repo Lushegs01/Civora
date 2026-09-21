@@ -392,7 +392,7 @@ export function ReportWizard() {
         <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-[13px]">
           <span className="text-ink">
             <strong className="font-semibold">{t("report.draft_restored.title", locale)}</strong>
-            <span className="text-ink-soft"> {t("report.draft_restored.desc", locale)} {relativeTime(draftRestored)}</span>
+            <span className="text-ink-soft"> {t("report.draft_restored.desc", locale)} {relativeTime(draftRestored, Date.now(), locale)}</span>
           </span>
           <button
             onClick={async () => {
