@@ -260,7 +260,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
                       </div>
                       <div className="min-w-0">
                         <div className="truncate text-xs font-bold text-[#0B1F14]">evidence_photo_01.jpg</div>
-                        <div className="font-mono text-[10px] text-ink-soft">2.4 MB · {t("landing.trust.corroborated", locale)}</div>
+                        <div className="truncate font-mono text-[10px] text-ink-soft">2.4 MB · {t("evidence.source.citizen", locale)}</div>
                       </div>
                     </div>
                     <span className="shrink-0 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
@@ -303,7 +303,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
                     <span className="flex items-center gap-1.5 font-semibold text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {t("landing.trust.workflow.verified", locale)}
                     </span>
-                    <span className="font-mono text-[10px] text-emerald-600">{t("landing.trust.corroborated", locale)}</span>
+                    <span className="shrink-0 font-mono text-[10px] text-emerald-600">{t("landing.trust.corroborated", locale)}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-lg border border-[#E3EAE2] bg-white px-2.5 py-1.5 text-xs">
                     <span className="flex items-center gap-1.5 font-semibold text-[#14532D]">

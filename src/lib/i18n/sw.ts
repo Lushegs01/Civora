@@ -741,7 +741,7 @@ const sw: Record<keyof typeof en, string> = {
   "landing.trust.no_account": "Hakuna akaunti inayohitajika",
   "landing.trust.loc_optional": "Mahali ni hiari",
   "landing.trust.distinct_states": "Kuripotiwa, kuthibitishwa na kujibiwa ni hali tofauti",
-  "landing.trust.corroborated": "Kuthibitishwa na watu, si kwa kubahatisha",
+  "landing.trust.corroborated": "Imethibitishwa",
   "landing.trust.evidence_linked": "Ushahidi hubaki umeunganishwa na chanzo chake",
   "landing.trust.evidence_desc": "Kila kipengele katika mnyororo hurekodi kilikotoka, kilipowasili, na alama ya uthibitisho ya maudhui yake.",
   "landing.trust.integrity": "Uadilifu",

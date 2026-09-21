@@ -745,7 +745,7 @@ const en = {
   "landing.trust.no_account": "No account needed",
   "landing.trust.loc_optional": "Location is optional",
   "landing.trust.distinct_states": "Reported, verified and responded are separate states",
-  "landing.trust.corroborated": "Corroborated by people, not by guesswork",
+  "landing.trust.corroborated": "Corroborated",
   "landing.trust.evidence_linked": "Evidence stays linked to its source",
   "landing.trust.evidence_desc": "Every item in the chain records where it came from, when it arrived and a checksum of its contents.",
   "landing.trust.integrity": "Integrity",

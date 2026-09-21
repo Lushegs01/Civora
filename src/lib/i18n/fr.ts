@@ -741,7 +741,7 @@ const fr: Record<keyof typeof en, string> = {
   "landing.trust.no_account": "Aucun compte nécessaire",
   "landing.trust.loc_optional": "La localisation est facultative",
   "landing.trust.distinct_states": "Signalé, vérifié et traité sont des états distincts",
-  "landing.trust.corroborated": "Corroboré par des personnes, pas par des suppositions",
+  "landing.trust.corroborated": "Corroboré",
   "landing.trust.evidence_linked": "Les preuves restent liées à leur source",
   "landing.trust.evidence_desc": "Chaque élément de la chaîne enregistre sa provenance, son heure d'arrivée et une somme de contrôle de son contenu.",
   "landing.trust.integrity": "Intégrité",
