@@ -141,3 +141,49 @@ describe("health warnings", () => {
     vi.unstubAllEnvs();
   });
 });
+
+describe("migration connection selection", () => {
+  // `migrate deploy` takes a session-scoped advisory lock that a transaction
+  // pooler cannot hold, so a pooled URL fails with P1002 after a ten-second
+  // timeout. A deployment whose only database variable is the pooled one
+  // builds, deploys and then cannot migrate — this pins the choice.
+  const POOLED = "postgresql://u:p@ep-x-pooler.c-6.us-east-2.aws.neon.tech/neondb";
+  const DIRECT = "postgresql://u:p@ep-x.c-6.us-east-2.aws.neon.tech/neondb";
+
+  it("prefers the direct endpoint over the pooled one", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    expect(selectMigrationUrl({ DATABASE_URL: POOLED, DATABASE_URL_UNPOOLED: DIRECT })).toBe(DIRECT);
+  });
+
+  it("reads the unpooled name each provider uses", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    // Neon injects DATABASE_URL_UNPOOLED; Vercel Postgres POSTGRES_URL_NON_POOLING.
+    expect(selectMigrationUrl({ DATABASE_URL_UNPOOLED: DIRECT })).toBe(DIRECT);
+    expect(selectMigrationUrl({ POSTGRES_URL_NON_POOLING: DIRECT })).toBe(DIRECT);
+  });
+
+  it("ignores a DIRECT_URL that was set to the pooled string", async () => {
+    // The mistake that looks correct: the variable is named for a direct
+    // connection but holds the pooled endpoint, and it fails identically.
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    expect(selectMigrationUrl({ DIRECT_URL: POOLED, DATABASE_URL_UNPOOLED: DIRECT })).toBe(DIRECT);
+  });
+
+  it("treats a pgbouncer query flag as pooled", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    const flagged = `${DIRECT}?pgbouncer=true`;
+    expect(selectMigrationUrl({ DIRECT_URL: flagged, DATABASE_URL: DIRECT })).toBe(DIRECT);
+  });
+
+  it("falls back to the pooled URL rather than nothing when it is all there is", async () => {
+    // Better to attempt the migration and fail loudly than to skip it and
+    // deploy against an unmigrated database.
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    expect(selectMigrationUrl({ DATABASE_URL: POOLED })).toBe(POOLED);
+  });
+
+  it("returns empty when no connection string is configured", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    expect(selectMigrationUrl({})).toBe("");
+  });
+});

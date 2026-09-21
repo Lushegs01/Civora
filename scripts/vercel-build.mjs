@@ -30,13 +30,27 @@ function bool(value, fallback = false) {
 const databaseUrl =
   process.env.DIRECT_URL ||
   process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_URL_UNPOOLED ||
   process.env.DATABASE_URL ||
   process.env.POSTGRES_URL;
+
+/** Host only — a connection string carries the password. */
+function hostOf(url) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return "an unparseable connection string";
+  }
+}
 
 run("npx", ["prisma", "generate"]);
 
 if (databaseUrl) {
-  console.log("Applying database migrations.");
+  // Named because the failure this most often hits — P1002, a timeout
+  // acquiring pg_advisory_lock — is diagnosed from the host: a pooled
+  // endpoint cannot hold the session lock that `migrate deploy` needs.
+  // prisma.config.ts picks the connection; this is what it picked.
+  console.log(`Applying database migrations against ${hostOf(databaseUrl)}.`);
   run("npx", ["prisma", "migrate", "deploy"]);
 } else {
   console.warn(

@@ -23,6 +23,7 @@ import { hashPassword } from "../src/lib/auth/password";
 const connectionString =
   process.env.DIRECT_URL ||
   process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_URL_UNPOOLED ||
   process.env.DATABASE_URL ||
   process.env.POSTGRES_URL;
 if (!connectionString) {
