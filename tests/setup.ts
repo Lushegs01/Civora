@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../scripts/load-env";
 
 // Tests run against a real PostgreSQL database (TEST_DATABASE_URL, or
 // DATABASE_URL when that is unset). Using the real engine is the point: the
