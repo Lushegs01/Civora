@@ -70,7 +70,7 @@ export function CaseTimeline({
                   <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5">
                     <h3 className="text-[13.5px] font-semibold leading-snug text-ink">{e.title}</h3>
                     <time dateTime={e.at} className="shrink-0 text-[11px] tabular-nums text-ink-soft/60">
-                      {formatDateTime(e.at)}
+                      {formatDateTime(e.at, locale)}
                     </time>
                   </div>
                   <p className="mt-0.5 text-[12px] font-medium text-ink-soft/70">{e.actorLabel}</p>

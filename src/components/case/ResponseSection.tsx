@@ -71,7 +71,7 @@ export function ResponseSection({
             <blockquote className="rounded-2xl bg-canvas px-4 py-3.5">
               <p className="text-[13.5px] leading-relaxed text-ink">&ldquo;{latestUpdate.body}&rdquo;</p>
               <footer className="mt-1.5 text-[11.5px] font-medium text-ink-soft/70">
-                — {latestUpdate.authorLabel} · {formatDateTime(latestUpdate.at)}
+                — {latestUpdate.authorLabel} · {formatDateTime(latestUpdate.at, locale)}
               </footer>
             </blockquote>
           </div>
@@ -92,7 +92,7 @@ export function ResponseSection({
             ) : view.awaitingReporter ? (
               t("case.awaitingReporterInfo", locale)
             ) : view.nextUpdateAt ? (
-              formatDateTime(view.nextUpdateAt)
+              formatDateTime(view.nextUpdateAt, locale)
             ) : (
               t("case.notScheduled", locale)
             )}

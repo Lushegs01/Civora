@@ -18,6 +18,7 @@ const en = {
   "nav.privacy": "Privacy",
   "nav.resources": "Get help",
   "nav.responder": "Responder",
+  "nav.responder_workspace": "Responder workspace",
   "nav.settings": "Settings",
 
   // ── Actions ─────────────────────────────────────────────────────────────────
@@ -54,6 +55,22 @@ const en = {
   "category.other": "Other",
 
   // ── Civic categories ────────────────────────────────────────────────────────
+  "civic.translation.written": "Publisher's translation",
+  "civic.translation.written.desc": "This wording was supplied with the source information and reviewed. It was not generated when you opened the page.",
+  "civic.action.no_destination": "no link published",
+  "civic.action.no_destination.desc": "The source names this step but does not publish an address for it. It is shown so the step is not lost, and left inactive so the link is not invented.",
+  "civic.action.report_fault": "Report a fault",
+  "civic.action.view_regulations": "View full regulations",
+  "civic.action.contact_utility": "Contact the utility",
+  "civic.action.apply_mediation": "Apply for mediation",
+  "civic.action.track_cases": "Track related cases",
+  "civic.action.find_registry": "Find your registry office",
+  "civic.action.report_refused_request": "Report a refused request",
+  "civic.action.check_allocation": "Check your region's allocation",
+  "civic.action.contact_directorate": "Contact the directorate",
+  "civic.action.find_tribunal": "Find your ward tribunal",
+  "civic.action.report_refused_filing": "Report a refused filing",
+  "civic.action.report_water_point": "Report a broken water point",
   "civic.category.service": "Public service",
   "civic.category.right": "Rights",
   "civic.category.policy": "Policy",
@@ -84,11 +101,22 @@ const en = {
 
   // ── Response states ─────────────────────────────────────────────────────────
   "response.not_assigned": "Not assigned",
+  "response.not_assigned.desc": "No organization has taken ownership of this case yet.",
   "response.received": "Received",
+  "response.received.desc": "The report has been received and is awaiting triage.",
   "response.acknowledged": "Acknowledged",
+  "response.acknowledged.desc": "A responsible organization has acknowledged the report.",
   "response.in_progress": "In progress",
+  "response.in_progress.desc": "The responsible organization is actively working on the case.",
   "response.action_recorded": "Action recorded",
+  "response.action_recorded.desc": "A concrete action has been recorded against the case.",
   "response.closed": "Closed",
+  "response.closed.desc": "The case has been closed with a documented outcome.",
+
+  // ── Priority ─────────────────────────────────────────────────────────────────
+  "priority.standard": "Standard",
+  "priority.elevated": "Elevated",
+  "priority.urgent": "Urgent",
 
   // ── Freshness states ────────────────────────────────────────────────────────
   "freshness.current": "Current",
@@ -874,6 +902,12 @@ const en = {
   "report.leave_report": "Leave this report",
   "report.previous_step": "Previous step",
   "trustcard.why_trusted": "Why you can rely on this",
+  "trustcard.why.source": "Official source.",
+  "trustcard.why.source.desc": "Every item names the body that issued it and the kind of authority that body holds.",
+  "trustcard.why.freshness": "Checked, with a date.",
+  "trustcard.why.freshness.desc": "The last verification date is shown, so information that has gone stale says so rather than looking current.",
+  "trustcard.why.uncertainty": "Uncertainty is kept.",
+  "trustcard.why.uncertainty.desc": "Where a procedure is unclear or the sources disagree, that is recorded on the item instead of being smoothed away.",
   // ── Evidence kinds and source types (looked up by value) ───────────────────
   "evidence.photo": "Photograph",
   "evidence.video": "Video",

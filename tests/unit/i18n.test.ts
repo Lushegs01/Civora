@@ -61,6 +61,82 @@ function indirectKeysUsed(): Set<string> {
   return keys;
 }
 
+/** Enum members, read from the authoritative schema rather than re-listed here. */
+function schemaEnums(): Record<string, string[]> {
+  const schema = fs.readFileSync(path.join(process.cwd(), "prisma/schema.prisma"), "utf-8");
+  const enums: Record<string, string[]> = {};
+  for (const match of schema.matchAll(/enum\s+(\w+)\s*\{([^}]*)\}/g)) {
+    enums[match[1]] = match[2]
+      .split("\n")
+      .map((line) => line.replace(/\/\/.*$/, "").trim())
+      .filter((line) => /^[a-z_][a-z0-9_]*$/i.test(line));
+  }
+  return enums;
+}
+
+/**
+ * The domain each templated key family draws its members from.
+ *
+ * A family listed here is expanded and checked. A family that appears in the
+ * source and is *not* listed here fails the test by name, so a new one cannot
+ * be added without also being covered.
+ */
+const KEY_FAMILY_DOMAINS: Record<string, string> = {
+  category: "CaseCategory",
+  verification: "VerificationState",
+  response: "ResponseState",
+  privacy: "PrivacyMode",
+  priority: "CasePriority",
+  lang: "__locales"
+};
+
+/**
+ * Keys built from a domain value at the call site — t(`response.${state}.desc`).
+ *
+ * The families used to be a hand-written list, and that is exactly how six
+ * response descriptions and three priority labels went missing: the list held
+ * `response.${r}` but not `response.${r}.desc`, and no priority family at all.
+ * Nothing failed, because t() degrades an unknown key to its humanized last
+ * segment — so every response badge's tooltip read "Desc", in all three
+ * languages, and the suite stayed green.
+ *
+ * So the families are derived now. The shape comes from the source, the
+ * members come from schema.prisma, and a new enum member or a new templated
+ * call fails here until the dictionary has caught up.
+ */
+function templatedKeysUsed(): { keys: string[]; unregistered: string[] } {
+  const enums = schemaEnums();
+  const domains: Record<string, string[]> = { __locales: ["en", "sw", "fr"] };
+  const keys = new Set<string>();
+  const unregistered = new Set<string>();
+
+  for (const file of sourceFiles(SRC)) {
+    const source = fs.readFileSync(file, "utf-8");
+    // `\bt(` alone also matches test( and expect(...).not(, so require that the
+    // character before the call is not part of an identifier.
+    for (const match of source.matchAll(/(^|[^\w.$])t\(\s*`([^`]+)`/gm)) {
+      const template = match[2];
+      const parts = template.split(/\$\{[^}]*\}/);
+      if (parts.length !== 2) continue;
+      const [prefix, suffix] = parts;
+      const namespace = prefix.replace(/\.$/, "");
+      if (!/^[a-z][a-zA-Z0-9_]*$/.test(namespace)) continue;
+      const domain = KEY_FAMILY_DOMAINS[namespace];
+      if (!domain) {
+        unregistered.add(`${namespace} (from \`${template}\`)`);
+        continue;
+      }
+      const members = domains[domain] ?? enums[domain];
+      if (!members) {
+        unregistered.add(`${namespace} -> ${domain} not found in schema.prisma`);
+        continue;
+      }
+      for (const member of members) keys.add(`${prefix}${member}${suffix}`);
+    }
+  }
+  return { keys: [...keys], unregistered: [...unregistered] };
+}
+
 describe("translation coverage", () => {
   it("has an entry for every literal key the interface uses", () => {
     const missing = [...literalKeysUsed()].filter((key) => !(key in en)).sort();
@@ -72,32 +148,32 @@ describe("translation coverage", () => {
     expect(missing).toEqual([]);
   });
 
+  it("registers every templated key family it finds in the source", () => {
+    // A family the source builds but this test does not know how to expand is
+    // an uncovered family, which is how the last gap survived. Name it here.
+    expect(templatedKeysUsed().unregistered).toEqual([]);
+  });
+
   it("has an entry for every key built from a domain value", () => {
-    const families = [
-      ...["safety", "community", "service", "infrastructure", "dispute", "other"].flatMap((c) => [
-        `category.${c}`,
-        `category.${c}.blurb`
-      ]),
-      ...["unverified", "partially_verified", "documented", "conflicting", "resolved"].flatMap((v) => [
-        `verification.${v}`,
-        `verification.${v}.desc`
-      ]),
-      ...["not_assigned", "received", "acknowledged", "in_progress", "action_recorded", "closed"].map(
-        (r) => `response.${r}`
-      ),
-      ...["anonymous", "confidential", "identified"].flatMap((p) => [`privacy.${p}`, `privacy.${p}.desc`]),
-      ...["reported", "evidence", "corroborated", "assigned", "response", "resolved"].map(
-        (s) => `case.progress.${s}`
-      ),
-      ...["photo", "video", "document", "report", "official", "note"].map((k) => `evidence.${k}`),
-      ...["primary", "corroborating", "official", "citizen"].map((s) => `evidence.source.${s}`),
-      ...["service", "right", "policy", "opportunity", "project", "safety", "procedure"].map(
-        (c) => `civic.category.${c}`
-      ),
-      ...["current", "review_needed", "outdated", "conflicting"].map((f) => `freshness.${f}`)
-    ];
-    const missing = families.filter((key) => !(key in en)).sort();
+    const missing = templatedKeysUsed()
+      .keys.filter((key) => !(key in en))
+      .sort();
     expect(missing).toEqual([]);
+  });
+
+  it("covers a domain value that is only ever reached through a template", () => {
+    // priority.* is reached exclusively as t(`priority.${priority}`), so it is
+    // invisible to both literal and indirect scanning. It was missing entirely.
+    for (const member of schemaEnums().CasePriority) {
+      expect(en[`priority.${member}` as keyof typeof en], `priority.${member}`).toBeTruthy();
+    }
+  });
+
+  it("gives every response state a description, not just a label", () => {
+    // The descriptions are the badge tooltips. Each one rendered as "Desc".
+    for (const member of schemaEnums().ResponseState) {
+      expect(en[`response.${member}.desc` as keyof typeof en], `response.${member}.desc`).toBeTruthy();
+    }
   });
 
   it("never renders a dotted key to a reader", () => {

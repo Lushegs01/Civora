@@ -31,7 +31,13 @@ export interface CivicInfoView {
   whatRemainsUncertain: string[];
   languageVersions: Record<
     string,
-    { title: string; explanation: string; eligibility?: string; requirements?: string[] }
+    {
+      title: string;
+      explanation: string;
+      eligibility?: string;
+      requirements?: string[];
+      whatRemainsUncertain?: string[];
+    }
   >;
   /** Demo corpus flag — the UI labels these unmistakably. */
   fictional: boolean;

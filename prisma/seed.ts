@@ -1,7 +1,7 @@
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import crypto from "node:crypto";
-import "dotenv/config";
+import "../scripts/load-env";
 import {
   DEMO_CASES,
   DEMO_CIVIC_ITEMS,
@@ -301,7 +301,7 @@ async function main() {
         relatedCaseIds: item.relatedCaseIds ?? [],
         relatedCivicIds: [],
         whatRemainsUncertain: item.whatRemainsUncertain ?? [],
-        languageVersions: {} as Prisma.InputJsonValue,
+        languageVersions: (item.languageVersions ?? {}) as unknown as Prisma.InputJsonValue,
         fictional: true,
         tags: item.tags ?? []
       }

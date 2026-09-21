@@ -64,6 +64,10 @@ export interface CivicInfoItem {
     explanation: string;
     eligibility?: string;
     requirements?: string[];
+    // The uncertainty notes are the part a reader most needs in their own
+    // language: an item that reads as settled in French because only its
+    // caveats stayed in English is worse than one that never translated.
+    whatRemainsUncertain?: string[];
   }>;
   fictional: boolean;               // true for demo data — always labelled
   tags?: string[];                  // for search

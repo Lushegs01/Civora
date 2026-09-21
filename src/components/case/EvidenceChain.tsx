@@ -107,7 +107,7 @@ export function EvidenceChain({
                     </span>
                     <span className="text-[11px] text-ink-soft/40">·</span>
                     <span className="text-[11.5px] tabular-nums text-ink-soft/60">
-                      {formatDateTime(e.submittedAt)}
+                      {formatDateTime(e.submittedAt, locale)}
                     </span>
                   </span>
                 </span>
@@ -141,7 +141,7 @@ function EvidenceDetail({ e, viewerToken }: { e: PublicEvidenceView; viewerToken
   const rows: Array<[string, React.ReactNode]> = [
     [t("case.source", locale), e.submittedByLabel],
     [t("case.sourceType", locale), t(SOURCE_TYPE_LABEL[e.sourceType], locale)],
-    [t("case.dateSubmitted", locale), formatDateTime(e.submittedAt)]
+    [t("case.dateSubmitted", locale), formatDateTime(e.submittedAt, locale)]
   ];
   if (e.excerpt) rows.push([t("case.relevantExcerpt", locale), <span key="x">&ldquo;{e.excerpt}&rdquo;</span>]);
   if (e.relationship) rows.push([t("case.relationshipToClaim", locale), e.relationship]);

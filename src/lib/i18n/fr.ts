@@ -13,6 +13,7 @@ const fr: Record<keyof typeof en, string> = {
   "nav.privacy": "Confidentialité",
   "nav.resources": "Obtenir de l'aide",
   "nav.responder": "Intervenant",
+  "nav.responder_workspace": "Espace intervenant",
   "nav.settings": "Paramètres",
 
   // ── Actions ─────────────────────────────────────────────────────────────────
@@ -49,6 +50,22 @@ const fr: Record<keyof typeof en, string> = {
   "category.other": "Autre",
 
   // ── Civic categories ────────────────────────────────────────────────────────
+  "civic.translation.written": "Traduction de l'\u00e9diteur",
+  "civic.translation.written.desc": "Ce texte a \u00e9t\u00e9 fourni avec l'information source puis relu. Il n'a pas \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9 \u00e0 l'ouverture de la page.",
+  "civic.action.no_destination": "aucun lien publié",
+  "civic.action.no_destination.desc": "La source mentionne cette démarche sans en publier l'adresse. Elle est affichée pour ne pas perdre l'étape, et laissée inactive pour ne pas inventer le lien.",
+  "civic.action.report_fault": "Signaler une défaillance",
+  "civic.action.view_regulations": "Consulter la réglementation",
+  "civic.action.contact_utility": "Contacter le service des eaux",
+  "civic.action.apply_mediation": "Demander une médiation",
+  "civic.action.track_cases": "Suivre les dossiers liés",
+  "civic.action.find_registry": "Trouver votre bureau d'état civil",
+  "civic.action.report_refused_request": "Signaler une demande refusée",
+  "civic.action.check_allocation": "Vérifier le quota de votre région",
+  "civic.action.contact_directorate": "Contacter la direction",
+  "civic.action.find_tribunal": "Trouver votre tribunal de quartier",
+  "civic.action.report_refused_filing": "Signaler un dépôt refusé",
+  "civic.action.report_water_point": "Signaler un point d'eau hors service",
   "civic.category.service": "Service public",
   "civic.category.right": "Droits",
   "civic.category.policy": "Politique",
@@ -78,12 +95,23 @@ const fr: Record<keyof typeof en, string> = {
   "verification.resolved.desc": "Le dossier a une réponse documentée et est considéré comme clos.",
 
   // ── Response states ─────────────────────────────────────────────────────────
-  "response.not_assigned": "Non assigné",
+  "response.not_assigned": "Non attribué",
+  "response.not_assigned.desc": "Aucune organisation n'a encore pris en charge ce dossier.",
   "response.received": "Reçu",
-  "response.acknowledged": "Reconnu",
+  "response.received.desc": "Le signalement a été reçu et attend d'être trié.",
+  "response.acknowledged": "Accusé de réception",
+  "response.acknowledged.desc": "Une organisation responsable a accusé réception du signalement.",
   "response.in_progress": "En cours",
+  "response.in_progress.desc": "L'organisation responsable traite activement le dossier.",
   "response.action_recorded": "Action enregistrée",
-  "response.closed": "Clos",
+  "response.action_recorded.desc": "Une action concrète a été enregistrée pour ce dossier.",
+  "response.closed": "Clôturé",
+  "response.closed.desc": "Le dossier a été clôturé avec un résultat documenté.",
+
+  // ── Priorité ──────────────────────────────────────────────────────────────
+  "priority.standard": "Standard",
+  "priority.elevated": "Élevée",
+  "priority.urgent": "Urgente",
 
   // ── Freshness states ────────────────────────────────────────────────────────
   "freshness.current": "Actuel",
@@ -870,6 +898,12 @@ const fr: Record<keyof typeof en, string> = {
   "report.leave_report": "Quitter ce signalement",
   "report.previous_step": "Étape précédente",
   "trustcard.why_trusted": "Pourquoi vous pouvez vous y fier",
+  "trustcard.why.source": "Source officielle.",
+  "trustcard.why.source.desc": "Chaque fiche nomme l'organisme qui l'a publiée et le type d'autorité dont il dispose.",
+  "trustcard.why.freshness": "Vérifié, avec une date.",
+  "trustcard.why.freshness.desc": "La date de dernière vérification est affichée : une information périmée le dit, au lieu de paraître à jour.",
+  "trustcard.why.uncertainty": "L'incertitude est conservée.",
+  "trustcard.why.uncertainty.desc": "Lorsqu'une procédure est floue ou que les sources divergent, cela figure sur la fiche plutôt que d'être gommé.",
 
   // ── Evidence kinds and source types (looked up by value) ───────────────────
   "evidence.photo": "Photographie",

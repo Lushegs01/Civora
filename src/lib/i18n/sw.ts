@@ -13,6 +13,7 @@ const sw: Record<keyof typeof en, string> = {
   "nav.privacy": "Faragha",
   "nav.resources": "Pata msaada",
   "nav.responder": "Mtoa majibu",
+  "nav.responder_workspace": "Eneo la mwitikiaji",
   "nav.settings": "Mipangilio",
 
   // ── Actions ─────────────────────────────────────────────────────────────────
@@ -49,6 +50,22 @@ const sw: Record<keyof typeof en, string> = {
   "category.other": "Nyingine",
 
   // ── Civic categories ────────────────────────────────────────────────────────
+  "civic.translation.written": "Tafsiri ya mchapishaji",
+  "civic.translation.written.desc": "Maneno haya yalitolewa pamoja na taarifa asili na kukaguliwa. Hayakutengenezwa wakati ulipofungua ukurasa huu.",
+  "civic.action.no_destination": "hakuna kiungo kilichochapishwa",
+  "civic.action.no_destination.desc": "Chanzo kinataja hatua hii lakini hakichapishi anwani yake. Inaonyeshwa ili hatua isipotee, na imeachwa bila kufanya kazi ili kiungo kisibuniwe.",
+  "civic.action.report_fault": "Ripoti hitilafu",
+  "civic.action.view_regulations": "Soma kanuni kamili",
+  "civic.action.contact_utility": "Wasiliana na mamlaka ya maji",
+  "civic.action.apply_mediation": "Omba usuluhishi",
+  "civic.action.track_cases": "Fuatilia kesi zinazohusiana",
+  "civic.action.find_registry": "Tafuta ofisi yako ya usajili",
+  "civic.action.report_refused_request": "Ripoti ombi lililokataliwa",
+  "civic.action.check_allocation": "Angalia mgao wa mkoa wako",
+  "civic.action.contact_directorate": "Wasiliana na kurugenzi",
+  "civic.action.find_tribunal": "Tafuta baraza la kata lako",
+  "civic.action.report_refused_filing": "Ripoti shauri lililokataliwa",
+  "civic.action.report_water_point": "Ripoti kituo cha maji kilichoharibika",
   "civic.category.service": "Huduma ya umma",
   "civic.category.right": "Haki",
   "civic.category.policy": "Sera",
@@ -78,12 +95,23 @@ const sw: Record<keyof typeof en, string> = {
   "verification.resolved.desc": "Kesi ina majibu yaliyoandikwa na inachukuliwa kuwa imefungwa.",
 
   // ── Response states ─────────────────────────────────────────────────────────
-  "response.not_assigned": "Haijapewa",
+  "response.not_assigned": "Haijakabidhiwa",
+  "response.not_assigned.desc": "Hakuna shirika ambalo bado limechukua jukumu la kesi hii.",
   "response.received": "Imepokelewa",
-  "response.acknowledged": "Imetambuliwa",
+  "response.received.desc": "Ripoti imepokelewa na inasubiri kupangwa.",
+  "response.acknowledged": "Imethibitishwa kupokelewa",
+  "response.acknowledged.desc": "Shirika linalohusika limethibitisha kupokea ripoti hii.",
   "response.in_progress": "Inaendelea",
-  "response.action_recorded": "Hatua imeandikwa",
+  "response.in_progress.desc": "Shirika linalohusika linashughulikia kesi hii kwa sasa.",
+  "response.action_recorded": "Hatua imerekodiwa",
+  "response.action_recorded.desc": "Hatua madhubuti imerekodiwa kwa kesi hii.",
   "response.closed": "Imefungwa",
+  "response.closed.desc": "Kesi imefungwa na matokeo yaliyoandikwa.",
+
+  // ── Kipaumbele ────────────────────────────────────────────────────────
+  "priority.standard": "Kawaida",
+  "priority.elevated": "Imepandishwa",
+  "priority.urgent": "Dharura",
 
   // ── Freshness states ────────────────────────────────────────────────────────
   "freshness.current": "Ya sasa",
@@ -870,6 +898,12 @@ const sw: Record<keyof typeof en, string> = {
   "report.leave_report": "Acha ripoti hii",
   "report.previous_step": "Hatua iliyotangulia",
   "trustcard.why_trusted": "Kwa nini unaweza kuitegemea",
+  "trustcard.why.source": "Chanzo rasmi.",
+  "trustcard.why.source.desc": "Kila taarifa hutaja taasisi iliyoitoa na aina ya mamlaka iliyo nayo.",
+  "trustcard.why.freshness": "Imekaguliwa, na tarehe.",
+  "trustcard.why.freshness.desc": "Tarehe ya ukaguzi wa mwisho huonyeshwa, hivyo taarifa iliyopitwa na wakati hujitangaza badala ya kuonekana mpya.",
+  "trustcard.why.uncertainty": "Kutokuwa na uhakika huhifadhiwa.",
+  "trustcard.why.uncertainty.desc": "Pale utaratibu haueleweki au vyanzo vinatofautiana, hilo huandikwa kwenye taarifa badala ya kufichwa.",
 
   // ── Evidence kinds and source types (looked up by value) ───────────────────
   "evidence.photo": "Picha",

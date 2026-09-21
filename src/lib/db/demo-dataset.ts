@@ -811,10 +811,32 @@ export interface DemoCivicItem {
   fees?: string;
   deadlines?: string;
   contactInfo?: string;
-  nextActions: Array<{ label: string; type: string; href?: string }>;
+  // `label` is the English wording; `labelKey` is what the interface actually
+  // renders, so an action button is not the one part of a translated page that
+  // stays in English. NextActionsPanel prefers the key and falls back to label.
+  nextActions: Array<{ label: string; labelKey?: string; type: string; href?: string }>;
   relatedCaseIds?: string[];
   whatRemainsUncertain?: string[];
   tags?: string[];
+  /**
+   * The item's own text in the other languages the interface offers.
+   *
+   * Translating the chrome and leaving the civic information in English means a
+   * Swahili reader gets a Swahili menu over an English answer, which is the
+   * part they actually came for. These are written translations, not machine
+   * output: the reader is told which they are looking at, and a language with
+   * no version here falls back to the source text rather than to a guess.
+   */
+  languageVersions?: Record<
+    string,
+    {
+      title: string;
+      explanation: string;
+      eligibility?: string;
+      requirements?: string[];
+      whatRemainsUncertain?: string[];
+    }
+  >;
 }
 
 export const DEMO_CIVIC_ITEMS: DemoCivicItem[] = [
@@ -834,11 +856,23 @@ export const DEMO_CIVIC_ITEMS: DemoCivicItem[] = [
     freshnessThresholdDays: 30,
     verificationMethod: "Checked against published state regulations (2024 handbook)",
     nextActions: [
-      { label: "Report a fault", type: "report" },
-      { label: "View full regulations", type: "link" }
+      { label: "Report a fault", labelKey: "civic.action.report_fault", type: "report", href: "/report" },
+      { label: "View full regulations", labelKey: "civic.action.view_regulations", type: "link" }
     ],
     relatedCaseIds: ["CS-1042"],
-    tags: ["electrical", "safety", "walkway"]
+    tags: ["electrical", "safety", "walkway"],
+    languageVersions: {
+      fr: {
+        title: "Normes de s\u00e9curit\u00e9 \u00e9lectrique dans les espaces publics",
+        explanation:
+          "Les espaces publics et les passages doivent \u00eatre \u00e9quip\u00e9s d'installations \u00e9lectriques correctement isol\u00e9es. Tout c\u00e2blage expos\u00e9 ou panneau calcin\u00e9 doit \u00eatre mis hors tension dans les 24 heures suivant le signalement."
+      },
+      sw: {
+        title: "Viwango vya Usalama wa Umeme katika Maeneo ya Umma",
+        explanation:
+          "Maeneo ya umma na njia za watembea kwa miguu lazima yawe na vifaa vya umeme vilivyofunikwa ipasavyo. Waya wowote ulio wazi au paneli iliyoungua lazima itenganishwe na umeme ndani ya saa 24 baada ya kuripotiwa."
+      }
+    }
   },
   {
     id: "CIV-WATER-01",
@@ -854,9 +888,27 @@ export const DEMO_CIVIC_ITEMS: DemoCivicItem[] = [
     lastVerifiedOffsetMs: -60 * DAY,
     freshnessThresholdDays: 30,
     whatRemainsUncertain: ["The exact locations of emergency tankers are not always published in advance."],
-    nextActions: [{ label: "Contact Utility", type: "contact" }],
+    nextActions: [{ label: "Contact Utility", labelKey: "civic.action.contact_utility", type: "contact" }],
     relatedCaseIds: ["CS-1040"],
-    tags: ["water", "outage", "rights"]
+    tags: ["water", "outage", "rights"],
+    languageVersions: {
+      fr: {
+        whatRemainsUncertain: [
+          "Les emplacements exacts des citernes d'urgence ne sont pas toujours publi\u00e9s \u00e0 l'avance."
+        ],
+        title: "Droits en cas de coupure d'eau d'urgence",
+        explanation:
+          "Si une coupure d'eau municipale dure plus de 48 heures, le service des eaux est tenu de fournir des points d'eau de substitution ou des citernes aux communaut\u00e9s concern\u00e9es."
+      },
+      sw: {
+        whatRemainsUncertain: [
+          "Maeneo kamili ya magari ya maji ya dharura hayatangazwi mapema kila wakati."
+        ],
+        title: "Haki Wakati wa Kukatika kwa Maji kwa Dharura",
+        explanation:
+          "Iwapo kukatika kwa maji ya manispaa kunazidi saa 48, mamlaka ya maji inawajibika kutoa vituo mbadala vya maji au magari ya maji kwa jamii zilizoathirika."
+      }
+    }
   },
   {
     id: "CIV-MED-01",
@@ -876,9 +928,25 @@ export const DEMO_CIVIC_ITEMS: DemoCivicItem[] = [
     eligibility: "Residents of Kano Municipal",
     requirements: ["Both parties must agree to mediate", "Valid ID"],
     fees: "Free of charge",
-    nextActions: [{ label: "Apply for mediation", type: "apply" }],
+    nextActions: [{ label: "Apply for mediation", labelKey: "civic.action.apply_mediation", type: "apply" }],
     relatedCaseIds: ["CS-1044"],
-    tags: ["mediation", "dispute", "community"]
+    tags: ["mediation", "dispute", "community"],
+    languageVersions: {
+      fr: {
+        title: "Service communautaire de m\u00e9diation des litiges",
+        explanation:
+          "M\u00e9diation neutre et gratuite pour les litiges portant sur les ressources communes, les limites de terrain et le bruit de voisinage. La proc\u00e9dure est confidentielle et volontaire.",
+        eligibility: "R\u00e9sidents de la municipalit\u00e9 de Kano",
+        requirements: ["Les deux parties doivent accepter la m\u00e9diation", "Pi\u00e8ce d'identit\u00e9 en cours de validit\u00e9"]
+      },
+      sw: {
+        title: "Huduma ya Usuluhishi wa Migogoro ya Jamii",
+        explanation:
+          "Usuluhishi huru na bila malipo kwa migogoro inayohusu rasilimali za pamoja, mipaka ya ardhi na kelele za jirani. Utaratibu ni wa siri na wa hiari.",
+        eligibility: "Wakazi wa Manispaa ya Kano",
+        requirements: ["Pande zote mbili lazima zikubali kusuluhishwa", "Kitambulisho halali"]
+      }
+    }
   },
   {
     id: "CIV-POLICY-01",
@@ -898,9 +966,250 @@ export const DEMO_CIVIC_ITEMS: DemoCivicItem[] = [
     whatRemainsUncertain: [
       "Whether Phase 1 is actually complete, as public notices and procurement records disagree."
     ],
-    nextActions: [{ label: "Track related cases", type: "internal", href: "/community" }],
+    nextActions: [{ label: "Track related cases", labelKey: "civic.action.track_cases", type: "internal", href: "/community" }],
     relatedCaseIds: ["CS-1038"],
-    tags: ["project", "market", "budget"]
+    tags: ["project", "market", "budget"],
+    languageVersions: {
+      fr: {
+        whatRemainsUncertain: [
+          "Si la phase 1 est r\u00e9ellement achev\u00e9e : les avis publics et les dossiers de march\u00e9 se contredisent."
+        ],
+        title: "Programme de r\u00e9novation des halles de march\u00e9",
+        explanation:
+          "Projet financ\u00e9 par l'\u00c9tat pour r\u00e9nover 5 grandes halles de march\u00e9. La phase 1 couvre les r\u00e9parations structurelles, la phase 2 les am\u00e9nagements int\u00e9rieurs."
+      },
+      sw: {
+        whatRemainsUncertain: [
+          "Kama awamu ya kwanza imekamilika kweli: matangazo ya umma na kumbukumbu za manunuzi zinapingana."
+        ],
+        title: "Mpango wa Ukarabati wa Mabanda ya Soko",
+        explanation:
+          "Mradi unaofadhiliwa na serikali ya jimbo wa kukarabati mabanda makuu 5 ya soko. Awamu ya kwanza inahusu ukarabati wa msingi, awamu ya pili inahusu vifaa vya ndani."
+      }
+    }
+  },
+
+  // ── A second and third jurisdiction ──────────────────────────────────────────
+  //
+  // Civora's claim is that the same structure carries a different country's
+  // civic information, so the corpus exercises it rather than asserting it.
+  // These items are governed by different authorities at different levels, and
+  // their source language is not English: the Senegalese items are written in
+  // French by their issuing authority and the Tanzanian ones in Swahili, with
+  // the English base text as the translation. Nothing in the model prefers
+  // English — `languageVersions` carries whichever languages exist, and a
+  // reader whose language is missing is shown the source text, labelled.
+  {
+    id: "CIV-SN-ETAT-01",
+    title: "Replacing a lost birth certificate",
+    category: "procedure",
+    country: "Senegal",
+    region: "Dakar",
+    locality: "Dakar Plateau",
+    level: "local",
+    explanation:
+      "A duplicate birth certificate is issued by the civil registry office of the district where the birth was recorded, not where the applicant now lives. A request made at the wrong office is refused rather than forwarded.",
+    officialSource: "Bureau de l'\u00e9tat civil, Dakar Plateau",
+    sourceAuthority: "Municipal Authority",
+    publishedOffsetMs: -300 * DAY,
+    lastVerifiedOffsetMs: -8 * DAY,
+    freshnessThresholdDays: 60,
+    verificationMethod: "Confirmed against the municipal fee schedule and counter hours published for the current year.",
+    eligibility: "The person named on the record, a parent, or a legal guardian with proof of relationship.",
+    requirements: [
+      "The district where the birth was registered",
+      "Valid photo identification",
+      "Proof of relationship if applying on behalf of someone else"
+    ],
+    fees: "1,000 FCFA per copy",
+    deadlines: "Counter requests are processed within 5 working days.",
+    nextActions: [
+      { label: "Find your registry office", labelKey: "civic.action.find_registry", type: "link" },
+      { label: "Report a refused request", labelKey: "civic.action.report_refused_request", type: "report", href: "/report" }
+    ],
+    whatRemainsUncertain: [
+      "Whether offices outside Dakar charge the same fee \u2014 the published schedule covers the capital only."
+    ],
+    tags: ["civil registry", "birth certificate", "identity", "senegal"],
+    languageVersions: {
+      fr: {
+        whatRemainsUncertain: [
+          "Si les bureaux hors de Dakar appliquent le m\u00eame tarif \u2014 le bar\u00e8me publi\u00e9 ne couvre que la capitale."
+        ],
+        title: "Obtenir un duplicata d'acte de naissance",
+        explanation:
+          "Le duplicata d'un acte de naissance est d\u00e9livr\u00e9 par le bureau de l'\u00e9tat civil de la commune o\u00f9 la naissance a \u00e9t\u00e9 enregistr\u00e9e, et non celle o\u00f9 le demandeur r\u00e9side aujourd'hui. Une demande d\u00e9pos\u00e9e au mauvais bureau est refus\u00e9e et non transmise.",
+        eligibility: "La personne concern\u00e9e, un parent, ou un tuteur l\u00e9gal pouvant justifier du lien.",
+        requirements: [
+          "La commune d'enregistrement de la naissance",
+          "Une pi\u00e8ce d'identit\u00e9 avec photo en cours de validit\u00e9",
+          "Un justificatif de lien de parent\u00e9 en cas de demande pour un tiers"
+        ]
+      },
+      sw: {
+        whatRemainsUncertain: [
+          "Kama ofisi zilizo nje ya Dakar hutoza ada ile ile \u2014 orodha iliyochapishwa inahusu mji mkuu pekee."
+        ],
+        title: "Kupata nakala ya cheti cha kuzaliwa kilichopotea",
+        explanation:
+          "Nakala ya cheti cha kuzaliwa hutolewa na ofisi ya usajili wa raia ya eneo ambalo kuzaliwa kulisajiliwa, si eneo analoishi mwombaji sasa. Ombi linalowasilishwa ofisi isiyo sahihi hukataliwa badala ya kupelekwa mbele.",
+        eligibility: "Mtu aliyetajwa kwenye cheti, mzazi, au mlezi wa kisheria mwenye ushahidi wa uhusiano.",
+        requirements: [
+          "Eneo ambalo kuzaliwa kulisajiliwa",
+          "Kitambulisho halali chenye picha",
+          "Ushahidi wa uhusiano iwapo unaomba kwa niaba ya mtu mwingine"
+        ]
+      }
+    }
+  },
+  {
+    id: "CIV-SN-FORM-01",
+    title: "Vocational training places for young people",
+    category: "opportunity",
+    country: "Senegal",
+    level: "federal",
+    explanation:
+      "Funded places on six-month vocational courses are allocated twice a year. Places are allocated by application date within each region, not nationally, so a region's allocation can close while another still has places.",
+    officialSource: "Direction nationale de la formation professionnelle",
+    sourceAuthority: "National Directorate",
+    publishedOffsetMs: -220 * DAY,
+    lastVerifiedOffsetMs: -75 * DAY,
+    freshnessThresholdDays: 45,
+    verificationMethod: "Checked against the last published allocation circular. The circular for the coming intake has not been issued.",
+    eligibility: "Applicants aged 18\u201335 who are not currently in full-time education.",
+    requirements: ["Proof of age", "Evidence of residence in the region applied to"],
+    fees: "No application fee. Course materials are not covered.",
+    nextActions: [
+      { label: "Check your region's allocation", labelKey: "civic.action.check_allocation", type: "link" },
+      { label: "Contact the directorate", labelKey: "civic.action.contact_directorate", type: "contact" }
+    ],
+    whatRemainsUncertain: [
+      "The opening date of the next intake. The previous circular has expired and no replacement has been published.",
+      "Whether unused places in one region are reallocated to another."
+    ],
+    tags: ["training", "youth", "opportunity", "senegal"],
+    languageVersions: {
+      fr: {
+        whatRemainsUncertain: [
+          "La date d'ouverture de la prochaine session. La circulaire pr\u00e9c\u00e9dente a expir\u00e9 et aucune autre n'a \u00e9t\u00e9 publi\u00e9e.",
+          "Si les places non utilis\u00e9es dans une r\u00e9gion sont r\u00e9attribu\u00e9es \u00e0 une autre."
+        ],
+        title: "Places de formation professionnelle pour les jeunes",
+        explanation:
+          "Des places financ\u00e9es en formation professionnelle de six mois sont attribu\u00e9es deux fois par an. L'attribution se fait par date de d\u00e9p\u00f4t au sein de chaque r\u00e9gion, et non au niveau national : le quota d'une r\u00e9gion peut donc \u00eatre \u00e9puis\u00e9 alors qu'une autre dispose encore de places.",
+        eligibility: "Candidats de 18 \u00e0 35 ans qui ne suivent pas d'\u00e9tudes \u00e0 temps plein.",
+        requirements: ["Justificatif d'\u00e2ge", "Justificatif de r\u00e9sidence dans la r\u00e9gion demand\u00e9e"]
+      },
+      sw: {
+        whatRemainsUncertain: [
+          "Tarehe ya kuanza kwa awamu ijayo. Waraka uliopita umeisha muda na hakuna mwingine uliotolewa.",
+          "Kama nafasi zisizotumika katika mkoa mmoja hugawiwa upya mkoa mwingine."
+        ],
+        title: "Nafasi za mafunzo ya ufundi kwa vijana",
+        explanation:
+          "Nafasi zinazofadhiliwa katika kozi za ufundi za miezi sita hugawanywa mara mbili kwa mwaka. Ugawaji hufanyika kwa tarehe ya maombi ndani ya kila mkoa, si kitaifa, hivyo nafasi za mkoa mmoja zinaweza kuisha wakati mkoa mwingine bado una nafasi.",
+        eligibility: "Waombaji wenye umri wa miaka 18\u201335 ambao hawako masomoni kwa muda wote.",
+        requirements: ["Ushahidi wa umri", "Ushahidi wa makazi katika mkoa unaoombewa"]
+      }
+    }
+  },
+  {
+    id: "CIV-TZ-ARDHI-01",
+    title: "Taking a land boundary dispute to a ward tribunal",
+    category: "right",
+    country: "Tanzania",
+    region: "Dar es Salaam",
+    level: "state",
+    explanation:
+      "A boundary dispute between neighbours is heard first by the ward tribunal, which must attempt mediation before it rules. A case filed straight at the district land office is sent back, and the delay counts against no one.",
+    officialSource: "Ward Tribunal Secretariat, Dar es Salaam",
+    sourceAuthority: "Regional Authority",
+    publishedOffsetMs: -260 * DAY,
+    lastVerifiedOffsetMs: -12 * DAY,
+    freshnessThresholdDays: 60,
+    verificationMethod: "Confirmed against the tribunal's published sitting procedure and filing fee notice.",
+    eligibility: "Either party to the dispute, or a representative carrying written authority.",
+    requirements: [
+      "A written statement of the disputed boundary",
+      "Any document showing occupation or ownership",
+      "Names and addresses of both parties"
+    ],
+    fees: "Filing is free. A surveyor's report, if the tribunal orders one, is paid by the party that requested it.",
+    nextActions: [
+      { label: "Find your ward tribunal", labelKey: "civic.action.find_tribunal", type: "link" },
+      { label: "Report a refused filing", labelKey: "civic.action.report_refused_filing", type: "report", href: "/report" }
+    ],
+    tags: ["land", "dispute", "tribunal", "tanzania"],
+    languageVersions: {
+      sw: {
+        title: "Kupeleka mgogoro wa mpaka wa ardhi kwenye baraza la kata",
+        explanation:
+          "Mgogoro wa mpaka kati ya majirani husikilizwa kwanza na baraza la kata, ambalo lazima lijaribu usuluhishi kabla ya kutoa uamuzi. Shauri linalopelekwa moja kwa moja ofisi ya ardhi ya wilaya hurudishwa, na ucheleweshaji huo haumhesabiwi mtu yeyote.",
+        eligibility: "Upande wowote katika mgogoro, au mwakilishi mwenye idhini ya maandishi.",
+        requirements: [
+          "Maelezo ya maandishi ya mpaka unaobishaniwa",
+          "Hati yoyote inayoonyesha umiliki au matumizi",
+          "Majina na anwani za pande zote mbili"
+        ]
+      },
+      fr: {
+        title: "Porter un litige de bornage devant le tribunal de quartier",
+        explanation:
+          "Un litige de bornage entre voisins est d'abord examin\u00e9 par le tribunal de quartier, qui doit tenter une m\u00e9diation avant de statuer. Un dossier d\u00e9pos\u00e9 directement au service foncier du district est renvoy\u00e9, et ce d\u00e9lai n'est imput\u00e9 \u00e0 personne.",
+        eligibility: "L'une ou l'autre partie au litige, ou un repr\u00e9sentant muni d'une autorisation \u00e9crite.",
+        requirements: [
+          "Un expos\u00e9 \u00e9crit de la limite contest\u00e9e",
+          "Tout document attestant l'occupation ou la propri\u00e9t\u00e9",
+          "Les noms et adresses des deux parties"
+        ]
+      }
+    }
+  },
+  {
+    id: "CIV-TZ-MAJI-01",
+    title: "Who maintains a community water point",
+    category: "policy",
+    country: "Tanzania",
+    level: "federal",
+    explanation:
+      "A community water point is maintained by the registered water user association for that point, funded from the tariff it collects. Where no association is registered, responsibility sits with the district water engineer \u2014 which is the case for most points that have stopped working.",
+    officialSource: "National Water Supply Directorate",
+    sourceAuthority: "National Directorate",
+    publishedOffsetMs: -520 * DAY,
+    lastVerifiedOffsetMs: -140 * DAY,
+    freshnessThresholdDays: 60,
+    verificationMethod: "Last confirmed against the national maintenance policy. Two district circulars issued since then have not been reconciled with it.",
+    nextActions: [
+      { label: "Report a broken water point", labelKey: "civic.action.report_water_point", type: "report", href: "/report" },
+      { label: "Track related cases", labelKey: "civic.action.track_cases", type: "internal", href: "/community" }
+    ],
+    whatRemainsUncertain: [
+      "Whether the district circulars supersede the national policy on who pays for parts.",
+      "Which points have a registered association \u2014 no public register is published."
+    ],
+    tags: ["water", "maintenance", "policy", "tanzania"],
+    languageVersions: {
+      sw: {
+        whatRemainsUncertain: [
+          "Kama waraka wa wilaya unabatilisha sera ya kitaifa kuhusu nani analipia vipuri.",
+          "Ni vituo vipi vina jumuiya iliyosajiliwa \u2014 hakuna daftari la umma lililochapishwa."
+        ],
+        title: "Nani anayehudumia kituo cha maji cha jamii",
+        explanation:
+          "Kituo cha maji cha jamii huhudumiwa na jumuiya ya watumiaji maji iliyosajiliwa kwa kituo hicho, kwa kutumia ada inayokusanywa. Pale ambapo hakuna jumuiya iliyosajiliwa, jukumu ni la mhandisi wa maji wa wilaya \u2014 na hivyo ndivyo ilivyo kwa vituo vingi vilivyoacha kufanya kazi.",
+        requirements: []
+      },
+      fr: {
+        whatRemainsUncertain: [
+          "Si les circulaires du district l'emportent sur la politique nationale quant \u00e0 qui paie les pi\u00e8ces.",
+          "Quels points disposent d'une association enregistr\u00e9e \u2014 aucun registre public n'est publi\u00e9."
+        ],
+        title: "Qui entretient un point d'eau communautaire",
+        explanation:
+          "Un point d'eau communautaire est entretenu par l'association d'usagers de l'eau enregistr\u00e9e pour ce point, sur les recettes du tarif qu'elle per\u00e7oit. En l'absence d'association enregistr\u00e9e, la responsabilit\u00e9 incombe \u00e0 l'ing\u00e9nieur des eaux du district \u2014 ce qui est le cas de la plupart des points hors service.",
+        requirements: []
+      }
+    }
   }
 ];
 

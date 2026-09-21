@@ -2,6 +2,7 @@
 
 import { useLocale } from "@/components/system/LocaleProvider";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import type { NextAction } from "@/lib/civic-types";
 import { t } from "@/lib/i18n/i18n";
 
@@ -42,10 +43,23 @@ export function NextActionsPanel({ actions }: { actions: NextAction[] }) {
           );
         }
 
+        // No destination. A button that looks live and does nothing is worse
+        // on this panel than anywhere else in the product: the whole point of
+        // it is telling the reader where to go next. So it says what it is —
+        // an action the source names but whose address the corpus does not
+        // carry — rather than swallowing the click.
         return (
-          <Button key={idx} icon={iconName} variant={variant}>
+          <span
+            key={idx}
+            title={t("civic.action.no_destination.desc", locale)}
+            className="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-4 py-2 text-[14px] font-medium text-slate-500"
+          >
+            <Icon name={iconName} className="h-4 w-4" />
             {label}
-          </Button>
+            <span className="text-[12px] font-normal text-slate-400">
+              {t("civic.action.no_destination", locale)}
+            </span>
+          </span>
         );
       })}
     </div>
