@@ -10,6 +10,18 @@ response, and everyone can see what actually happened.
 > notices and documents are invented for evaluation. Fictional records are
 > labelled as such throughout the interface.
 
+## Try it
+
+**[civoraa.vercel.app](https://civoraa.vercel.app)** — running, seeded, no sign-up.
+
+| Where to start | What to look at |
+| --- | --- |
+| [Civic Explorer](https://civoraa.vercel.app/explore) | Eight civic items across Nigeria, Senegal and Tanzania, each carrying its source, its last verification date and what about it is still uncertain. Switch language in the sidebar: the items are written in French and Swahili, not machine-translated at read time. |
+| [Report](https://civoraa.vercel.app/report) | Seven steps. The review step states what stays private and what may be published, before you submit. Turn the browser offline and submit anyway — it queues and sends on reconnect. |
+| [Responder workspace](https://civoraa.vercel.app/responder) | Access code `civora-demo`. Open case **CS-1045**: a corroboration candidate for CS-1042 is waiting, with a per-signal breakdown. Confirm or reject it and watch what does *not* change. |
+| [Community board](https://civoraa.vercel.app/community) | Only cases a handler has published, in the fixed vocabulary of `src/lib/privacy.ts`. |
+| [`/api/health`](https://civoraa.vercel.app/api/health) | What the deployment can actually do, and what configuration is missing. |
+
 ---
 
 ## The distinction the product exists to protect
@@ -49,6 +61,11 @@ cp .env.example .env.local          # set DATABASE_URL and SESSION_SECRET
 npm run setup                       # prisma migrate deploy && prisma db seed
 npm run dev                         # http://localhost:3000
 ```
+
+`.env.local` is the file Next.js reads and the one `.gitignore` keeps out of the
+repository, so it is the only one you need: `scripts/load-env.ts` gives the
+Prisma tooling the same precedence the application uses — the real environment
+first, then `.env.local`, then `.env`.
 
 Civora needs PostgreSQL. With Docker:
 
@@ -279,6 +296,11 @@ endpoint returns the original text with an explanation in the reader's
 language. Civora supports exactly the languages its interface offers: English,
 Swahili and French.
 
+Machine translation is the fallback, not the first answer. A civic item that
+carries a written translation for the reader's language shows it directly and
+says where it came from; the model is offered only for an item that has none.
+The two are never presented as the same thing.
+
 Every AI route is rate limited, size limited, timed out, and subject to a
 deployment-wide daily quota.
 
@@ -327,6 +349,12 @@ Integration and security suites run against a real PostgreSQL database
 (`TEST_DATABASE_URL`, falling back to `DATABASE_URL`) because the guarantees
 under test — transactions, unique constraints, the case-number sequence —
 do not exist in a mock.
+
+The suites truncate every table they touch, and that fallback is the sharp
+edge: with only `DATABASE_URL` set, `npm test` empties the database you have
+been developing against, and the demo corpus goes with it. Point
+`TEST_DATABASE_URL` at a separate database, or re-run `npm run db:seed`
+afterwards.
 
 What is covered: token hashing and comparison, state transitions, closure
 rules, matching (including the false positives it must *not* produce), the
@@ -450,7 +478,7 @@ empty and mismatched. Check those separately, from a browser you are not already
 signed in to, or with:
 
 ```bash
-curl -s https://your-deployment/api/civic     # expect four items, not []
+curl -s https://your-deployment/api/civic     # expect eight items, not []
 curl -s -X POST https://your-deployment/api/responder/session \
   -H 'Content-Type: application/json' \
   -H 'Origin: https://your-deployment' \
@@ -484,8 +512,11 @@ Honest notes on what is not finished:
 - **Matching is lexical.** Token overlap with stop-word filtering and weighted
   location signals; no embeddings, no geospatial index. It proposes, a person
   decides.
-- **Civic information is demo data.** The corpus is fictional and labelled.
-  Real deployments need a real ingestion and re-verification process.
+- **Civic information is demo data.** The corpus is fictional and labelled. It
+  spans three countries, two source languages and every freshness state the
+  model can express, which is enough to exercise the structure and nowhere near
+  enough to be useful to anyone. Real deployments need a real ingestion and
+  re-verification process; there is none.
 - **No push notifications or email.** A reporter learns about a response by
   opening their case page.
 - **Evidence virus scanning is not implemented.** Type and size are validated;
