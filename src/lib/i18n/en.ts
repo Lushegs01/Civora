@@ -749,7 +749,7 @@ const en = {
   "landing.trust.evidence_linked": "Evidence stays linked to its source",
   "landing.trust.evidence_desc": "Every item in the chain records where it came from, when it arrived and a checksum of its contents.",
   "landing.trust.integrity": "Integrity",
-  "landing.trust.sealed": "Checksums recorded on arrival",
+  "landing.trust.sealed": "Sealed on arrival",
   "landing.trust.zk_identity": "Identity kept separate from the case",
   "landing.trust.no_hidden": "Nothing hidden",
   "landing.trust.no_hidden_desc": "Where records disagree, the disagreement is published alongside them.",

@@ -259,7 +259,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
                         <Icon name="camera" className="h-3.5 w-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate text-xs font-bold text-[#0B1F14]">evidence_photo_01.jpg</div>
+                        <div className="truncate text-xs font-bold text-[#0B1F14]">photo_01.jpg</div>
                         <div className="truncate font-mono text-[10px] text-ink-soft">2.4 MB · {t("evidence.source.citizen", locale)}</div>
                       </div>
                     </div>

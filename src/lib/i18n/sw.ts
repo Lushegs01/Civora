@@ -745,7 +745,7 @@ const sw: Record<keyof typeof en, string> = {
   "landing.trust.evidence_linked": "Ushahidi hubaki umeunganishwa na chanzo chake",
   "landing.trust.evidence_desc": "Kila kipengele katika mnyororo hurekodi kilikotoka, kilipowasili, na alama ya uthibitisho ya maudhui yake.",
   "landing.trust.integrity": "Uadilifu",
-  "landing.trust.sealed": "Alama za uthibitisho hurekodiwa zinapowasili",
+  "landing.trust.sealed": "Imetiwa muhuri ilipowasili",
   "landing.trust.zk_identity": "Utambulisho hubaki mbali na kesi",
   "landing.trust.no_hidden": "Hakuna kinachofichwa",
   "landing.trust.no_hidden_desc": "Pale kumbukumbu zinapotofautiana, tofauti hiyo huchapishwa pamoja nazo.",

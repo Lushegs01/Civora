@@ -745,7 +745,7 @@ const fr: Record<keyof typeof en, string> = {
   "landing.trust.evidence_linked": "Les preuves restent liées à leur source",
   "landing.trust.evidence_desc": "Chaque élément de la chaîne enregistre sa provenance, son heure d'arrivée et une somme de contrôle de son contenu.",
   "landing.trust.integrity": "Intégrité",
-  "landing.trust.sealed": "Sommes de contrôle enregistrées à l'arrivée",
+  "landing.trust.sealed": "Scellé à l'arrivée",
   "landing.trust.zk_identity": "L'identité reste séparée du dossier",
   "landing.trust.no_hidden": "Rien n'est caché",
   "landing.trust.no_hidden_desc": "Lorsque les sources divergent, le désaccord est publié avec elles.",
