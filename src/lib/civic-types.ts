@@ -4,14 +4,19 @@
 // freshness) so the UI can show *why* information is trusted, not just *that*
 // it is trusted. Product Rule: AI never determines verification status.
 
-export type CivicCategory =
-  | "service"
-  | "right"
-  | "policy"
-  | "opportunity"
-  | "project"
-  | "safety"
-  | "procedure";
+// Declared as const arrays first so the importer can validate against exactly
+// the values the type allows — one list, not a type and a hand-kept copy of it.
+export const CIVIC_CATEGORIES = [
+  "service",
+  "right",
+  "policy",
+  "opportunity",
+  "project",
+  "safety",
+  "procedure"
+] as const;
+
+export type CivicCategory = (typeof CIVIC_CATEGORIES)[number];
 
 export type FreshnessState =
   | "current"       // Verified recently
@@ -19,7 +24,9 @@ export type FreshnessState =
   | "outdated"      // Source known to have changed or too old
   | "conflicting";  // Multiple credible sources disagree
 
-export type JurisdictionLevel = "federal" | "state" | "local";
+export const JURISDICTION_LEVELS = ["federal", "state", "local"] as const;
+
+export type JurisdictionLevel = (typeof JURISDICTION_LEVELS)[number];
 
 export interface Jurisdiction {
   country: string;
