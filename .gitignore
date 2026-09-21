@@ -10,3 +10,4 @@ data/uploads
 *.tsbuildinfo
 .DS_Store
 .data
+.vercel
