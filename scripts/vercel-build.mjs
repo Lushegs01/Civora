@@ -55,20 +55,38 @@ if (databaseUrl) {
 // deployment serving, so the visible result is a red build rather than a site
 // that quietly went up without the data it was redeployed to load.
 if (bool(process.env.CIVORA_SEED_ON_BUILD)) {
-  if (!databaseUrl) {
+  // A connected Vercel store injects the same connection string into preview
+  // builds as into production, so a preview that seeds "its own" database in
+  // fact wipes production's. Adding a variable in the dashboard applies it to
+  // every environment unless told otherwise, which makes that the easy mistake
+  // rather than an unlikely one — so the environment is checked here instead
+  // of trusting the variable to have been scoped correctly.
+  //
+  // Skipped rather than fatal: the preview build itself is sound, only the
+  // seeding was misdirected, and failing it would redden every pull request.
+  const vercelEnv = process.env.VERCEL_ENV;
+  if (vercelEnv && vercelEnv !== "production") {
+    console.warn(
+      `CIVORA_SEED_ON_BUILD is set on a ${vercelEnv} deployment — refusing to ` +
+        "seed. Preview and development builds usually receive the production " +
+        "database's connection string, so seeding here would delete production " +
+        "data. Scope the variable to the production environment only."
+    );
+  } else if (!databaseUrl) {
     console.error(
       "CIVORA_SEED_ON_BUILD is set but no database connection string was found. " +
         "Connect a Postgres store, or unset the variable."
     );
     process.exit(1);
+  } else {
+    console.warn(
+      "CIVORA_SEED_ON_BUILD is set: replacing the database contents with the " +
+        "fictional demo corpus. Every existing case, report and evidence record " +
+        "is deleted first. Remove this variable once the seed has run — while it " +
+        "is set, every redeploy repeats the wipe."
+    );
+    run("npx", ["tsx", "prisma/seed.ts"]);
   }
-  console.warn(
-    "CIVORA_SEED_ON_BUILD is set: replacing the database contents with the " +
-      "fictional demo corpus. Every existing case, report and evidence record " +
-      "is deleted first. Remove this variable once the seed has run — while it " +
-      "is set, every redeploy repeats the wipe."
-  );
-  run("npx", ["tsx", "prisma/seed.ts"]);
 }
 
 run("npx", ["next", "build"]);

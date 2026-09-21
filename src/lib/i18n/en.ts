@@ -2,7 +2,12 @@
 // Every key used in the UI should appear here. Other locales fall back to
 // English for any missing key. Keys are dot-separated namespaces.
 
-const en: Record<string, string> = {
+// Deliberately unannotated. `Record<string, string>` makes `keyof typeof en`
+// resolve to `string`, so fr.ts and sw.ts — which both declare themselves
+// `Record<keyof typeof en, string>` — would accept any subset of these keys
+// without complaint. They sat at 341 of 834 for exactly that reason. With the
+// keys left literal, a dictionary missing one of them fails to compile.
+const en = {
   // ── Navigation ──────────────────────────────────────────────────────────────
   "nav.home": "Home",
   "nav.cases": "My cases",

@@ -421,6 +421,15 @@ variable is explicitly truthy, and it fails the build rather than deploying
 without the data it was asked to load — Vercel keeps the previous deployment
 serving, so a failure shows up as a red build, not as a site that went down.
 
+The `production` in those commands is not decoration. A connected Vercel store
+injects the same connection string into preview builds as into production, so a
+preview deployment that seeded would be deleting production's data — and adding
+a variable through the dashboard applies it to every environment unless you say
+otherwise, which makes that the easy mistake rather than an unlikely one. The
+build therefore reads `VERCEL_ENV` and refuses to seed anything that is not a
+production deployment, saying why in the build log and continuing, so an
+opened pull request does not turn red for it.
+
 Leaving the variable set is the thing to avoid: the seed deletes every case
 before it writes, so each subsequent deploy would discard whatever has been
 reported in between. Use it once, then remove it.

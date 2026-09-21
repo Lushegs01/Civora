@@ -5,6 +5,7 @@ import en from "@/lib/i18n/en";
 import sw from "@/lib/i18n/sw";
 import fr from "@/lib/i18n/fr";
 import { t } from "@/lib/i18n/i18n";
+import type { Locale } from "@/lib/i18n/i18n";
 
 // A civic product that renders "case.timeline" as a heading has lost the
 // reader before it has said anything. This suite is the guard: every key the
@@ -75,15 +76,33 @@ describe("translation coverage", () => {
     expect(t("still.unknown", "en", "Written fallback")).toBe("Written fallback");
   });
 
-  it("falls back to English for a locale that has not been translated yet", () => {
-    // Honest degradation: the reader sees correct English, never invented text.
-    expect(t("case.timeline", "sw")).toBe(en["case.timeline"]);
+  it("serves every English key in both translated locales", () => {
+    // fr and sw sat at 41% for a while, so more than half the interface
+    // silently rendered English to a reader who had chosen another language.
+    // Parity is the guarantee now: a new English key cannot ship without its
+    // translations, because this fails.
+    const locales: Array<[string, Record<string, string>]> = [
+      ["fr", fr],
+      ["sw", sw]
+    ];
+    for (const [name, dictionary] of locales) {
+      const missing = Object.keys(en).filter((key) => !dictionary[key]);
+      expect(missing, `${name} is missing translations`).toEqual([]);
+    }
+  });
+
+  it("falls back to English for a locale with no dictionary of its own", () => {
+    // Honest degradation: the reader sees correct English, never invented
+    // text. Exercised through an unknown locale, since fr and sw are complete.
+    expect(t("case.timeline", "xx" as Locale)).toBe(en["case.timeline"]);
   });
 
   it("uses the translation when one exists", () => {
-    const translated = Object.keys(sw).find((key) => sw[key] !== en[key] && key in en);
+    const swahili: Record<string, string> = sw;
+    const english: Record<string, string> = en;
+    const translated = Object.keys(swahili).find((key) => swahili[key] !== english[key]);
     expect(translated).toBeTruthy();
-    expect(t(translated!, "sw")).toBe(sw[translated!]);
+    expect(t(translated!, "sw")).toBe(swahili[translated!]);
   });
 });
 
