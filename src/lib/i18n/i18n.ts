@@ -30,7 +30,7 @@ const warned = new Set<string>();
  */
 export function t(key: string, locale: Locale = "en", fallback?: string): string {
   const dictionary = dictionaries[locale] ?? dictionaries.en;
-  const value = dictionary[key] ?? en[key];
+  const value = dictionary[key] ?? dictionaries.en[key];
   if (value) return value;
   if (fallback) return fallback;
 

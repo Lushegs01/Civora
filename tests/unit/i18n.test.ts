@@ -81,10 +81,11 @@ describe("translation coverage", () => {
     // silently rendered English to a reader who had chosen another language.
     // Parity is the guarantee now: a new English key cannot ship without its
     // translations, because this fails.
-    for (const [name, dictionary] of [
+    const locales: Array<[string, Record<string, string>]> = [
       ["fr", fr],
       ["sw", sw]
-    ] as const) {
+    ];
+    for (const [name, dictionary] of locales) {
       const missing = Object.keys(en).filter((key) => !dictionary[key]);
       expect(missing, `${name} is missing translations`).toEqual([]);
     }
@@ -97,9 +98,11 @@ describe("translation coverage", () => {
   });
 
   it("uses the translation when one exists", () => {
-    const translated = Object.keys(sw).find((key) => sw[key] !== en[key] && key in en);
+    const swahili: Record<string, string> = sw;
+    const english: Record<string, string> = en;
+    const translated = Object.keys(swahili).find((key) => swahili[key] !== english[key]);
     expect(translated).toBeTruthy();
-    expect(t(translated!, "sw")).toBe(sw[translated!]);
+    expect(t(translated!, "sw")).toBe(swahili[translated!]);
   });
 });
 
