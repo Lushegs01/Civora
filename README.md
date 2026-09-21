@@ -400,6 +400,31 @@ vercel env pull .env.vercel
 DOTENV_CONFIG_PATH=.env.vercel npm run db:seed
 ```
 
+That prefix is POSIX shell. In Windows `cmd`, set the variable on its own line
+first (`set DOTENV_CONFIG_PATH=.env.vercel`), and do not fold it onto the same
+line with `&&` — the space before `&&` becomes part of the value, and the seed
+then fails looking for a file whose name ends in a space.
+
+When the hosted database cannot be reached from a developer's machine at all,
+the build can seed instead. Set `CIVORA_SEED_ON_BUILD=true` in the project's
+environment, redeploy, then **remove the variable**:
+
+```bash
+vercel env add CIVORA_SEED_ON_BUILD production   # true
+# redeploy, confirm /api/civic returns items, then:
+vercel env rm CIVORA_SEED_ON_BUILD production
+```
+
+`scripts/vercel-build.mjs` runs the seed after migrations and before
+`next build`, using the connection string Vercel injects. It is off unless the
+variable is explicitly truthy, and it fails the build rather than deploying
+without the data it was asked to load — Vercel keeps the previous deployment
+serving, so a failure shows up as a red build, not as a site that went down.
+
+Leaving the variable set is the thing to avoid: the seed deletes every case
+before it writes, so each subsequent deploy would discard whatever has been
+reported in between. Use it once, then remove it.
+
 The seed prints a generated responder password once, and it is the only thing
 that creates accounts — without it a fresh deployment has no users at all, so
 there is no way to sign in as a responder. Seeding does not turn demo mode on;
