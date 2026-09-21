@@ -18,6 +18,33 @@ function isPooled(url: string): boolean {
   return /[-.]pooler\.|pgbouncer=true/.test(url);
 }
 
+/**
+ * Neon serves both endpoints from one hostname bar an infix:
+ * `ep-foo-pooler.region.neon.tech` pools, `ep-foo.region.neon.tech` does not.
+ * A project connected through the Neon integration can end up with only the
+ * pooled URL injected, and then there is no direct endpoint to find under any
+ * variable name — migrations fail on the advisory lock with nothing in the
+ * environment to fix it.
+ *
+ * Dropping the infix reaches the direct endpoint. This is a guess and is
+ * scoped like one: Neon hostnames only, and only once every configured
+ * candidate has turned out to be pooled. A wrong guess fails exactly where
+ * the pooled URL already fails, so it costs nothing to try. Setting
+ * DATABASE_URL_UNPOOLED or DIRECT_URL explicitly is better and skips it.
+ */
+function deriveNeonDirect(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.endsWith(".neon.tech")) return null;
+    if (!parsed.hostname.includes("-pooler.")) return null;
+    parsed.hostname = parsed.hostname.replace("-pooler.", ".");
+    parsed.searchParams.delete("pgbouncer");
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function selectMigrationUrl(env: Record<string, string | undefined> = process.env): string {
   const candidates = [
     env.DIRECT_URL,
@@ -29,8 +56,19 @@ export function selectMigrationUrl(env: Record<string, string | undefined> = pro
     .map((url) => url?.trim())
     .filter((url): url is string => Boolean(url));
 
-  // Prefer any direct endpoint over the first-named one.
-  return candidates.find((url) => !isPooled(url)) ?? candidates[0] ?? "";
+  // A direct endpoint someone configured beats anything inferred.
+  const configured = candidates.find((url) => !isPooled(url));
+  if (configured) return configured;
+
+  for (const url of candidates) {
+    const derived = deriveNeonDirect(url);
+    if (derived) return derived;
+  }
+
+  // Everything is pooled and nothing could be derived. Hand back the pooled
+  // URL so migrate fails loudly, rather than skipping migrations and serving
+  // an unmigrated database.
+  return candidates[0] ?? "";
 }
 
 const migrationUrl = selectMigrationUrl();

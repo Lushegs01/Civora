@@ -175,15 +175,48 @@ describe("migration connection selection", () => {
     expect(selectMigrationUrl({ DIRECT_URL: flagged, DATABASE_URL: DIRECT })).toBe(DIRECT);
   });
 
-  it("falls back to the pooled URL rather than nothing when it is all there is", async () => {
-    // Better to attempt the migration and fail loudly than to skip it and
-    // deploy against an unmigrated database.
-    const { selectMigrationUrl } = await import("../../prisma.config");
-    expect(selectMigrationUrl({ DATABASE_URL: POOLED })).toBe(POOLED);
-  });
-
   it("returns empty when no connection string is configured", async () => {
     const { selectMigrationUrl } = await import("../../prisma.config");
     expect(selectMigrationUrl({})).toBe("");
+  });
+
+  it("derives Neon's direct endpoint when only the pooled URL is injected", async () => {
+    // The deployment this was written for: Neon's integration injected
+    // DATABASE_URL alone, so no variable held a direct endpoint and migrate
+    // timed out on the advisory lock with nothing in the environment to fix.
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    const chosen = selectMigrationUrl({
+      DATABASE_URL:
+        "postgresql://u:p@ep-twilight-flower-b4gup7z0-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&pgbouncer=true"
+    });
+    expect(chosen).toContain("ep-twilight-flower-b4gup7z0.c-6.us-east-2.aws.neon.tech");
+    expect(chosen).not.toContain("-pooler.");
+    expect(chosen).not.toContain("pgbouncer=true");
+    expect(chosen).toContain("sslmode=require");
+  });
+
+  it("keeps a configured direct endpoint rather than deriving one", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    expect(
+      selectMigrationUrl({ DATABASE_URL: POOLED, POSTGRES_URL_NON_POOLING: DIRECT })
+    ).toBe(DIRECT);
+  });
+
+  it("hands back a pooler it cannot derive from, rather than nothing", async () => {
+    // Supabase's direct endpoint is a different hostname, not the same one
+    // with an infix removed, so guessing would point at nothing. Returning
+    // the pooled URL lets migrate fail loudly, which beats skipping
+    // migrations and serving an unmigrated database.
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    const supabase = "postgresql://u:p@aws-0-eu-west-1.pooler.supabase.com:6543/postgres";
+    expect(selectMigrationUrl({ DATABASE_URL: supabase })).toBe(supabase);
+  });
+
+  it("preserves credentials when deriving", async () => {
+    const { selectMigrationUrl } = await import("../../prisma.config");
+    const chosen = selectMigrationUrl({
+      DATABASE_URL: "postgresql://civora:pa%24s@ep-x-pooler.c-6.aws.neon.tech/neondb"
+    });
+    expect(chosen).toContain("civora:pa%24s@");
   });
 });
