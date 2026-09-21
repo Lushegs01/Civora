@@ -44,7 +44,7 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
         {/* Hero */}
         <section className="relative flex flex-col items-center text-center pb-14 pt-10 md:pb-20 md:pt-16">
           {/* Subtle radial glow background behind hero */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/8 blur-[100px]" aria-hidden="true" />
+          <div className="pointer-events-none absolute start-1/2 top-1/2 -z-10 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/8 blur-[100px]" aria-hidden="true" />
           
           <div className="mb-6 flex items-center justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1.5 text-[11px] font-medium text-ink-soft shadow-sm backdrop-blur">
@@ -98,7 +98,7 @@ export function HomeContent({ openCases, awaitingResponse, resolved }: { openCas
           </div>
           <div className="card grid grid-cols-3 divide-x divide-line">
             {snapshot.map((s) => (
-              <div key={s.label} className="px-4 py-5 text-center sm:px-6 sm:text-left">
+              <div key={s.label} className="px-4 py-5 text-center sm:px-6 sm:text-start">
                 <span className={`mx-auto mb-3 flex h-9 w-9 items-center justify-center rounded-full sm:mx-0 ${s.tone}`}>
                   <Icon name={s.icon} className="h-4 w-4" />
                 </span>

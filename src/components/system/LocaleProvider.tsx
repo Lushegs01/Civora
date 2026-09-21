@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LOCALES, type Locale } from "@/lib/validation/schemas";
+import { localeDirection } from "@/lib/i18n/i18n";
 
 interface LocaleContextValue {
   locale: Locale;
@@ -39,8 +40,17 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Keep the document language in step so assistive technology announces
-    // content in the right voice.
+    // content in the right voice, and the direction with it.
+    //
+    // Setting `dir` on <html> is what flips the layout for Arabic. It only
+    // works because the components were converted from physical Tailwind
+    // classes to logical ones — ms/me, ps/pe, start/end, text-start — which
+    // resolve against this attribute. With ml-4 and text-left the document
+    // direction would change and the layout would stay stubbornly
+    // left-to-right, which is the usual way "we support RTL" turns out to
+    // mean the text merely runs backwards inside a Western layout.
     document.documentElement.lang = locale;
+    document.documentElement.dir = localeDirection(locale);
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {

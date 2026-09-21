@@ -515,7 +515,7 @@ function CategoryStep({ data, onChange }: { data: WizardData; onChange: (p: Part
               onClick={() => onChange({ category: key })}
               aria-pressed={active}
               className={cn(
-                "press flex min-h-11 items-start gap-3 rounded-card border px-4 py-4 text-left",
+                "press flex min-h-11 items-start gap-3 rounded-card border px-4 py-4 text-start",
                 active
                   ? "border-brand bg-brand-soft/60 ring-2 ring-brand/20"
                   : "border-line bg-surface hover:bg-muted/60"
@@ -619,7 +619,7 @@ function LocationStep({ data, onChange }: { data: WizardData; onChange: (p: Part
           onClick={useCurrent}
           disabled={locating}
           className={cn(
-            "press flex min-h-14 w-full items-center gap-3 rounded-card border px-4 text-left",
+            "press flex min-h-14 w-full items-center gap-3 rounded-card border px-4 text-start",
             data.coordinates ? "border-brand bg-brand-soft/50" : "border-line bg-surface hover:bg-muted/60"
           )}
         >
@@ -656,7 +656,7 @@ function LocationStep({ data, onChange }: { data: WizardData; onChange: (p: Part
 
         <button
           onClick={() => onChange({ locationGeneral: "", coordinates: undefined })}
-          className="press min-h-11 w-full rounded-card border border-line bg-surface px-4 py-3 text-left text-[14.5px] font-semibold text-ink hover:bg-muted/60"
+          className="press min-h-11 w-full rounded-card border border-line bg-surface px-4 py-3 text-start text-[14.5px] font-semibold text-ink hover:bg-muted/60"
         >
           {t("report.location.skip", locale)}
           <span className="mt-0.5 block text-xs font-normal text-ink-soft">
@@ -693,7 +693,7 @@ function TimeStep({ data, onChange }: { data: WizardData; onChange: (p: Partial<
               onClick={() => onChange({ incidentChoice: o.key })}
               aria-pressed={active}
               className={cn(
-                "press flex min-h-14 w-full items-center gap-3 rounded-card border px-4 text-left",
+                "press flex min-h-14 w-full items-center gap-3 rounded-card border px-4 text-start",
                 active ? "border-brand bg-brand-soft/50 ring-2 ring-brand/15" : "border-line bg-surface hover:bg-muted/60"
               )}
             >
@@ -863,7 +863,7 @@ function PrivacyStep({ data, onChange }: { data: WizardData; onChange: (p: Parti
               onClick={() => onChange({ privacyMode: key })}
               aria-pressed={active}
               className={cn(
-                "press flex w-full items-start gap-3 rounded-card border px-4 py-4 text-left",
+                "press flex w-full items-start gap-3 rounded-card border px-4 py-4 text-start",
                 active ? "border-brand bg-brand-soft/50 ring-2 ring-brand/15" : "border-line bg-surface hover:bg-muted/60"
               )}
             >
@@ -1219,7 +1219,7 @@ function OutcomeScreen({
       {/* Possible corroboration is reported as exactly that: a candidate a
           person still has to confirm. It is never announced as verification. */}
       {outcome.possibleMatches.length > 0 && (
-        <div className="mt-5 w-full rounded-card border border-info/30 bg-info-soft/40 px-4 py-3.5 text-left">
+        <div className="mt-5 w-full rounded-card border border-info/30 bg-info-soft/40 px-4 py-3.5 text-start">
           <p className="flex gap-2 text-[13px] leading-relaxed text-ink">
             <Icon name="search" className="mt-0.5 h-4 w-4 shrink-0 text-info" />
             <span>
@@ -1237,16 +1237,16 @@ function OutcomeScreen({
       )}
 
       {!outcome.publicVisible && (
-        <p className="mt-4 w-full rounded-card bg-muted px-4 py-3 text-left text-[12.5px] leading-relaxed text-ink-soft">
-          <Icon name="eye-off" className="mr-1.5 inline h-3.5 w-3.5" />
+        <p className="mt-4 w-full rounded-card bg-muted px-4 py-3 text-start text-[12.5px] leading-relaxed text-ink-soft">
+          <Icon name="eye-off" className="me-1.5 inline h-3.5 w-3.5" />
           {t("report.outcome.screening", locale) ||
             "Your case is not on the public board. It is held for review first — you can always see it here, and so can the organization handling it."}
         </p>
       )}
 
       {outcome.attachmentsFailed > 0 && (
-        <p role="alert" className="mt-4 w-full rounded-card bg-warning-soft px-4 py-3 text-left text-[12.5px] leading-relaxed text-ink">
-          <Icon name="triangle-alert" className="mr-1.5 inline h-3.5 w-3.5 text-warning" />
+        <p role="alert" className="mt-4 w-full rounded-card bg-warning-soft px-4 py-3 text-start text-[12.5px] leading-relaxed text-ink">
+          <Icon name="triangle-alert" className="me-1.5 inline h-3.5 w-3.5 text-warning" />
           {(t("report.outcome.attachments_failed", locale) ||
             "{count} attachment(s) didn't upload. Your report was recorded — open the case to attach them again.").replace(
             "{count}",
@@ -1256,7 +1256,7 @@ function OutcomeScreen({
       )}
 
       {outcome.recoveryCode && (
-        <div className="mt-5 w-full rounded-card border border-brand/30 bg-brand-soft/40 px-4 py-4 text-left">
+        <div className="mt-5 w-full rounded-card border border-brand/30 bg-brand-soft/40 px-4 py-4 text-start">
           <p className="text-[13px] font-semibold text-ink">
             {t("report.outcome.recovery.title", locale) || "Your one-time recovery code"}
           </p>

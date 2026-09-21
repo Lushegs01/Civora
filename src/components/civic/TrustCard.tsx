@@ -5,7 +5,9 @@ import { JurisdictionBadge } from "./JurisdictionBadge";
 import { NextActionsPanel } from "./NextActionsPanel";
 import { AiTranslateCard } from "./AiTranslateCard";
 import { AiExplainCard } from "./AiExplainCard";
+import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
+import { VerificationBadge } from "@/components/ui/Badges";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import type { CivicInfoView } from "@/lib/dto/civic";
 import { CIVIC_CATEGORY_META } from "@/lib/civic-types";
@@ -113,7 +115,7 @@ export function TrustCard({
                 <Icon name="list-checks" className="h-4 w-4" />
                 {t("trustcard.requirements", locale)}
               </h3>
-              <ul className="mt-2 text-slate-700 list-disc pl-5">
+              <ul className="mt-2 text-slate-700 list-disc ps-5">
                 {localizedContent.requirements.map((req, i) => (
                   <li key={i}>{req}</li>
                 ))}
@@ -127,9 +129,37 @@ export function TrustCard({
                 <Icon name="help-circle" className="h-4 w-4" />
                 {t("trustcard.what_uncertain", locale)}
               </h3>
-              <ul className="mt-2 text-orange-900 list-disc pl-5">
+              <ul className="mt-2 text-orange-900 list-disc ps-5">
                 {localizedContent.whatRemainsUncertain.map((unc, i) => (
                   <li key={i}>{unc}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {item.relatedCases.length > 0 && (
+            <div className="not-prose mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-700">
+                <Icon name="folder" className="h-4 w-4" />
+                {t("trustcard.related_cases", locale)}
+              </h3>
+              <p className="mt-1 text-[13px] text-slate-500">
+                {t("trustcard.related_cases.desc", locale)}
+              </p>
+              <ul className="mt-3 space-y-2">
+                {item.relatedCases.map((c) => (
+                  <li key={c.publicCaseId}>
+                    <Link
+                      href={`/community/${c.publicCaseId}`}
+                      className="group flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      <span className="font-mono text-[13px] font-medium text-brand-deep group-hover:underline">
+                        {c.publicCaseId}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-[14px] text-slate-800">{c.title}</span>
+                      <VerificationBadge state={c.verification} size="sm" />
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>

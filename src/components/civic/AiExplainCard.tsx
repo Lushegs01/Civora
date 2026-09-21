@@ -51,7 +51,7 @@ export function AiExplainCard({ text }: { text: string }) {
       <button
         onClick={toggle}
         aria-expanded={isOpen}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-blue-100"
+        className="flex w-full items-center justify-between p-4 text-start transition-colors hover:bg-blue-100"
       >
         <span className="flex items-center gap-2 font-medium text-blue-900">
           <Icon name="sparkles" className="h-5 w-5 text-blue-600" />

@@ -279,6 +279,48 @@ jitter. One permanently failing report never blocks the rest of the queue.
 Tabs coordinate over a Web Lock and broadcast outcomes to each other, so two
 open tabs cannot submit the same report twice and both show the same result.
 
+## Languages and direction
+
+Four: English, Swahili, French and Arabic. Every key exists in every
+dictionary — 901 of them — and the coverage test derives the list from
+`LOCALES`, so a fifth language cannot ship half-translated and a new key
+cannot ship English-only.
+
+Arabic is the reason the interface has a direction at all. `localeDirection`
+sets `dir` on `<html>`, and the components use logical CSS properties —
+`ms`/`me`, `ps`/`pe`, `start`/`end`, `text-start` — rather than physical ones.
+That distinction is the whole of it: with `ml-4` and `text-left`, setting `dir`
+makes the text run right-to-left inside a layout that stubbornly stays Western.
+A test fails if a physical class returns.
+
+Civic information carries its own translations, separate from the interface.
+A written translation is shown with a badge saying so; machine translation is
+offered only for an item that has none, and the two are never conflated.
+
+## Adding a jurisdiction
+
+Civic information imports from a JSON file, so adapting Civora for another
+community is a data task rather than a pull request:
+
+```bash
+npm run civic:import -- examples/civic-ghana.json --dry-run   # validate only
+npm run civic:import -- examples/civic-ghana.json             # upsert by id
+```
+
+`examples/civic-ghana.json` is a worked example. The schema is strict about
+provenance — issuing body, kind of authority, publication date, verification
+date and the method used are all required, and an item that lacks them is
+rejected rather than rendered with an empty source line. It also refuses a
+verification date earlier than publication or in the future, an unrecognized
+field, and the same id twice. Every bad item is reported at once.
+
+`fictional` has no default. A demo corpus and a real one must not be
+distinguishable only by whether someone remembered to say which this is.
+
+Re-running is safe: items upsert by id, so a correction updates in place.
+`--replace` deletes only the ids the file names, so one jurisdiction's corpus
+cannot remove another's.
+
 ## AI
 
 AI is advisory and has no write surface. It can summarize, explain and
@@ -311,7 +353,7 @@ provider — never the reporter's own words.
 Translation is either real or absent. When no provider is configured, the
 endpoint returns the original text with an explanation in the reader's
 language. Civora supports exactly the languages its interface offers: English,
-Swahili and French.
+Swahili, French and Arabic.
 
 Machine translation is the fallback, not the first answer. A civic item that
 carries a written translation for the reader's language shows it directly and
@@ -530,10 +572,11 @@ Honest notes on what is not finished:
   location signals; no embeddings, no geospatial index. It proposes, a person
   decides.
 - **Civic information is demo data.** The corpus is fictional and labelled. It
-  spans three countries, two source languages and every freshness state the
-  model can express, which is enough to exercise the structure and nowhere near
-  enough to be useful to anyone. Real deployments need a real ingestion and
-  re-verification process; there is none.
+  spans four countries and every freshness state the model can express, which
+  is enough to exercise the structure and nowhere near enough to be useful to
+  anyone. There is now an import path (see *Adding a jurisdiction*), but no
+  scheduled re-verification: `lastVerifiedAt` ages until a human updates it,
+  which is honest but manual.
 - **No push notifications or email.** A reporter learns about a response by
   opening their case page.
 - **Evidence virus scanning is not implemented.** Type and size are validated;

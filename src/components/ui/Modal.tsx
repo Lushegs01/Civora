@@ -116,7 +116,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="-mr-1 -mt-1 rounded-full p-2 text-ink-soft hover:bg-muted hover:text-ink transition-colors"
+            className="-me-1 -mt-1 rounded-full p-2 text-ink-soft hover:bg-muted hover:text-ink transition-colors"
           >
             <Icon name="x" className="h-5 w-5" />
           </button>

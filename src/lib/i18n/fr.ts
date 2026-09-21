@@ -414,6 +414,7 @@ const fr: Record<keyof typeof en, string> = {
   "lang.en": "English",
   "lang.sw": "Swahili",
   "lang.fr": "Français",
+  "lang.ar": "Arabe",
   "lang.switch": "Langue",
 
   // ── Added so no dotted key can reach a reader ───────────────────────────────
@@ -898,6 +899,10 @@ const fr: Record<keyof typeof en, string> = {
   "report.leave_report": "Quitter ce signalement",
   "report.previous_step": "Étape précédente",
   "trustcard.why_trusted": "Pourquoi vous pouvez vous y fier",
+  "trustcard.related_cases": "Signalements liés à cette information",
+  "trustcard.related_cases.desc": "Dossiers portant sur l'information publiée ci-dessus. Seuls les dossiers publiés par un gestionnaire y figurent.",
+  "case.cited_by": "Information concernée par ce dossier",
+  "case.cited_by.desc": "Information civique publiée qui cite ce dossier.",
   "trustcard.why.source": "Source officielle.",
   "trustcard.why.source.desc": "Chaque fiche nomme l'organisme qui l'a publiée et le type d'autorité dont il dispose.",
   "trustcard.why.freshness": "Vérifié, avec une date.",

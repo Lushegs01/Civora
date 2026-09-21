@@ -222,7 +222,7 @@ function AddEvidenceDialog({
             type="file"
             accept="image/*,video/mp4,video/webm,application/pdf,text/plain"
             onChange={(e) => setFileName(e.target.files?.[0]?.name || null)}
-            className="block w-full rounded-field border border-line bg-surface px-3.5 py-2.5 text-[13.5px] text-ink-soft file:mr-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-[13px] file:font-medium file:text-ink"
+            className="block w-full rounded-field border border-line bg-surface px-3.5 py-2.5 text-[13.5px] text-ink-soft file:me-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-[13px] file:font-medium file:text-ink"
           />
           {fileName && (
             <p className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-soft">

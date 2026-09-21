@@ -12,7 +12,8 @@ export function LanguageSwitcher() {
     const next: Record<Locale, Locale> = {
       en: "sw",
       sw: "fr",
-      fr: "en"
+      fr: "ar",
+      ar: "en"
     };
     setLocale(next[locale]);
   };
@@ -20,7 +21,7 @@ export function LanguageSwitcher() {
   return (
     <button
       onClick={handleToggle}
-      className="flex items-center gap-3 px-3 py-2 w-full text-left rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+      className="flex items-center gap-3 px-3 py-2 w-full text-start rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
       aria-label={t("lang.switch", locale)}
     >
       <Icon name="globe" className="h-5 w-5 opacity-70" />

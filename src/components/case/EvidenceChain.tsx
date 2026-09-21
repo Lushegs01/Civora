@@ -87,7 +87,7 @@ export function EvidenceChain({
               <span
                 aria-hidden="true"
                 className={cn(
-                  "absolute left-0 top-3.5 flex h-8 w-8 items-center justify-center rounded-full ring-[3px] ring-canvas",
+                  "absolute start-0 top-3.5 flex h-8 w-8 items-center justify-center rounded-full ring-[3px] ring-canvas",
                   restricted ? "bg-muted text-ink-soft" : style.tile
                 )}
               >
@@ -96,7 +96,7 @@ export function EvidenceChain({
               <button
                 onClick={() => setOpenId(e.id)}
                 aria-haspopup="dialog"
-                className="press ml-11 flex w-[calc(100%-2.75rem)] items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-3 text-left transition-colors hover:border-ink/15 hover:bg-canvas"
+                className="press ms-11 flex w-[calc(100%-2.75rem)] items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-3 text-start transition-colors hover:border-ink/15 hover:bg-canvas"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-semibold text-ink">{e.title}</span>

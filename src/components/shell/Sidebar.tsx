@@ -34,7 +34,7 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-surface px-5 py-6 md:flex",
+        "sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-line bg-surface px-5 py-6 md:flex",
         className
       )}
     >
@@ -65,7 +65,7 @@ export function Sidebar({ className }: { className?: string }) {
         
         <button
           onClick={() => setSimpleMode(!isSimpleMode)}
-          className="press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium text-ink-soft hover:bg-muted/50 hover:text-ink transition-colors w-full text-left"
+          className="press flex min-h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium text-ink-soft hover:bg-muted/50 hover:text-ink transition-colors w-full text-start"
         >
           <Icon name="eye" className="h-[18px] w-[18px] text-ink-soft" />
           {isSimpleMode ? t("simple.disable", locale) : t("simple.enable", locale)}

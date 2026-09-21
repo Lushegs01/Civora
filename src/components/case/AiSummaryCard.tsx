@@ -52,7 +52,7 @@ export function AiSummaryCard({
       <button
         onClick={toggle}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-canvas"
+        className="flex w-full items-center gap-3 px-5 py-4 text-start transition-colors hover:bg-canvas"
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-deep">
           <Icon name="sparkles" className="h-3.5 w-3.5" />

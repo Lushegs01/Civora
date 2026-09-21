@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import en from "@/lib/i18n/en";
 import sw from "@/lib/i18n/sw";
 import fr from "@/lib/i18n/fr";
-import { t } from "@/lib/i18n/i18n";
+import ar from "@/lib/i18n/ar";
+import { localeDirection, t } from "@/lib/i18n/i18n";
+import { LOCALES } from "@/lib/validation/schemas";
 import type { Locale } from "@/lib/i18n/i18n";
 
 // A civic product that renders "case.timeline" as a heading has lost the
@@ -192,10 +194,13 @@ describe("translation coverage", () => {
     // silently rendered English to a reader who had chosen another language.
     // Parity is the guarantee now: a new English key cannot ship without its
     // translations, because this fails.
-    const locales: Array<[string, Record<string, string>]> = [
-      ["fr", fr],
-      ["sw", sw]
-    ];
+    // Derived from LOCALES, not listed by hand: a fourth language was added
+    // and this assertion would have kept passing while none of it was checked.
+    const dictionaries: Record<string, Record<string, string>> = { en, sw, fr, ar };
+    const locales: Array<[string, Record<string, string>]> = LOCALES.filter((l) => l !== "en").map(
+      (name) => [name, dictionaries[name]]
+    );
+    expect(locales.length).toBe(LOCALES.length - 1);
     for (const [name, dictionary] of locales) {
       const missing = Object.keys(en).filter((key) => !dictionary[key]);
       expect(missing, `${name} is missing translations`).toEqual([]);
@@ -217,6 +222,35 @@ describe("translation coverage", () => {
   });
 });
 
+describe("writing direction", () => {
+  it("marks Arabic right-to-left and everything else left-to-right", () => {
+    expect(localeDirection("ar")).toBe("rtl");
+    for (const locale of LOCALES.filter((l) => l !== "ar")) {
+      expect(localeDirection(locale), locale).toBe("ltr");
+    }
+  });
+
+  it("treats an unknown locale as left-to-right rather than throwing", () => {
+    expect(localeDirection("xx")).toBe("ltr");
+  });
+
+  it("uses logical CSS properties, so `dir` actually flips the layout", () => {
+    // ml-4 and text-left do not follow the document direction: with them the
+    // text would run right-to-left inside a layout that stayed Western. The
+    // components were converted to ms/me, ps/pe, start/end and text-start,
+    // and this fails if a physical class creeps back in.
+    const offenders: string[] = [];
+    for (const file of sourceFiles(SRC)) {
+      const source = fs.readFileSync(file, "utf-8");
+      for (const match of source.matchAll(/className=(?:\{)?["`'](.*?)["`']/gs)) {
+        const physical = match[1].match(/\b(ml|mr|pl|pr)-[\d.]+|\btext-(left|right)\b|\bborder-(l|r)\b/g);
+        if (physical) offenders.push(`${file.replace(SRC, "src")}: ${physical.join(", ")}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe("dictionary hygiene", () => {
   it("defines no key twice", () => {
     const source = fs.readFileSync(path.join(SRC, "lib/i18n/en.ts"), "utf-8");
@@ -224,10 +258,11 @@ describe("dictionary hygiene", () => {
     expect(keys.length).toBe(new Set(keys).size);
   });
 
-  it("only ships locales the interface actually offers", () => {
-    // Hausa was listed in a locale check but never had a dictionary; the
-    // switcher offers English, Swahili and French, and so do we.
-    expect(Object.keys({ en, sw, fr }).sort()).toEqual(["en", "fr", "sw"]);
+  it("ships a dictionary for every locale it offers, and no others", () => {
+    // Hausa was once listed in a locale check but never had a dictionary.
+    // Both directions are checked: a locale without a dictionary, and a
+    // dictionary for a locale the switcher never offers.
+    expect(Object.keys({ en, sw, fr, ar }).sort()).toEqual([...LOCALES].sort());
   });
 
   it("has no empty values", () => {

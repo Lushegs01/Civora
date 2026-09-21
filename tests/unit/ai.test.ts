@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { caseSummarySchema, deterministicSummary } from "@/lib/ai/summary";
 import type { PublicCaseView } from "@/lib/dto/case";
+import { LOCALES } from "@/lib/validation/schemas";
 
 function view(over: Partial<PublicCaseView> = {}): PublicCaseView {
   return {
@@ -118,12 +119,16 @@ describe("translation honesty", () => {
 
   it("supports every locale the interface offers", async () => {
     const { LANGUAGE_NAMES, translateText } = await import("@/lib/ai/language");
-    expect(Object.keys(LANGUAGE_NAMES).sort()).toEqual(["en", "fr", "sw"]);
+    // Derived from LOCALES rather than listed: Arabic was added and this
+    // assertion should fail loudly if a language reaches the switcher without
+    // its translation notices, not be quietly left behind.
+    expect(Object.keys(LANGUAGE_NAMES).sort()).toEqual([...LOCALES].sort());
 
-    for (const locale of ["sw", "fr"] as const) {
+    for (const locale of LOCALES.filter((l) => l !== "en")) {
       const result = await translateText("Some civic text to translate.", locale);
-      expect(result.notice.length).toBeGreaterThan(10);
-      expect(result.notice).not.toMatch(/^Machine translation is not enabled/);
+      expect(result.notice.length, locale).toBeGreaterThan(10);
+      // The notice is in the reader's own language, never an English default.
+      expect(result.notice, locale).not.toMatch(/^Machine translation is not enabled/);
     }
   });
 

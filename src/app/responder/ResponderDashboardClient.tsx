@@ -165,7 +165,7 @@ export function ResponderDashboardClient({
                 </span>
               </div>
               <div className="col-span-2 flex items-center justify-between sm:col-span-1 sm:justify-end">
-                <span className="text-xs text-ink-soft sm:text-right">{relativeTime(c.updatedAt, Date.now(), locale)}</span>
+                <span className="text-xs text-ink-soft sm:text-end">{relativeTime(c.updatedAt, Date.now(), locale)}</span>
                 <Icon name="chevron-right" className="h-4 w-4 text-ink-soft/60 sm:hidden" />
               </div>
             </Link>
