@@ -479,33 +479,53 @@ present — so a preview from a fork still builds, and reports its missing
 configuration at `/api/health` rather than failing the deploy.
 
 Seeding is never automatic, because it rewrites existing data. When you want the
-fictional corpus on the hosted database, pull the connected store's URL and seed
-against it:
+fictional corpus on the hosted database, pull the connected store's URL and
+point the seed at the file:
 
 ```bash
 vercel env pull .env.vercel
-DOTENV_CONFIG_PATH=.env.vercel npm run db:seed
+npm run db:seed -- --env .env.vercel --yes
+npm run civic:import -- examples/civic-ghana.json --env .env.vercel
 ```
 
-That prefix is POSIX shell. In Windows `cmd`, set the variable on its own line
-first (`set DOTENV_CONFIG_PATH=.env.vercel`), and do not fold it onto the same
-line with `&&` — the space before `&&` becomes part of the value, and the seed
-then fails looking for a file whose name ends in a space.
+`--env` is spelled the same in `cmd`, PowerShell and bash, which the older
+`DOTENV_CONFIG_PATH=…` prefix was not: that form is POSIX-only, and its `cmd`
+equivalent is a separate `set` line whose value silently absorbs a trailing
+space before `&&` and is lost when the window closes. The variable still works
+if you prefer it. `vercel env pull` needs `vercel login` first and writes into
+the current directory, so run both from the repository root.
 
-When the hosted database cannot be reached from a developer's machine at all,
-the build can seed instead. Set `CIVORA_SEED_ON_BUILD=true` in the project's
-environment, redeploy, then **remove the variable**:
+The order matters. `db:seed` deletes every civic item before it writes, so an
+import has to come after it, not before.
+
+`--yes` is required whenever the target is not `localhost`. Both commands print
+the host and database they are about to write to — never the password — so the
+line above the work tells you which database you actually reached. If no
+connection string is found, the failure lists the env files it opened and the
+variables it looked for, which is usually enough to see that `.env.vercel` was
+never pulled or that a second terminal lost the setting.
+
+When the hosted database cannot be reached from a developer's machine at all —
+an IP allow-list, a proxy, or simply no `vercel` CLI — the build can do both
+instead, with no local setup. Add the variables, redeploy, then **remove them**:
 
 ```bash
-vercel env add CIVORA_SEED_ON_BUILD production   # true
+vercel env add CIVORA_SEED_ON_BUILD production    # true
+vercel env add CIVORA_IMPORT_ON_BUILD production  # examples/civic-ghana.json
 # redeploy, confirm /api/civic returns items, then:
 vercel env rm CIVORA_SEED_ON_BUILD production
+vercel env rm CIVORA_IMPORT_ON_BUILD production
 ```
 
-`scripts/vercel-build.mjs` runs the seed after migrations and before
-`next build`, using the connection string Vercel injects. It is off unless the
-variable is explicitly truthy, and it fails the build rather than deploying
-without the data it was asked to load — Vercel keeps the previous deployment
+Both can be added from the Vercel dashboard rather than the CLI; scope them to
+**Production** only, for the reason two paragraphs below. `CIVORA_IMPORT_ON_BUILD`
+takes a comma-separated list of JSON files relative to the repository root, and
+runs after the seed so the order is not yours to remember.
+
+`scripts/vercel-build.mjs` runs the seed and then the imports, after migrations
+and before `next build`, using the connection string Vercel injects. Both are
+off unless their variable is set, and a failure stops the build rather than
+deploying without the data it was asked to load — Vercel keeps the previous deployment
 serving, so a failure shows up as a red build, not as a site that went down.
 
 The `production` in those commands is not decoration. A connected Vercel store
@@ -513,13 +533,16 @@ injects the same connection string into preview builds as into production, so a
 preview deployment that seeded would be deleting production's data — and adding
 a variable through the dashboard applies it to every environment unless you say
 otherwise, which makes that the easy mistake rather than an unlikely one. The
-build therefore reads `VERCEL_ENV` and refuses to seed anything that is not a
-production deployment, saying why in the build log and continuing, so an
-opened pull request does not turn red for it.
+build therefore reads `VERCEL_ENV` and refuses to write anything from a
+deployment that is not production, saying why in the build log and continuing,
+so an opened pull request does not turn red for it.
 
-Leaving the variable set is the thing to avoid: the seed deletes every case
-before it writes, so each subsequent deploy would discard whatever has been
-reported in between. Use it once, then remove it.
+Leaving `CIVORA_SEED_ON_BUILD` set is the thing to avoid: the seed deletes every
+case before it writes, so each subsequent deploy would discard whatever has been
+reported in between. Use it once, then remove it. `CIVORA_IMPORT_ON_BUILD` only
+upserts the items its files name, so leaving it set repeats work rather than
+destroying it — but it would also restore an item somebody deliberately deleted,
+so remove it too.
 
 The seed prints a generated responder password once, and it is the only thing
 that creates accounts — without it a fresh deployment has no users at all, so

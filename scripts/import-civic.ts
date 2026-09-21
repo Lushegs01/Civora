@@ -1,4 +1,5 @@
-import "./load-env";
+import { withoutEnvArg } from "./load-env";
+import { confirmDestructive, describeTarget, requireConnectionString } from "./db-target";
 import fs from "node:fs";
 import path from "node:path";
 import { PrismaClient, type Prisma } from "@prisma/client";
@@ -8,6 +9,10 @@ import { describeImport, parseCivicImport, type CivicImportItem } from "../src/l
 // Loads civic information from a JSON file.
 //
 //   npm run civic:import -- path/to/items.json [--replace] [--dry-run]
+//                                               [--env path/to/.env.file]
+//
+// `--env` names the environment file to read configuration from, and is the
+// same string in cmd, PowerShell and bash — see scripts/load-env.ts.
 //
 // Upsert by default, so re-running after a correction updates in place and
 // nothing else in the corpus is touched. --replace deletes the items named in
@@ -17,7 +22,11 @@ import { describeImport, parseCivicImport, type CivicImportItem } from "../src/l
 // Validation is separate from writing: --dry-run runs the whole check and
 // reports what would happen without opening a write transaction.
 
-const args = process.argv.slice(2);
+// `--env <file>` is stripped before the input file is chosen, or the env file
+// would be read as the corpus to import: it is the first argument that does
+// not begin with a dash.
+const argv = process.argv.slice(2);
+const args = withoutEnvArg(argv);
 const file = args.find((a) => !a.startsWith("--"));
 const replace = args.includes("--replace");
 const dryRun = args.includes("--dry-run");
@@ -28,7 +37,7 @@ function die(message: string): never {
 }
 
 if (!file) {
-  die("Usage: npm run civic:import -- <file.json> [--replace] [--dry-run]");
+  die("Usage: npm run civic:import -- <file.json> [--replace] [--dry-run] [--env <file>]");
 }
 
 const resolved = path.resolve(file);
@@ -61,14 +70,21 @@ if (dryRun) {
   process.exit(0);
 }
 
-const connectionString =
-  process.env.DIRECT_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_URL_UNPOOLED ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL;
-if (!connectionString) {
-  die("A database connection string is required. Set DATABASE_URL, or pull one from a connected store.");
+const IMPORT_COMMAND = "npm run civic:import --";
+const connectionString = requireConnectionString(IMPORT_COMMAND, argv);
+
+// An upsert needs no confirmation: it adds and corrects, and leaves everything
+// the file does not name alone. `--replace` deletes first, so on anything but
+// a local database it is held to the same `--yes` as seeding.
+if (replace) {
+  confirmDestructive(
+    connectionString,
+    argv,
+    `The ${items.length} item(s) named in this file will be deleted before they are written again.`,
+    IMPORT_COMMAND
+  );
+} else {
+  console.log(`  Target: ${describeTarget(connectionString)}`);
 }
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });

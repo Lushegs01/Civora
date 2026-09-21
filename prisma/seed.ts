@@ -2,6 +2,7 @@ import { PrismaClient, type Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import crypto from "node:crypto";
 import "../scripts/load-env";
+import { confirmDestructive, requireConnectionString } from "../scripts/db-target";
 import {
   DEMO_CASES,
   DEMO_CIVIC_ITEMS,
@@ -18,19 +19,21 @@ import { hashPassword } from "../src/lib/auth/password";
 // generated relative to the moment of seeding so the demo always looks live.
 
 // Prefers an unpooled connection for the bulk writes, and accepts the names
-// Vercel's Postgres integration injects so `vercel env pull` is enough to seed
-// a hosted database from a laptop.
-const connectionString =
-  process.env.DIRECT_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_URL_UNPOOLED ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL;
-if (!connectionString) {
-  throw new Error(
-    "A database connection string is required to seed. Set DATABASE_URL, or pull one from a connected Postgres store."
-  );
-}
+// Vercel's Postgres integration injects so `vercel env pull .env.vercel` and
+// `--env .env.vercel` are enough to seed a hosted database from a laptop.
+//
+// The target is printed, and a non-local one needs `--yes`, because the wipe
+// below is the whole of the destruction and it happens before any prompt the
+// operator might otherwise get from a mistake.
+const seedArgv = process.argv.slice(2);
+const SEED_COMMAND = "npm run db:seed --";
+const connectionString = requireConnectionString(SEED_COMMAND, seedArgv);
+confirmDestructive(
+  connectionString,
+  seedArgv,
+  "Every case, report, evidence record and civic item in it will be deleted and rewritten.",
+  SEED_COMMAND
+);
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
