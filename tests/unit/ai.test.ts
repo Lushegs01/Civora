@@ -156,6 +156,144 @@ describe("translation honesty", () => {
   });
 });
 
+describe("provider selection", () => {
+  const AI_VARS = ["AI_PROVIDER", "OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "AI_MODEL", "AI_BASE_URL"];
+
+  beforeEach(() => {
+    vi.resetModules();
+    for (const name of AI_VARS) delete process.env[name];
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    for (const name of AI_VARS) delete process.env[name];
+    process.env.AI_PROVIDER = "mock";
+  });
+
+  /** Captures the single outbound request the provider makes. */
+  function captureFetch(body: unknown = { choices: [{ message: { content: "ok" } }] }) {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init: RequestInit) => {
+        calls.push({ url, init });
+        return new Response(JSON.stringify(body), { status: 200 });
+      })
+    );
+    return calls;
+  }
+
+  it("stays mock when a provider is named but no key is set", async () => {
+    process.env.AI_PROVIDER = "gemini";
+    const { providerName } = await import("@/lib/ai/provider");
+    expect(providerName()).toBe("mock");
+  });
+
+  it("stays mock for a provider it does not know, whatever key is present", async () => {
+    process.env.AI_PROVIDER = "definitely-not-a-provider";
+    process.env.GEMINI_API_KEY = "k";
+    const { providerName } = await import("@/lib/ai/provider");
+    expect(providerName()).toBe("mock");
+  });
+
+  it("names the live provider, so a summary is attributable", async () => {
+    process.env.AI_PROVIDER = "gemini";
+    process.env.GEMINI_API_KEY = "k";
+    const { providerName } = await import("@/lib/ai/provider");
+    expect(providerName()).toBe("gemini");
+  });
+
+  it("accepts GOOGLE_API_KEY, which is what Google's own tooling exports", async () => {
+    process.env.AI_PROVIDER = "gemini";
+    process.env.GOOGLE_API_KEY = "k";
+    const { providerName } = await import("@/lib/ai/provider");
+    expect(providerName()).toBe("gemini");
+  });
+
+  it("sends a Gemini call to Gemini's OpenAI-compatible endpoint", async () => {
+    process.env.AI_PROVIDER = "gemini";
+    process.env.GEMINI_API_KEY = "test-key";
+    const calls = captureFetch();
+
+    const { chat } = await import("@/lib/ai/provider");
+    const result = await chat({ system: "s", user: "u" });
+
+    expect(result).toEqual({ ok: true, content: "ok" });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+    );
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe("Bearer test-key");
+    expect(JSON.parse(String(calls[0].init.body)).model).toBe("gemini-2.5-flash");
+  });
+
+  it("still sends an OpenAI call to OpenAI", async () => {
+    process.env.AI_PROVIDER = "openai";
+    process.env.OPENAI_API_KEY = "test-key";
+    const calls = captureFetch();
+
+    const { chat } = await import("@/lib/ai/provider");
+    await chat({ system: "s", user: "u" });
+
+    expect(calls[0].url).toBe("https://api.openai.com/v1/chat/completions");
+    expect(JSON.parse(String(calls[0].init.body)).model).toBe("gpt-4o-mini");
+  });
+
+  it("lets AI_MODEL and AI_BASE_URL override either provider", async () => {
+    process.env.AI_PROVIDER = "gemini";
+    process.env.GEMINI_API_KEY = "k";
+    process.env.AI_MODEL = "gemini-2.0-flash";
+    process.env.AI_BASE_URL = "https://gateway.example/v1";
+    const calls = captureFetch();
+
+    const { chat } = await import("@/lib/ai/provider");
+    await chat({ system: "s", user: "u" });
+
+    expect(calls[0].url).toBe("https://gateway.example/v1/chat/completions");
+    expect(JSON.parse(String(calls[0].init.body)).model).toBe("gemini-2.0-flash");
+  });
+
+  it("names the missing key variable instead of failing silently", async () => {
+    // Warnings are production-only, and NODE_ENV is read-only to TypeScript —
+    // stubEnv is how the rest of the suite reaches it.
+    vi.stubEnv("NODE_ENV", "production");
+    process.env.AI_PROVIDER = "gemini";
+    const { configurationWarnings } = await import("@/lib/config");
+    const warning = configurationWarnings().find((w) => w.includes("AI_PROVIDER"));
+    expect(warning).toMatch(/GEMINI_API_KEY or GOOGLE_API_KEY/);
+    vi.unstubAllEnvs();
+  });
+
+  it("names an unrecognized provider rather than quietly running mock", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    process.env.AI_PROVIDER = "claude";
+    const { configurationWarnings } = await import("@/lib/config");
+    const warning = configurationWarnings().find((w) => w.includes("AI_PROVIDER"));
+    expect(warning).toMatch(/not a provider Civora knows/);
+    expect(warning).toMatch(/openai or gemini/);
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("reading what a model actually returns", () => {
+  it("accepts JSON wrapped in a markdown fence", async () => {
+    const { parseJsonObject } = await import("@/lib/ai/provider");
+    // Models asked for JSON return it fenced anyway; Gemini does so often.
+    expect(parseJsonObject('```json\n{"overview":"ok"}\n```')).toEqual({ overview: "ok" });
+    expect(parseJsonObject('```\n{"overview":"ok"}\n```')).toEqual({ overview: "ok" });
+    expect(parseJsonObject('{"overview":"ok"}')).toEqual({ overview: "ok" });
+  });
+
+  it("still refuses anything that is not a JSON object", async () => {
+    const { parseJsonObject } = await import("@/lib/ai/provider");
+    expect(parseJsonObject("```json\nnot json\n```")).toBeNull();
+    expect(parseJsonObject('["an","array"]')).toBeNull();
+    expect(parseJsonObject("null")).toBeNull();
+    expect(parseJsonObject("plain prose")).toBeNull();
+  });
+});
+
 describe("AI cannot change trust state", () => {
   it("exposes no write surface at all", async () => {
     const summary = await import("@/lib/ai/summary");

@@ -126,19 +126,66 @@ export const retention = {
   contactDays: int(process.env.RETENTION_CONTACT_DAYS, 180)
 };
 
+/**
+ * Model providers Civora can reach.
+ *
+ * Both speak the same wire format: Gemini publishes an OpenAI-compatible
+ * endpoint that takes the same request body and returns the same response
+ * shape, so one client serves both and there is no second code path to keep
+ * honest. What differs is only the address, the key and the default model.
+ */
+const AI_PROVIDERS = {
+  openai: {
+    keyVars: ["OPENAI_API_KEY"],
+    defaultModel: "gpt-4o-mini",
+    defaultBaseUrl: "https://api.openai.com/v1"
+  },
+  gemini: {
+    // GOOGLE_API_KEY is what Google's own tooling exports, so accept it too
+    // rather than making someone rename a variable they already have.
+    keyVars: ["GEMINI_API_KEY", "GOOGLE_API_KEY"],
+    defaultModel: "gemini-2.5-flash",
+    defaultBaseUrl: "https://generativelanguage.googleapis.com/v1beta/openai"
+  }
+} as const;
+
+export type AiProvider = keyof typeof AI_PROVIDERS;
+
+export function isAiProvider(value: string): value is AiProvider {
+  return value in AI_PROVIDERS;
+}
+
+const aiProvider = (process.env.AI_PROVIDER || "mock").trim().toLowerCase();
+const aiSpec = isAiProvider(aiProvider) ? AI_PROVIDERS[aiProvider] : null;
+
+/** The first of the provider's accepted key variables that is actually set. */
+function aiApiKey(): string {
+  if (!aiSpec) return "";
+  for (const name of aiSpec.keyVars) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+
 export const ai = {
-  provider: (process.env.AI_PROVIDER || "mock").trim().toLowerCase(),
-  apiKey: process.env.OPENAI_API_KEY?.trim() || "",
-  model: process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini",
-  baseUrl: process.env.OPENAI_BASE_URL?.trim() || "https://api.openai.com/v1",
+  provider: aiProvider,
+  apiKey: aiApiKey(),
+  // AI_MODEL and AI_BASE_URL are provider-neutral. The OPENAI_-prefixed names
+  // still work, so an existing OpenAI deployment keeps its configuration.
+  model: process.env.AI_MODEL?.trim() || process.env.OPENAI_MODEL?.trim() || aiSpec?.defaultModel || "",
+  baseUrl:
+    process.env.AI_BASE_URL?.trim() || process.env.OPENAI_BASE_URL?.trim() || aiSpec?.defaultBaseUrl || "",
   timeoutMs: int(process.env.AI_TIMEOUT_MS, 12_000),
   maxInputChars: int(process.env.AI_MAX_INPUT_CHARS, 6_000),
   /** Daily ceiling on live provider calls across the whole deployment. */
-  dailyQuota: int(process.env.AI_DAILY_QUOTA, 500)
+  dailyQuota: int(process.env.AI_DAILY_QUOTA, 500),
+  /** Which environment variable to name when the key is the thing missing. */
+  keyVars: aiSpec?.keyVars ?? []
 };
 
 /** True when a real model can actually be reached. */
-export const aiLive = ai.provider === "openai" && ai.apiKey.length > 0;
+export const aiLive = aiSpec !== null && ai.apiKey.length > 0;
 
 /**
  * Evidence storage driver.
@@ -242,5 +289,19 @@ export function configurationWarnings(): string[] {
   if (isDemoMode) warnings.push("CIVORA_DEMO_MODE is enabled in a production build.");
   if (demoToolsEnabled) warnings.push("ENABLE_DEMO_TOOLS is enabled in a production build.");
   if (!redis.url) warnings.push("No REDIS_REST_URL; rate limiting falls back to the database.");
+  // An AI provider that silently resolves to "mock" is the hardest kind of
+  // misconfiguration to notice: nothing errors, every AI surface just says the
+  // feature is not enabled. So say which variable is missing, by name.
+  if (ai.provider !== "mock") {
+    if (!isAiProvider(ai.provider)) {
+      warnings.push(
+        `AI_PROVIDER="${ai.provider}" is not a provider Civora knows; expected ${Object.keys(AI_PROVIDERS).join(" or ")}. AI features are disabled.`
+      );
+    } else if (!ai.apiKey) {
+      warnings.push(
+        `AI_PROVIDER="${ai.provider}" is set but no key is configured; set ${ai.keyVars.join(" or ")}. AI features are disabled.`
+      );
+    }
+  }
   return warnings;
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Locale } from "../validation/schemas";
-import { chat, providerName } from "./provider";
+import { chat, providerName, type ProviderName } from "./provider";
 
 // Translation and plain-language explanation.
 //
@@ -25,7 +25,7 @@ export interface LanguageResult {
   /** The untouched input, so the UI can always show something readable. */
   sourceText: string;
   targetLanguage: string;
-  provider: "mock" | "openai";
+  provider: ProviderName;
   /** Reader-facing explanation, already in the requested language. */
   notice: string;
 }
@@ -97,7 +97,7 @@ export interface ExplainResult {
   status: "explained" | "unavailable";
   text?: string;
   sourceText: string;
-  provider: "mock" | "openai";
+  provider: ProviderName;
   notice: string;
 }
 

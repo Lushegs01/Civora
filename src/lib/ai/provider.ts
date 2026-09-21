@@ -1,4 +1,4 @@
-import { ai, aiLive } from "../config";
+import { ai, aiLive, isAiProvider, type AiProvider } from "../config";
 import { log } from "../log";
 
 // One place talks to the model provider.
@@ -19,8 +19,18 @@ export type ChatResult =
   | { ok: true; content: string }
   | { ok: false; reason: "not_configured" | "timeout" | "provider_error" | "empty" };
 
-export function providerName(): "mock" | "openai" {
-  return aiLive ? "openai" : "mock";
+export type ProviderName = AiProvider | "mock";
+
+/**
+ * What the reader is told they are looking at.
+ *
+ * "mock" is not a euphemism for broken — it is the honest answer when no
+ * provider is configured, and every caller renders it as "not enabled on this
+ * deployment" rather than inventing a result. Naming the live provider matters
+ * too: a summary produced by a model is attributable to that model.
+ */
+export function providerName(): ProviderName {
+  return aiLive && isAiProvider(ai.provider) ? ai.provider : "mock";
 }
 
 export async function chat(options: ChatOptions): Promise<ChatResult> {
@@ -70,10 +80,20 @@ export async function chat(options: ChatOptions): Promise<ChatResult> {
   }
 }
 
-/** Parses model JSON without trusting it. Returns null on anything unexpected. */
+/**
+ * Parses model JSON without trusting it. Returns null on anything unexpected.
+ *
+ * Models asked for JSON commonly return it inside a markdown fence anyway, and
+ * Gemini does so more often than most. A fence is a formatting habit, not a
+ * different answer, so it is stripped before parsing — everything after that is
+ * as untrusted as before, and a caller still validates the shape against a
+ * schema before any of it reaches a reader.
+ */
 export function parseJsonObject(content: string): Record<string, unknown> | null {
+  const fenced = /^\s*```(?:json)?\s*\n?([\s\S]*?)\n?\s*```\s*$/i.exec(content);
+  const candidate = fenced ? fenced[1] : content;
   try {
-    const value: unknown = JSON.parse(content);
+    const value: unknown = JSON.parse(candidate);
     if (!value || typeof value !== "object" || Array.isArray(value)) return null;
     return value as Record<string, unknown>;
   } catch {
