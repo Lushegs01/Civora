@@ -68,8 +68,10 @@ configuration that is missing.
 
 ## Demo walkthrough
 
-Demo mode (`CIVORA_DEMO_MODE=true`) seeds a fictional dataset and enables a
-shared responder access code. It is off by default in production.
+Demo mode (`CIVORA_DEMO_MODE=true`) enables the shared responder access code
+and plants demo tracking tokens on a visitor's device. It is off by default in
+production, and it does not seed anything — the fictional dataset is loaded by
+`npm run db:seed`, separately and never automatically.
 
 1. **Landing** (`/`) — what Civora is and how trust is established.
 2. **Report** (`/report`) — category → description → location → time →
@@ -79,7 +81,9 @@ shared responder access code. It is off by default in production.
    Ask for a recovery code at submission time to reach it from elsewhere.
 4. **Community board** (`/community`) — only cases a handler has published.
 5. **Responder workspace** (`/responder`) — sign in with the demo access code
-   `civora-demo`. That code signs you in as the seeded platform administrator,
+   `civora-demo`. That is the default only outside production; a hosted
+   deployment has no default and uses whatever `DEMO_RESPONDER_CODE` is set to.
+   That code signs you in as the seeded platform administrator,
    so you can reach every case. Case **CS-1045** arrives with a corroboration
    candidate for **CS-1042** waiting for a decision: look at the per-signal
    breakdown, then confirm or reject it and watch what does *not* change.
@@ -224,7 +228,10 @@ different organization requires at least organization-admin. Every permission
 question is answered by `src/lib/authz.ts` — no route re-derives its own.
 
 The shared demo access code only works while `CIVORA_DEMO_MODE=true`, and only
-for accounts flagged `isDemo`. Production sign-in is email and password
+for accounts flagged `isDemo`. It falls back to `civora-demo` outside
+production; a production build has no fallback, so the code is exactly what
+`DEMO_RESPONDER_CODE` says and demo sign-in is refused outright when that is
+unset (`src/lib/config.ts`). Production sign-in is email and password
 (scrypt, via `node:crypto`).
 
 ## Evidence
@@ -355,7 +362,7 @@ Connect a **Postgres** store and a **Blob** store to the project. Vercel injects
 Civora reads directly — so neither the database nor the storage driver needs a
 variable set by hand.
 
-That leaves exactly one to add yourself:
+That leaves one to add yourself:
 
 ```bash
 vercel env add SESSION_SECRET production   # paste: openssl rand -hex 32
@@ -365,6 +372,19 @@ vercel env add SESSION_SECRET preview      # a different value
 Generate the value locally rather than pasting one from elsewhere; it is the key
 that signs session binding, and it should never have existed in a chat log, a
 terminal history you share, or a ticket.
+
+A deployment meant to be explorable — a demo for reviewers rather than a
+production instance — needs two more, neither of which has a default in a
+production build:
+
+```bash
+vercel env add CIVORA_DEMO_MODE production      # true
+vercel env add DEMO_RESPONDER_CODE production   # the code you hand out
+```
+
+Whatever you set is the code; `civora-demo` is the local default and is not
+implied here. Publish one code and deploy another and reviewers are refused at
+`/responder` with a generic "access code isn't recognized".
 
 Vercel runs `vercel-build` in preference to `build`. That script applies
 `prisma migrate deploy` before building, but only when a connection string is
@@ -389,6 +409,23 @@ production deployment should leave off.
 Check the result with `curl https://your-deployment/api/health`. It reports
 `status`, whether the database is reachable, which storage driver resolved, and
 a warning for anything still missing.
+
+It cannot tell you that the seed ran or that the access code matches the one you
+published — a reachable database and a configured code both report healthy while
+empty and mismatched. Check those separately, from a browser you are not already
+signed in to, or with:
+
+```bash
+curl -s https://your-deployment/api/civic     # expect four items, not []
+curl -s -X POST https://your-deployment/api/responder/session \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://your-deployment' \
+  -d '{"code":"civora-demo"}'                 # expect {"ok":true,...,"demo":true}
+```
+
+The failures are distinguishable: `demo_unseeded` means the corpus is missing,
+`demo_unconfigured` means `DEMO_RESPONDER_CODE` is unset, and
+`invalid_credentials` means it is set to something other than the code you sent.
 
 Nothing depends on the local filesystem or on process memory for authoritative
 state. `OBJECT_STORAGE_DRIVER=local` is refused when `NODE_ENV=production`.
