@@ -31,9 +31,44 @@ function literalKeysUsed(): Set<string> {
   return keys;
 }
 
+/**
+ * Keys the interface reaches indirectly.
+ *
+ * Components collect keys in a const and pass the variable to t() —
+ * `{ labelKey: "nav.landing.home" }`, `["cloud-off", "landing.conditions.1.title"]`.
+ * literalKeysUsed() only sees a key written at the call site, so thirty of
+ * these were missing from the dictionary while the suite stayed green, and
+ * the landing page rendered humanize()'s output: seven cards headed "Label"
+ * over the word "Detail", and a navigation that read English in every locale.
+ *
+ * So every key-shaped literal counts, whatever syntax carries it — but only
+ * in files that call t() at all. Structured log event names share the dotted
+ * shape ("ai.timeout", "case.view_failed") and reach log.error rather than
+ * the dictionary; they live in API routes and lib internals, which render
+ * nothing and so never call t().
+ */
+function indirectKeysUsed(): Set<string> {
+  const namespaces = new Set(Object.keys(en).map((key) => key.split(".")[0]));
+  const keys = new Set<string>();
+  for (const file of sourceFiles(SRC)) {
+    const source = fs.readFileSync(file, "utf-8");
+    if (!/\bt\(/.test(source)) continue;
+    for (const match of source.matchAll(/"([a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)"/g)) {
+      const key = match[1];
+      if (namespaces.has(key.split(".")[0])) keys.add(key);
+    }
+  }
+  return keys;
+}
+
 describe("translation coverage", () => {
   it("has an entry for every literal key the interface uses", () => {
     const missing = [...literalKeysUsed()].filter((key) => !(key in en)).sort();
+    expect(missing).toEqual([]);
+  });
+
+  it("has an entry for every key reached through a variable", () => {
+    const missing = [...indirectKeysUsed()].filter((key) => !(key in en)).sort();
     expect(missing).toEqual([]);
   });
 
