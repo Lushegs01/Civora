@@ -420,6 +420,7 @@ const en = {
   "lang.en": "English",
   "lang.sw": "Swahili",
   "lang.fr": "Français",
+  "lang.ar": "Arabic",
   "lang.switch": "Language",
 
   // ── Added so no dotted key can reach a reader ───────────────────────────────
@@ -902,6 +903,10 @@ const en = {
   "report.leave_report": "Leave this report",
   "report.previous_step": "Previous step",
   "trustcard.why_trusted": "Why you can rely on this",
+  "trustcard.related_cases": "Reported against this information",
+  "trustcard.related_cases.desc": "Cases that concern what is published above. Only cases a handler has published appear here.",
+  "case.cited_by": "Information this case concerns",
+  "case.cited_by.desc": "Published civic information that names this case.",
   "trustcard.why.source": "Official source.",
   "trustcard.why.source.desc": "Every item names the body that issued it and the kind of authority that body holds.",
   "trustcard.why.freshness": "Checked, with a date.",

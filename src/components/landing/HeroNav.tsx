@@ -76,7 +76,7 @@ export function HeroNav() {
           </Link>
           <Link
             href="/home"
-            className="press group inline-flex min-h-11 items-center gap-2 rounded-full bg-white py-1.5 pl-5 pr-1.5 text-[14px] font-semibold text-[#0B1F14] shadow-[0_10px_30px_-12px_rgba(255,255,255,0.4)] transition-all hover:bg-white/90"
+            className="press group inline-flex min-h-11 items-center gap-2 rounded-full bg-white py-1.5 ps-5 pe-1.5 text-[14px] font-semibold text-[#0B1F14] shadow-[0_10px_30px_-12px_rgba(255,255,255,0.4)] transition-all hover:bg-white/90"
           >
             {t("nav.get_started", locale) || "Get started"}
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0B1F14] text-white transition-transform duration-200 group-hover:rotate-45">

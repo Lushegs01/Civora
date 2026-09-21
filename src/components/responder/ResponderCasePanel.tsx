@@ -480,7 +480,7 @@ export function ResponderCasePanel({
                   key={a.spec.kind}
                   onClick={() => open(a.spec)}
                   disabled={a.disabled}
-                  className={`press flex min-h-11 items-center gap-2.5 rounded-btn px-3.5 text-left text-[14px] font-medium ${
+                  className={`press flex min-h-11 items-center gap-2.5 rounded-btn px-3.5 text-start text-[14px] font-medium ${
                     a.disabled
                       ? "cursor-not-allowed text-ink-soft/50"
                       : a.primary
@@ -536,7 +536,7 @@ export function ResponderCasePanel({
                     <p className={`text-[13px] font-semibold ${s === view.verification ? "text-ink" : "text-ink-soft"}`}>
                       {t(`verification.${s}`, locale) || VERIFICATION_META[s].label}
                       {s === view.verification && (
-                        <span className="ml-1.5 text-[11px] font-normal text-brand-deep">
+                        <span className="ms-1.5 text-[11px] font-normal text-brand-deep">
                           {t("responder.panel.verification.current", locale)}
                         </span>
                       )}

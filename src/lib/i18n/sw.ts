@@ -414,6 +414,7 @@ const sw: Record<keyof typeof en, string> = {
   "lang.en": "English",
   "lang.sw": "Kiswahili",
   "lang.fr": "Kifaransa",
+  "lang.ar": "Kiarabu",
   "lang.switch": "Lugha",
 
   // ── Added so no dotted key can reach a reader ───────────────────────────────
@@ -898,6 +899,10 @@ const sw: Record<keyof typeof en, string> = {
   "report.leave_report": "Acha ripoti hii",
   "report.previous_step": "Hatua iliyotangulia",
   "trustcard.why_trusted": "Kwa nini unaweza kuitegemea",
+  "trustcard.related_cases": "Ripoti kuhusu taarifa hii",
+  "trustcard.related_cases.desc": "Kesi zinazohusu taarifa iliyochapishwa hapo juu. Ni kesi zilizochapishwa na msimamizi pekee zinazoonekana hapa.",
+  "case.cited_by": "Taarifa inayohusika na kesi hii",
+  "case.cited_by.desc": "Taarifa za kiraia zilizochapishwa zinazotaja kesi hii.",
   "trustcard.why.source": "Chanzo rasmi.",
   "trustcard.why.source.desc": "Kila taarifa hutaja taasisi iliyoitoa na aina ya mamlaka iliyo nayo.",
   "trustcard.why.freshness": "Imekaguliwa, na tarehe.",

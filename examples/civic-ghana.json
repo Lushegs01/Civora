@@ -1,0 +1,73 @@
+{
+  "source": "Worked example — the shape a local organization fills in to add a jurisdiction. All records are fictional.",
+  "items": [
+    {
+      "id": "CIV-GH-LAND-01",
+      "title": "Registering a land title at the district office",
+      "category": "procedure",
+      "country": "Ghana",
+      "region": "Greater Accra",
+      "locality": "Ga East",
+      "level": "local",
+      "explanation": "A land title is registered at the district office covering the plot, not the applicant's home district. The office publishes a searchable index of pending registrations, and an objection must be filed while a registration is still pending — once it completes, the only route is the courts.",
+      "officialSource": "District Lands Office, Ga East",
+      "sourceAuthority": "District Assembly",
+      "publishedAt": "2025-11-14",
+      "lastVerifiedAt": "2026-09-02",
+      "verificationMethod": "Checked against the published fee schedule and the counter hours posted at the district office.",
+      "freshnessThresholdDays": 60,
+      "eligibility": "The registered owner, or a representative holding written authority.",
+      "requirements": [
+        "Site plan prepared by a licensed surveyor",
+        "Proof of the current owner's identity",
+        "Evidence of how the plot was acquired"
+      ],
+      "fees": "Scaled by plot value; the published schedule starts at GHS 250.",
+      "deadlines": "An objection must be filed while the registration is still pending.",
+      "nextActions": [
+        { "label": "Search pending registrations", "type": "link" },
+        { "label": "Report a refused filing", "type": "report", "href": "/report" }
+      ],
+      "whatRemainsUncertain": [
+        "Whether the published fee schedule has been revised for the current year — the office confirmed the range verbally but has not reissued it."
+      ],
+      "relatedCaseIds": [],
+      "relatedCivicIds": [],
+      "languageVersions": {
+        "fr": {
+          "title": "Enregistrer un titre foncier au bureau de district",
+          "explanation": "Un titre foncier s'enregistre au bureau de district dont relève la parcelle, et non celui du domicile du demandeur. Le bureau publie un index consultable des enregistrements en cours ; une opposition doit être déposée tant que l'enregistrement est en cours — une fois abouti, seul le tribunal reste ouvert.",
+          "eligibility": "Le propriétaire enregistré, ou un représentant muni d'une autorisation écrite."
+        }
+      },
+      "tags": ["land", "registration", "ghana"],
+      "fictional": true
+    },
+    {
+      "id": "CIV-GH-WATER-01",
+      "title": "What a community may ask for during a prolonged water outage",
+      "category": "right",
+      "country": "Ghana",
+      "level": "federal",
+      "explanation": "Where a supply interruption is expected to last more than 72 hours, the utility publishes an alternative supply plan for the affected area. The plan names the delivery points; it does not commit to a volume per household.",
+      "officialSource": "National Water Services Directorate",
+      "sourceAuthority": "National Directorate",
+      "publishedAt": "2024-06-01",
+      "lastVerifiedAt": "2026-04-20",
+      "verificationMethod": "Last confirmed against the published service standard. Two regional notices issued since have not been reconciled with it.",
+      "freshnessThresholdDays": 90,
+      "nextActions": [
+        { "label": "Report a broken water point", "type": "report", "href": "/report" }
+      ],
+      "whatRemainsUncertain": [
+        "Whether the regional notices change the 72-hour threshold.",
+        "Which delivery points are currently active — no live list is published."
+      ],
+      "relatedCaseIds": [],
+      "relatedCivicIds": [],
+      "languageVersions": {},
+      "tags": ["water", "outage", "rights", "ghana"],
+      "fictional": true
+    }
+  ]
+}

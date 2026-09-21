@@ -8,8 +8,9 @@ import {
   viewerRoleFor
 } from "@/lib/authz";
 import { createReport } from "@/lib/cases/create";
-import { findCaseByPublicId } from "@/lib/db/repository";
+import { findCaseByPublicId, findCivicItemsCitingCase, findPublicCasesByIds } from "@/lib/db/repository";
 import { toPublicCaseView, toReporterCaseView, toResponderCaseView } from "@/lib/dto/case";
+import { toCivicInfoView } from "@/lib/dto/civic";
 import { hashToken } from "@/lib/auth/tokens";
 
 let orgA: Awaited<ReturnType<typeof createOrg>>;
@@ -252,5 +253,108 @@ describe("reporter authorization", () => {
     expect(
       await prisma.report.findUnique({ where: { trackingTokenHash: hashToken("made-up-token") } })
     ).toBeNull();
+  });
+});
+
+describe("civic information does not disclose non-public cases", () => {
+  /**
+   * `relatedCaseIds` on a civic item is authored data. If it named a case that
+   * was private, in screening or restricted, publishing the raw list would
+   * confirm that case exists to anyone reading a civic page. These pin the
+   * resolution to publicly visible cases only.
+   */
+  async function civicItemCiting(ids: string[]) {
+    return prisma.civicInfoItem.create({
+      data: {
+        id: "CIV-TEST-01",
+        title: "Test civic item",
+        category: "policy",
+        country: "Testland",
+        level: "federal",
+        explanation: "For the authorization suite.",
+        officialSource: "Test Authority",
+        sourceAuthority: "National Directorate",
+        publishedAt: new Date(),
+        lastVerifiedAt: new Date(),
+        freshnessThresholdDays: 30,
+        nextActions: [],
+        relatedCaseIds: ids,
+        relatedCivicIds: [],
+        whatRemainsUncertain: [],
+        languageVersions: {},
+        fictional: true,
+        tags: []
+      }
+    });
+  }
+
+  it("resolves only the cases a handler has published", async () => {
+    const shown = await createReport({
+      category: "infrastructure",
+      narrative: "A public one, published by a handler for the civic link suite.",
+      locationGeneral: "Test ward",
+      incidentAt: new Date(),
+      privacyMode: "anonymous"
+    });
+    const hidden = await createReport({
+      category: "safety",
+      narrative: "One held back by screening, whose existence must stay unmentioned.",
+      locationGeneral: "Test ward",
+      incidentAt: new Date(),
+      privacyMode: "anonymous"
+    });
+    await prisma.case.update({
+      where: { publicCaseId: shown.caseId },
+      data: { publicVisible: true, publicationState: "public_case" }
+    });
+    await prisma.case.update({
+      where: { publicCaseId: hidden.caseId },
+      data: { publicVisible: false, publicationState: "screening" }
+    });
+
+    await civicItemCiting([shown.caseId, hidden.caseId]);
+    const resolved = await findPublicCasesByIds([shown.caseId, hidden.caseId]);
+
+    expect(resolved.map((c) => c.publicCaseId)).toEqual([shown.caseId]);
+    // Absent, not marked as withheld — saying "one was hidden" is a disclosure.
+    expect(JSON.stringify(resolved)).not.toContain(hidden.caseId);
+  });
+
+  it("keeps the raw authored ids off the public view entirely", async () => {
+    const hidden = await createReport({
+      category: "safety",
+      narrative: "Not public, and its id must not travel with the civic item.",
+      locationGeneral: "Test ward",
+      incidentAt: new Date(),
+      privacyMode: "anonymous"
+    });
+    await prisma.case.update({
+      where: { publicCaseId: hidden.caseId },
+      data: { publicVisible: false, publicationState: "private_case" }
+    });
+    const item = await civicItemCiting([hidden.caseId]);
+
+    const view = toCivicInfoView(item, []);
+    expect(JSON.stringify(view)).not.toContain(hidden.caseId);
+    expect(view).not.toHaveProperty("relatedCaseIds");
+    expect(view.relatedCases).toEqual([]);
+  });
+
+  it("finds the civic information that cites a case", async () => {
+    const shown = await createReport({
+      category: "service",
+      narrative: "Published, and named by a civic item that cites it.",
+      locationGeneral: "Test ward",
+      incidentAt: new Date(),
+      privacyMode: "anonymous"
+    });
+    await prisma.case.update({
+      where: { publicCaseId: shown.caseId },
+      data: { publicVisible: true, publicationState: "public_case" }
+    });
+    await civicItemCiting([shown.caseId]);
+
+    const citing = await findCivicItemsCitingCase(shown.caseId);
+    expect(citing.map((c) => c.id)).toEqual(["CIV-TEST-01"]);
   });
 });

@@ -18,7 +18,7 @@ export function CaseProgress({ view, className }: { view: PublicCaseView; classN
               <span
                 aria-hidden="true"
                 className={cn(
-                  "absolute right-1/2 top-[14px] -z-0 h-[2px] w-full",
+                  "absolute end-1/2 top-[14px] -z-0 h-[2px] w-full",
                   step.done ? "bg-success" : "bg-line"
                 )}
               />

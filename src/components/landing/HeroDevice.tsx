@@ -50,18 +50,18 @@ export function HeroDevice() {
   return (
     <div className="relative mx-auto w-fit">
       {/* Glow behind device */}
-      <div className="absolute left-1/2 top-1/2 -z-10 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3E9B63]/30 blur-[90px]" />
+      <div className="absolute start-1/2 top-1/2 -z-10 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3E9B63]/30 blur-[90px]" />
 
       {/* Phone frame */}
       <div className="hero-device relative w-[292px] rounded-[52px] border border-white/20 bg-[#0D1512] p-[10px] shadow-[0_50px_100px_-30px_rgba(0,0,0,0.7)] sm:w-[310px]">
         {/* Side buttons */}
-        <div className="absolute -left-[2.5px] top-[110px] h-14 w-[3px] rounded-l-md bg-[#2A3A31]" />
-        <div className="absolute -right-[2.5px] top-[150px] h-20 w-[3px] rounded-r-md bg-[#2A3A31]" />
+        <div className="absolute -left-[2.5px] top-[110px] h-14 w-[3px] rounded-s-md bg-[#2A3A31]" />
+        <div className="absolute -right-[2.5px] top-[150px] h-20 w-[3px] rounded-e-md bg-[#2A3A31]" />
 
         {/* Screen */}
         <div className="relative overflow-hidden rounded-[43px] bg-[#F5F7F4]">
           {/* Dynamic island */}
-          <div className="absolute left-1/2 top-2.5 z-10 h-[22px] w-[92px] -translate-x-1/2 rounded-full bg-[#0D1512]" />
+          <div className="absolute start-1/2 top-2.5 z-10 h-[22px] w-[92px] -translate-x-1/2 rounded-full bg-[#0D1512]" />
 
           <div className="px-4 pb-3 pt-12">
             {/* Status bar */}
@@ -73,7 +73,7 @@ export function HeroDevice() {
                   <span className="h-2 w-[3px] rounded-sm bg-[#111]" />
                   <span className="h-2.5 w-[3px] rounded-sm bg-[#111]" />
                 </span>
-                <span className="ml-0.5 h-2.5 w-5 rounded-[3px] border border-[#111]/60 p-[1.5px]">
+                <span className="ms-0.5 h-2.5 w-5 rounded-[3px] border border-[#111]/60 p-[1.5px]">
                   <span className="block h-full w-3/4 rounded-[1.5px] bg-[#111]" />
                 </span>
               </span>
@@ -171,7 +171,7 @@ export function HeroDevice() {
       </div>
 
       {/* Floating card: verified case (mirrors the "Goal" card in reference) */}
-      <div className="hero-float absolute -left-24 top-[56%] hidden w-[228px] rounded-2xl bg-white p-4 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.55)] md:block">
+      <div className="hero-float absolute -start-24 top-[56%] hidden w-[228px] rounded-2xl bg-white p-4 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.55)] md:block">
         <div className="flex items-center gap-3">
           <Donut value={80} className="h-11 w-11 shrink-0" />
           <div className="min-w-0">
@@ -183,7 +183,7 @@ export function HeroDevice() {
       </div>
 
       {/* Floating card: crew dispatched (mirrors the "Premium" transaction card) */}
-      <div className="hero-float hero-float-delay absolute -bottom-14 -right-16 hidden items-center gap-2.5 rounded-2xl bg-white py-3 pl-3 pr-5 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.55)] sm:flex">
+      <div className="hero-float hero-float-delay absolute -bottom-14 -end-16 hidden items-center gap-2.5 rounded-2xl bg-white py-3 ps-3 pe-5 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.55)] sm:flex">
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EAF0FF] text-[#4A63D8]">
           <Icon name="wrench" className="h-4 w-4" />
         </span>

@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     });
 
     const hasMore = rows.length > limit;
-    const items = (hasMore ? rows.slice(0, limit) : rows).map(toCivicInfoView);
+    const items = (hasMore ? rows.slice(0, limit) : rows).map((item) => toCivicInfoView(item));
 
     return ok({
       items,

@@ -55,11 +55,11 @@ export function CaseTimeline({
             const style = EVENT_STYLE[e.type] || { icon: "info", tone: "bg-muted text-ink-soft" };
             const isFirst = i === 0;
             return (
-              <li key={e.id} className="relative pb-6 pl-11 last:pb-0">
+              <li key={e.id} className="relative pb-6 ps-11 last:pb-0">
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full ring-[3px] ring-canvas",
+                    "absolute start-0 top-0 flex h-8 w-8 items-center justify-center rounded-full ring-[3px] ring-canvas",
                     style.tone
                   )}
                 >

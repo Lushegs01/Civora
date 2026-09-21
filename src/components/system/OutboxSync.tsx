@@ -129,7 +129,7 @@ export function OutboxSync() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed inset-x-3 bottom-24 z-50 mx-auto max-w-sm animate-in md:bottom-6 md:right-6 md:left-auto md:mx-0"
+      className="fixed inset-x-3 bottom-24 z-50 mx-auto max-w-sm animate-in md:bottom-6 md:end-6 md:start-auto md:mx-0"
     >
       <div className="card flex items-start gap-3 p-4 shadow-raise">
         <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${tone}`}>

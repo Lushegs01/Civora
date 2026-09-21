@@ -1,10 +1,27 @@
-import type { CivicInfoItem } from "@prisma/client";
+import type { CivicInfoItem, ResponseState, VerificationState } from "@prisma/client";
 import { computeFreshness, type FreshnessState, type Jurisdiction, type NextAction } from "../civic-types";
 
 // Civic information leaves the server with its provenance attached: where it
 // came from, when it was last verified, how, and whether it is demo data.
 // Freshness is computed from lastVerifiedAt rather than stored, so a stale
 // record cannot keep claiming to be current.
+
+/**
+ * A case a civic item points at, resolved to what may be shown.
+ *
+ * `relatedCaseIds` is authored data, and authored data can name a case that is
+ * private, still in screening, or restricted. Exposing the raw list would have
+ * published the existence of those cases from a page that has no business
+ * knowing about them. So the ids never leave the server: they are resolved
+ * against `publicVisible`, and only cases that survive that check appear here.
+ */
+export interface RelatedCaseLink {
+  publicCaseId: string;
+  title: string;
+  verification: VerificationState;
+  response: ResponseState;
+  updatedAt: string;
+}
 
 export interface CivicInfoView {
   id: string;
@@ -26,7 +43,8 @@ export interface CivicInfoView {
   deadlines?: string;
   contactInfo?: string;
   nextActions: NextAction[];
-  relatedCaseIds: string[];
+  /** Public cases only. See RelatedCaseLink. */
+  relatedCases: RelatedCaseLink[];
   relatedCivicIds: string[];
   whatRemainsUncertain: string[];
   languageVersions: Record<
@@ -44,7 +62,11 @@ export interface CivicInfoView {
   tags: string[];
 }
 
-export function toCivicInfoView(item: CivicInfoItem): CivicInfoView {
+export function toCivicInfoView(
+  item: CivicInfoItem,
+  /** Already filtered to publicly visible cases by the caller. */
+  relatedCases: RelatedCaseLink[] = []
+): CivicInfoView {
   return {
     id: item.id,
     title: item.title,
@@ -70,7 +92,7 @@ export function toCivicInfoView(item: CivicInfoItem): CivicInfoView {
     deadlines: item.deadlines ?? undefined,
     contactInfo: item.contactInfo ?? undefined,
     nextActions: Array.isArray(item.nextActions) ? (item.nextActions as unknown as NextAction[]) : [],
-    relatedCaseIds: item.relatedCaseIds,
+    relatedCases,
     relatedCivicIds: item.relatedCivicIds,
     whatRemainsUncertain: item.whatRemainsUncertain,
     languageVersions:

@@ -105,7 +105,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
               <div className="mt-9 flex flex-wrap items-center gap-3.5">
                 <Link
                   href="/explore"
-                  className="press group inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-white py-2 pl-7 pr-2 text-[15px] font-semibold text-[#0B1F14] shadow-[0_18px_40px_-16px_rgba(255,255,255,0.45)] transition-colors hover:bg-[#EFF5F0]"
+                  className="press group inline-flex min-h-[52px] items-center gap-2.5 rounded-full bg-white py-2 ps-7 pe-2 text-[15px] font-semibold text-[#0B1F14] shadow-[0_18px_40px_-16px_rgba(255,255,255,0.45)] transition-colors hover:bg-[#EFF5F0]"
                 >
                   {t("landing.hero.btn1", locale)}
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B1F14] text-white transition-transform duration-200 group-hover:rotate-45">
@@ -122,7 +122,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
 
             </div>
 
-            <div className="relative lg:pl-6">
+            <div className="relative lg:ps-6">
               <HeroDevice />
             </div>
           </div>
@@ -143,7 +143,7 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
               <ResponseBadge state={demo.response} />
             </div>
             
-            <div className="mt-12 flex w-full max-w-2xl flex-col gap-4 text-left">
+            <div className="mt-12 flex w-full max-w-2xl flex-col gap-4 text-start">
               {demo.known.slice(0, 2).map((k: string, i: number) => (
                 <div key={i} className="flex items-start gap-4">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center text-success">
@@ -240,8 +240,8 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
 
           <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {LOOP.map((s, i) => (
-              <div key={s.label} className="relative pl-10">
-                <span className="absolute left-0 top-1 text-[12px] font-mono font-semibold text-[#2E7D4F]">
+              <div key={s.label} className="relative ps-10">
+                <span className="absolute start-0 top-1 text-[12px] font-mono font-semibold text-[#2E7D4F]">
                   0{i + 1}
                 </span>
                 <h3 className="font-display text-lg font-medium text-[#0B1F14]">{t(s.label, locale)}</h3>

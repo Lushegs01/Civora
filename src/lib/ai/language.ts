@@ -13,7 +13,8 @@ import { chat, providerName, type ProviderName } from "./provider";
 export const LANGUAGE_NAMES: Record<Locale, string> = {
   en: "English",
   sw: "Swahili",
-  fr: "French"
+  fr: "French",
+  ar: "Arabic"
 };
 
 export type LanguageResultStatus = "translated" | "unavailable" | "source_language";
@@ -33,25 +34,29 @@ export interface LanguageResult {
 const UNAVAILABLE_NOTICE: Record<Locale, string> = {
   en: "Machine translation is not enabled on this deployment, so the original text is shown unchanged.",
   sw: "Tafsiri ya mashine haijawashwa kwenye mfumo huu, kwa hivyo maandishi ya awali yanaonyeshwa bila mabadiliko.",
-  fr: "La traduction automatique n'est pas activée sur ce déploiement ; le texte original est affiché tel quel."
+  fr: "La traduction automatique n'est pas activée sur ce déploiement ; le texte original est affiché tel quel.",
+  ar: "الترجمة الآلية غير مُفعَّلة في هذه النسخة، لذا يُعرض النص الأصلي كما هو."
 };
 
 const FAILED_NOTICE: Record<Locale, string> = {
   en: "The translation service could not be reached. The original text is shown unchanged.",
   sw: "Huduma ya tafsiri haikupatikana. Maandishi ya awali yanaonyeshwa bila mabadiliko.",
-  fr: "Le service de traduction est injoignable. Le texte original est affiché tel quel."
+  fr: "Le service de traduction est injoignable. Le texte original est affiché tel quel.",
+  ar: "تعذّر الوصول إلى خدمة الترجمة. يُعرض النص الأصلي كما هو."
 };
 
 const TRANSLATED_NOTICE: Record<Locale, string> = {
   en: "Machine translation. Wording may differ from the official source.",
   sw: "Tafsiri ya mashine. Maneno yanaweza kutofautiana na chanzo rasmi.",
-  fr: "Traduction automatique. La formulation peut différer de la source officielle."
+  fr: "Traduction automatique. La formulation peut différer de la source officielle.",
+  ar: "ترجمة آلية. قد تختلف الصياغة عن المصدر الرسمي."
 };
 
 const SOURCE_NOTICE: Record<Locale, string> = {
   en: "This text is already in English.",
   sw: "Maandishi haya tayari yako kwa Kiingereza.",
-  fr: "Ce texte est déjà en anglais."
+  fr: "Ce texte est déjà en anglais.",
+  ar: "هذا النص بالعربية أصلًا."
 };
 
 export async function translateText(text: string, locale: Locale): Promise<LanguageResult> {
@@ -104,13 +109,15 @@ export interface ExplainResult {
 const EXPLAIN_UNAVAILABLE: Record<Locale, string> = {
   en: "Plain-language rewriting is not enabled on this deployment. The original explanation is shown below.",
   sw: "Uandishi kwa lugha rahisi haujawashwa kwenye mfumo huu. Maelezo ya awali yameonyeshwa hapa chini.",
-  fr: "La reformulation en langage simple n'est pas activée ici. L'explication d'origine est affichée ci-dessous."
+  fr: "La reformulation en langage simple n'est pas activée ici. L'explication d'origine est affichée ci-dessous.",
+  ar: "إعادة الصياغة بلغة مبسّطة غير مُفعَّلة في هذه النسخة. ويُعرض الشرح الأصلي أدناه."
 };
 
 const EXPLAIN_NOTICE: Record<Locale, string> = {
   en: "AI-assisted plain-language summary. The official source above remains authoritative.",
   sw: "Muhtasari wa lugha rahisi uliosaidiwa na AI. Chanzo rasmi hapo juu ndicho chenye mamlaka.",
-  fr: "Résumé en langage simple assisté par IA. La source officielle ci-dessus fait foi."
+  fr: "Résumé en langage simple assisté par IA. La source officielle ci-dessus fait foi.",
+  ar: "ملخّص بلغة مبسّطة بمساعدة الذكاء الاصطناعي. ويبقى المصدر الرسمي أعلاه هو المرجع."
 };
 
 export const explainSchema = z.string().trim().min(10).max(1200);

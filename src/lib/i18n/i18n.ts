@@ -1,13 +1,28 @@
 import en from "./en";
 import sw from "./sw";
 import fr from "./fr";
+import ar from "./ar";
 
 export type { Locale } from "../validation/schemas";
 import type { Locale } from "../validation/schemas";
 
 export type TranslationKey = keyof typeof en;
 
-const dictionaries: Record<Locale, Record<string, string>> = { en, sw, fr };
+const dictionaries: Record<Locale, Record<string, string>> = { en, sw, fr, ar };
+
+/**
+ * Writing direction for a locale.
+ *
+ * Kept here rather than in a component because layout, the `dir` attribute on
+ * <html>, and anything that needs to know which side "start" is on all have to
+ * agree. A locale absent from this map is left-to-right, which is the correct
+ * default for every language the interface offers today except Arabic.
+ */
+const RTL_LOCALES = new Set<string>(["ar"]);
+
+export function localeDirection(locale: string): "ltr" | "rtl" {
+  return RTL_LOCALES.has(locale) ? "rtl" : "ltr";
+}
 
 export function getDictionary(locale: Locale): Record<string, string> {
   return dictionaries[locale] ?? dictionaries.en;

@@ -51,13 +51,13 @@ export function CommunityExplorer({ rows }: { rows: Array<Omit<CaseCardRow, "hre
           <span className="sr-only">{t("community.search.label", locale) || "Search cases"}</span>
           <Icon
             name="search"
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
+            className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
           />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("community.search.placeholder", locale) || "Search by ID, title or area"}
-            className="field pl-10"
+            className="field ps-10"
             type="search"
           />
         </label>

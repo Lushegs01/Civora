@@ -15,7 +15,7 @@ export const CASE_CATEGORIES = [
 
 export const PRIVACY_MODES = ["anonymous", "confidential", "identified"] as const;
 
-export const LOCALES = ["en", "sw", "fr"] as const;
+export const LOCALES = ["en", "sw", "fr", "ar"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 /** Public case id, e.g. "CS-1042". */
