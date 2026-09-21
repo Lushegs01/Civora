@@ -285,6 +285,23 @@ AI is advisory and has no write surface. It can summarize, explain and
 translate. It cannot change a verification state, resolve or assign a case,
 decide who is telling the truth, or suppress contradictory evidence.
 
+Two providers are supported, Gemini and OpenAI, and neither is required —
+`AI_PROVIDER=mock` is the default and runs Civora's own deterministic analyzer
+instead. Gemini is reached through its OpenAI-compatible endpoint, so one
+client and one request format serve both and there is no second code path to
+keep honest:
+
+```bash
+AI_PROVIDER=gemini
+GEMINI_API_KEY=...        # or GOOGLE_API_KEY
+# AI_MODEL=gemini-2.5-flash   # the default; override if your key has another
+```
+
+`/api/health` reports the provider *and* the model that resolved, and names the
+missing variable when a provider is configured without a key — the failure
+otherwise looks exactly like a healthy deployment until someone clicks
+Translate and is told the feature is off.
+
 Model output is validated against a Zod schema before it renders, and cited
 evidence ids are checked against the case's actual evidence, so a model cannot
 invent a source. Invalid output falls back to Civora's deterministic analyzer,

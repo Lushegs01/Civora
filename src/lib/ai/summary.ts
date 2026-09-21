@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { PublicCaseView } from "../dto/case";
-import { chat, parseJsonObject, providerName } from "./provider";
+import { chat, parseJsonObject, providerName, type ProviderName } from "./provider";
 import { log } from "../log";
 
 // AI-assisted case summary.
@@ -21,7 +21,7 @@ export const caseSummarySchema = z.object({
 export type CaseSummaryCore = z.infer<typeof caseSummarySchema>;
 
 export interface CaseSummary extends CaseSummaryCore {
-  provider: "mock" | "openai";
+  provider: ProviderName;
   /** True when the text came from a model rather than the built-in analyzer. */
   aiGenerated: boolean;
   generatedAt: string;

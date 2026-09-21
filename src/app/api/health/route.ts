@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
-import { appMode, configurationWarnings, demoToolsEnabled } from "@/lib/config";
+import { ai, appMode, configurationWarnings, demoToolsEnabled } from "@/lib/config";
 import { storageDriver } from "@/lib/storage";
 import { providerName } from "@/lib/ai/provider";
 import { ok } from "@/lib/api/respond";
@@ -33,7 +33,11 @@ export async function GET() {
       demoTools: demoToolsEnabled,
       database,
       evidenceStorage: driver ? { driver: driver.name, durable: driver.durable } : null,
+      // The model is named as well as the provider: a key that works with a
+      // model name that does not is otherwise indistinguishable from a healthy
+      // deployment until someone clicks Translate and gets nothing.
       ai: providerName(),
+      aiModel: providerName() === "mock" ? null : ai.model,
       warnings
     },
     database ? 200 : 503
