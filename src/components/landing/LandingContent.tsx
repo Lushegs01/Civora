@@ -222,7 +222,6 @@ export function LandingContent({ demo }: { demo: PublicCaseView | null }) {
                 {t("landing.trust.transparent_desc", locale)}
               </p>
             </div>
-            </div>
           </div>
         </div>
       </section>
